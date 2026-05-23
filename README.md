@@ -1,7 +1,9 @@
 ## Front-end URL
+
 https://group-project-frontend-public-group.vercel.app/
 
 ## Group 7 API Details
+
 Group-7's Deployed API Base URL: https://tcss-460-group-7.onrender.com
 
 Group-7's API doc: https://tcss-460-group-7.onrender.com/api-docs

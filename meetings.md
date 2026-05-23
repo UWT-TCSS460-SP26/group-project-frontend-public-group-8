@@ -10,7 +10,6 @@ Meeting Manager: Caleb Ernst
 
 Meeting Scribe: Charlene Jarrell
 
-
 ## Agenda Item 1:
 
 _First user story: As a team, we want to make first contact with our upstream partner group so that we know which API our consumer app is built on._
@@ -27,13 +26,11 @@ Group-7's Partner-Facing README: https://github.com/UWT-TCSS460-SP26/tcss-460-gr
 
 Caleb messaged Group 7 to add our fronted to their CORS and Group 9 to get their deployed URL to add to our CORS.
 
-
 ## Agenda Item 2:
 
 _Second user story: As a team, we want to request our NextAuth consumer-client credentials from the instructor so that we can complete the OAuth2 flow against Auth²_
 
 Caleb completed in class yesterday.
-
 
 ## Agenda Item 3:
 
@@ -48,7 +45,6 @@ As a visitor, I want to search my partner team's API for movies and shows so tha
 As a visitor, I want to browse what's popular or trending so that I have something to look at before I search. (Charlene)
 
 As a visitor, I want to open a movie or show detail page so that I can read about something before deciding whether to (eventually) rate it. (Mansur)
-
 
 ## Agenda Item 4:
 
