@@ -26,6 +26,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           audience: "group-7-api",
         },
       },
+      client: {
+        token_endpoint_auth_method: "client_secret_post",
+      },
     },
   ],
   callbacks: {
