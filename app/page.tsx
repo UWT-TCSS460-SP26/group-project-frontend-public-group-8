@@ -11,11 +11,10 @@ export default function Home() {
       }}
     >
       <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.2 }}>
-        Discover Movies &amp; TV
+        Discover Movies &amp; Shows
       </h1>
       <p style={{ fontSize: '1.125rem', color: 'var(--text-muted)', marginBottom: '3rem', lineHeight: 1.6 }}>
-        Search, browse, and read about your favourite films and TV shows — powered by the Group 7
-        API.
+        Search, browse, and learn about the films and shows other people are watching. Find your new favorites and rate what you've watched.
       </p>
 
       <form
