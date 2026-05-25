@@ -14,7 +14,7 @@ export default function Home() {
         Discover Movies &amp; Shows
       </h1>
       <p style={{ fontSize: '1.125rem', color: 'var(--text-muted)', marginBottom: '3rem', lineHeight: 1.6 }}>
-        Search, browse, and learn about the films and shows other people are watching. Find your new favorites and rate what you've watched.
+        Search, browse, and learn about the films and shows other people are watching. Find your new favorites and rate what you&apos;ve watched.
       </p>
 
       <form
