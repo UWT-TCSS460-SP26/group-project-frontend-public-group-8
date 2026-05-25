@@ -13,7 +13,7 @@ const gridStyle: React.CSSProperties = {
 }
 
 const cardStyle: React.CSSProperties = {
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   borderRadius: '8px',
   overflow: 'hidden',
   textDecoration: 'none',
@@ -24,12 +24,12 @@ const cardStyle: React.CSSProperties = {
 const posterPlaceholderStyle: React.CSSProperties = {
   width: '100%',
   aspectRatio: '2/3',
-  background: '#e5e7eb',
+  background: 'var(--placeholder-bg)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: '0.75rem',
-  color: '#9ca3af',
+  color: 'var(--text-faint)',
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -89,9 +89,11 @@ export default async function SearchPage({ searchParams }: Props) {
             flex: 1,
             minWidth: '220px',
             padding: '0.625rem 0.875rem',
-            border: '1px solid #d1d5db',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
             fontSize: '1rem',
+            background: 'var(--card-bg)',
+            color: 'var(--text)',
           }}
         />
         <select
@@ -99,9 +101,11 @@ export default async function SearchPage({ searchParams }: Props) {
           defaultValue={type}
           style={{
             padding: '0.625rem 0.875rem',
-            border: '1px solid #d1d5db',
+            border: '1px solid var(--border)',
             borderRadius: '6px',
             fontSize: '1rem',
+            background: 'var(--card-bg)',
+            color: 'var(--text)',
           }}
         >
           <option value="all">All</option>
@@ -112,8 +116,8 @@ export default async function SearchPage({ searchParams }: Props) {
           type="submit"
           style={{
             padding: '0.625rem 1.25rem',
-            background: '#1a73e8',
-            color: '#fff',
+            background: 'var(--accent)',
+            color: 'var(--accent-text)',
             border: 'none',
             borderRadius: '6px',
             fontSize: '1rem',
@@ -126,14 +130,14 @@ export default async function SearchPage({ searchParams }: Props) {
       </form>
 
       {searched && !hasResults && !movieError && !tvError && (
-        <p style={{ color: '#6b7280' }}>No results found for &ldquo;{q}&rdquo;.</p>
+        <p style={{ color: 'var(--text-muted)' }}>No results found for &ldquo;{q}&rdquo;.</p>
       )}
 
       {movieError && (
-        <p style={{ color: '#dc2626', marginBottom: '1rem' }}>Movies error: {movieError}</p>
+        <p style={{ color: 'var(--error)', marginBottom: '1rem' }}>Movies error: {movieError}</p>
       )}
       {tvError && (
-        <p style={{ color: '#dc2626', marginBottom: '1rem' }}>TV error: {tvError}</p>
+        <p style={{ color: 'var(--error)', marginBottom: '1rem' }}>TV error: {tvError}</p>
       )}
 
       {movieResults.length > 0 && (
@@ -164,7 +168,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   >
                     {m.title}
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.2rem 0 0' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                     {m.releaseDate?.slice(0, 4)} &nbsp;★ {m.voteAverage.toFixed(1)}
                   </p>
                 </div>
@@ -202,7 +206,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   >
                     {s.name}
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.2rem 0 0' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                     {s.firstAirDate?.slice(0, 4)} &nbsp;★ {s.voteAverage.toFixed(1)}
                   </p>
                 </div>

@@ -13,7 +13,7 @@ export default function Home() {
       <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.2 }}>
         Discover Movies &amp; TV
       </h1>
-      <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '3rem', lineHeight: 1.6 }}>
+      <p style={{ fontSize: '1.125rem', color: 'var(--text-muted)', marginBottom: '3rem', lineHeight: 1.6 }}>
         Search, browse, and read about your favourite films and TV shows — powered by the Group 7
         API.
       </p>
@@ -34,17 +34,19 @@ export default function Home() {
           style={{
             flex: 1,
             padding: '0.75rem 1rem',
-            border: '1px solid #d1d5db',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             fontSize: '1rem',
+            background: 'var(--card-bg)',
+            color: 'var(--text)',
           }}
         />
         <button
           type="submit"
           style={{
             padding: '0.75rem 1.5rem',
-            background: '#1a73e8',
-            color: '#fff',
+            background: 'var(--accent)',
+            color: 'var(--accent-text)',
             border: 'none',
             borderRadius: '8px',
             fontSize: '1rem',
@@ -61,8 +63,8 @@ export default function Home() {
         style={{
           display: 'inline-block',
           padding: '0.75rem 2rem',
-          background: '#f3f4f6',
-          color: '#374151',
+          background: 'var(--bg-muted)',
+          color: 'var(--text-secondary)',
           borderRadius: '8px',
           textDecoration: 'none',
           fontWeight: 600,

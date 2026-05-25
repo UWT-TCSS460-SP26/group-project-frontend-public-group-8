@@ -19,7 +19,7 @@ export default async function MediaDetailPage({ params }: Props) {
     if (msg.startsWith('404')) notFound()
     return (
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-        <p style={{ color: '#dc2626' }}>Could not load details: {msg}</p>
+        <p style={{ color: 'var(--error)' }}>Could not load details: {msg}</p>
       </main>
     )
   }
@@ -50,12 +50,12 @@ export default async function MediaDetailPage({ params }: Props) {
             style={{
               width: '220px',
               aspectRatio: '2/3',
-              background: '#e5e7eb',
+              background: 'var(--placeholder-bg)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#9ca3af',
+              color: 'var(--text-faint)',
               flexShrink: 0,
             }}
           >
@@ -64,12 +64,12 @@ export default async function MediaDetailPage({ params }: Props) {
         )}
 
         <div style={{ flex: 1, minWidth: '260px' }}>
-          <p style={{ margin: '0 0 0.25rem', fontSize: '0.8rem', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <p style={{ margin: '0 0 0.25rem', fontSize: '0.8rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {mediaLabel}
           </p>
           <h1 style={{ margin: '0 0 0.5rem', lineHeight: 1.2 }}>{m.title}</h1>
 
-          <p style={{ margin: '0 0 0.75rem', color: '#6b7280', fontSize: '0.95rem' }}>
+          <p style={{ margin: '0 0 0.75rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
             {m.year}
             {m.genre ? ` · ${m.genre}` : ''}
             {type === 'tv' && m.seasons != null && ` · ${m.seasons} season${m.seasons !== 1 ? 's' : ''}`}
@@ -81,27 +81,27 @@ export default async function MediaDetailPage({ params }: Props) {
               <strong style={{ fontSize: '1.1rem' }}>
                 ★ {community.averageRating != null ? community.averageRating.toFixed(1) : '—'}
               </strong>
-              <span style={{ color: '#6b7280', marginLeft: '0.5rem', fontSize: '0.875rem' }}>
+              <span style={{ color: 'var(--text-muted)', marginLeft: '0.5rem', fontSize: '0.875rem' }}>
                 community average &middot; {community.ratingCount} rating{community.ratingCount !== 1 ? 's' : ''}
               </span>
             </p>
           ) : (
-            <p style={{ margin: '0 0 1rem', color: '#9ca3af', fontSize: '0.875rem' }}>
+            <p style={{ margin: '0 0 1rem', color: 'var(--text-faint)', fontSize: '0.875rem' }}>
               No community ratings yet.
             </p>
           )}
 
-          <p style={{ margin: 0, lineHeight: 1.7, color: '#374151' }}>{m.summary}</p>
+          <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{m.summary}</p>
 
           <p
             style={{
               marginTop: '1.5rem',
               padding: '0.75rem 1rem',
-              background: '#f9fafb',
-              border: '1px solid #e5e7eb',
+              background: 'var(--bg-subtle)',
+              border: '1px solid var(--border)',
               borderRadius: '6px',
               fontSize: '0.875rem',
-              color: '#6b7280',
+              color: 'var(--text-muted)',
             }}
           >
             Sign in to rate — rating &amp; reviews arrive in Sprint 7.
@@ -116,14 +116,14 @@ export default async function MediaDetailPage({ params }: Props) {
         </h2>
 
         {recentReviews.length === 0 ? (
-          <p style={{ color: '#9ca3af' }}>No reviews yet.</p>
+          <p style={{ color: 'var(--text-faint)' }}>No reviews yet.</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {recentReviews.map((r) => (
               <div
                 key={r.id}
                 style={{
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid var(--border)',
                   borderRadius: '8px',
                   padding: '1rem 1.25rem',
                 }}
@@ -134,11 +134,11 @@ export default async function MediaDetailPage({ params }: Props) {
                   </p>
                 )}
                 {r.content && (
-                  <p style={{ margin: '0 0 0.75rem', lineHeight: 1.6, color: '#374151' }}>
+                  <p style={{ margin: '0 0 0.75rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
                     {r.content}
                   </p>
                 )}
-                <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: 0 }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', margin: 0 }}>
                   {r.author ? (r.author.display_name ?? r.author.username) : 'Anonymous'}
                   {' · '}
                   {new Date(r.createdAt).toLocaleDateString()}

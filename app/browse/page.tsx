@@ -3,7 +3,7 @@ import { apiFetch } from '@/lib/api'
 import type { PopularMoviesResponse, PopularTVResponse } from '@/lib/api'
 
 const cardStyle: React.CSSProperties = {
-  border: '1px solid #e5e7eb',
+  border: '1px solid var(--border)',
   borderRadius: '8px',
   overflow: 'hidden',
   textDecoration: 'none',
@@ -14,12 +14,12 @@ const cardStyle: React.CSSProperties = {
 const posterPlaceholderStyle: React.CSSProperties = {
   width: '100%',
   aspectRatio: '2/3',
-  background: '#e5e7eb',
+  background: 'var(--placeholder-bg)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: '0.75rem',
-  color: '#9ca3af',
+  color: 'var(--text-faint)',
 }
 
 const cardBodyStyle: React.CSSProperties = {
@@ -50,9 +50,9 @@ export default async function BrowsePage() {
       <section style={{ marginBottom: '3rem' }}>
         <h2 style={{ marginBottom: '1rem' }}>Popular Movies</h2>
         {moviesError ? (
-          <p style={{ color: '#dc2626' }}>Could not load movies: {moviesError}</p>
+          <p style={{ color: 'var(--error)' }}>Could not load movies: {moviesError}</p>
         ) : movies.length === 0 ? (
-          <p style={{ color: '#9ca3af' }}>No movies returned.</p>
+          <p style={{ color: 'var(--text-faint)' }}>No movies returned.</p>
         ) : (
           <div style={gridStyle}>
             {movies.map((m) => (
@@ -79,7 +79,7 @@ export default async function BrowsePage() {
                   >
                     {m.title}
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.2rem 0 0' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                     {m.releaseDate?.slice(0, 4)} &nbsp;★ {m.voteAverage.toFixed(1)}
                   </p>
                 </div>
@@ -92,9 +92,9 @@ export default async function BrowsePage() {
       <section>
         <h2 style={{ marginBottom: '1rem' }}>Popular TV Shows</h2>
         {tvError ? (
-          <p style={{ color: '#dc2626' }}>Could not load TV shows: {tvError}</p>
+          <p style={{ color: 'var(--error)' }}>Could not load TV shows: {tvError}</p>
         ) : shows.length === 0 ? (
-          <p style={{ color: '#9ca3af' }}>No TV shows returned.</p>
+          <p style={{ color: 'var(--text-faint)' }}>No TV shows returned.</p>
         ) : (
           <div style={gridStyle}>
             {shows.map((s) => (
@@ -121,7 +121,7 @@ export default async function BrowsePage() {
                   >
                     {s.name}
                   </p>
-                  <p style={{ fontSize: '0.75rem', color: '#6b7280', margin: '0.2rem 0 0' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                     {s.firstAirDate?.slice(0, 4)} &nbsp;★ {s.voteAverage.toFixed(1)}
                   </p>
                 </div>
