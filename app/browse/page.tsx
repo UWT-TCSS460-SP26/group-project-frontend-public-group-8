@@ -80,7 +80,7 @@ export default async function BrowsePage() {
                     {m.title}
                   </p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
-                    {m.releaseDate?.slice(0, 4)} &nbsp;★ {m.voteAverage.toFixed(1)}
+                    {m.releaseDate?.slice(0, 4)}
                   </p>
                 </div>
               </Link>
@@ -122,7 +122,7 @@ export default async function BrowsePage() {
                     {s.name}
                   </p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
-                    {s.firstAirDate?.slice(0, 4)} &nbsp;★ {s.voteAverage.toFixed(1)}
+                    {s.firstAirDate?.slice(0, 4)}
                   </p>
                 </div>
               </Link>
