@@ -39,7 +39,7 @@ export default async function Header() {
               href="/profile"
               style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}
             >
-              {session.user.email}
+              Hi, {session.user.name?.split(' ')[0] ?? session.user.email}
             </Link>
             <SignOutButton />
           </>
