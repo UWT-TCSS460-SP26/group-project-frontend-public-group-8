@@ -44,45 +44,65 @@ export default function RatingSection({
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
 
-  const userId = (session?.user as { id?: number } | undefined)?.id
+  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'
 
-  // Fetch this user's existing rating and review once signed in
+  // Fetch this user's existing rating and review using token-keyed routes
   const fetchMyContent = useCallback(async () => {
-    if (!token || !userId) return
+    if (!token) return
 
-    // Fetch user's rating
+    // Use /v1/users/me/ratings to find the rating for this title
     try {
-      const { data } = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'}/v1/ratings/user/${userId}/title/${titleId}`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      ).then((r) => {
-        if (r.status === 404) return { data: null }
-        return r.json()
-      })
-      if (data) setCurrentRating(data.rating)
+      let page = 1
+      let found = false
+      while (!found) {
+        const res = await fetch(`${BASE}/v1/users/me/ratings?page=${page}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) break
+        const body = await res.json()
+        const match = body.data?.find((r: { title_id: number; rating: number }) => r.title_id === titleId)
+        if (match) {
+          setCurrentRating(match.rating)
+          found = true
+        }
+        if (page >= (body.pagination?.totalPages ?? 1)) break
+        page++
+      }
     } catch {
       // no existing rating is fine
     }
 
-    // Fetch user's review from the title's review list
+    // Find the user's review by fetching /v1/users/me/reviews
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'}/v1/reviews/title/${titleId}?limit=100`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
-      if (res.ok) {
+      let page = 1
+      let found = false
+      while (!found) {
+        const res = await fetch(`${BASE}/v1/users/me/reviews?page=${page}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) break
         const body = await res.json()
-        const mine = (body.data as Review[]).find((r) => r.authorId === userId)
-        if (mine) setMyReview(mine)
+        const match = body.data?.find((r: Review) => r.title_id === titleId)
+        if (match) {
+          setMyReview(match)
+          found = true
+        }
+        if (page >= (body.pagination?.totalPages ?? 1)) break
+        page++
       }
     } catch {
       // ignore
     }
-  }, [token, userId, titleId])
+  }, [token, titleId, BASE])
 
   useEffect(() => {
+    if (!token) {
+      setCurrentRating(null)
+      setMyReview(null)
+      return
+    }
     fetchMyContent()
-  }, [fetchMyContent])
+  }, [token, fetchMyContent])
 
   // ── Rating handlers ────────────────────────────────────────────────────────
 
