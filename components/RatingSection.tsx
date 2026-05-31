@@ -91,7 +91,7 @@ export default function RatingSection({
     setRatingError(null)
     setRatingSubmitting(true)
     try {
-      const { data } = await submitRating(titleId, star, token)
+      const { data } = await submitRating(titleId, star, mediaType, token)
       setCurrentRating(data.rating)
     } catch (e) {
       setRatingError(e instanceof Error ? e.message : 'Could not save rating.')

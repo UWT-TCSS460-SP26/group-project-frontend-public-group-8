@@ -44,7 +44,8 @@ export default function ProfilePage() {
   async function handleRatingChange(titleId: number, star: number) {
     if (!token) return
     try {
-      await submitRating(titleId, star, token)
+      const item = ratings.find((r) => r.title_id === titleId)
+      await submitRating(titleId, star, item?.media_type ?? 'movie', token)
       setRatings((prev) => prev.map((r) => (r.title_id === titleId ? { ...r, rating: star } : r)))
     } catch {
       // silent – user sees no change
