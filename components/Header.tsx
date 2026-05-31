@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
+import NavSearch from '@/components/NavSearch'
 
 export default async function Header() {
   const session = await auth()
@@ -19,24 +20,20 @@ export default async function Header() {
         background: 'var(--bg)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', flex: 1 }}>
         <Link
           href="/"
-          style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit' }}
+          style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
         >
           CineTrack
         </Link>
-        <nav style={{ display: 'flex', gap: '1.25rem' }}>
-          <Link href="/browse" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Browse
-          </Link>
-          <Link href="/search" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Search
-          </Link>
-        </nav>
+        <Link href="/browse" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem', flexShrink: 0 }}>
+          Browse
+        </Link>
+        <NavSearch />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
         <ThemeToggle />
 
         {session?.user ? (

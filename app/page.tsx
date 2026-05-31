@@ -17,46 +17,6 @@ export default function Home() {
         Search, browse, and learn about the films and shows other people are watching. Find your new favorites and rate what you&apos;ve watched.
       </p>
 
-      <form
-        method="get"
-        action="/search"
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          maxWidth: '500px',
-          margin: '0 auto 2.5rem',
-        }}
-      >
-        <input
-          name="q"
-          placeholder="Search movies or shows…"
-          style={{
-            flex: 1,
-            padding: '0.75rem 1rem',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            background: 'var(--card-bg)',
-            color: 'var(--text)',
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: '0.75rem 1.5rem',
-            background: 'var(--accent)',
-            color: 'var(--accent-text)',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '1rem',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
-        >
-          Search
-        </button>
-      </form>
-
       <Link
         href="/browse"
         style={{
