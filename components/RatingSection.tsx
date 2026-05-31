@@ -50,6 +50,7 @@ export default function RatingSection({
   const [reviews, setReviews] = useState<ReviewPreview[]>(initialReviews)
   const [totalReviews, setTotalReviews] = useState(reviewCount)
   const [myReview, setMyReview] = useState<OwnedReview | null>(null)
+  const [loadingMyContent, setLoadingMyContent] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [editingReview, setEditingReview] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
@@ -110,11 +111,13 @@ export default function RatingSection({
     if (!token) {
       setCurrentRating(null)
       setMyReview(null)
+      setLoadingMyContent(false)
       setShowReviewForm(false)
       setEditingReview(false)
       return
     }
-    fetchMyContent(token)
+    setLoadingMyContent(true)
+    fetchMyContent(token).finally(() => setLoadingMyContent(false))
   }, [token, fetchMyContent])
 
   // ── Rating handlers ────────────────────────────────────────────────────────
@@ -314,7 +317,7 @@ export default function RatingSection({
           Community Reviews{totalReviews > 0 ? ` (${totalReviews})` : ''}
         </h2>
 
-        {token && !myReview && !showReviewForm && (
+        {token && !myReview && !showReviewForm && !loadingMyContent && (
           <button
             type="button"
             onClick={() => setShowReviewForm(true)}
@@ -334,7 +337,7 @@ export default function RatingSection({
           </button>
         )}
 
-        {token && !myReview && showReviewForm && (
+        {token && !myReview && showReviewForm && !loadingMyContent && (
           <div
             style={{
               border: '1px solid var(--border)',
