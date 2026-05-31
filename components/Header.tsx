@@ -40,7 +40,12 @@ export default async function Header() {
 
         {session?.user ? (
           <>
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{session.user.email}</span>
+            <Link
+              href="/profile"
+              style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}
+            >
+              {session.user.email}
+            </Link>
             <form
               action={async (_: FormData) => {
                 'use server'

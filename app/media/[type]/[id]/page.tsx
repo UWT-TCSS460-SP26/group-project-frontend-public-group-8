@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import type { EnrichedMediaResponse } from '@/lib/api'
+import RatingSection from '@/components/RatingSection'
 
 interface Props {
   params: Promise<{ type: string; id: string }>
@@ -92,64 +93,16 @@ export default async function MediaDetailPage({ params }: Props) {
           )}
 
           <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{m.summary}</p>
-
-          <p
-            style={{
-              marginTop: '1.5rem',
-              padding: '0.75rem 1rem',
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              color: 'var(--text-muted)',
-            }}
-          >
-            Sign in to rate — rating &amp; reviews arrive in Sprint 7.
-          </p>
         </div>
       </div>
 
-      {/* Reviews */}
-      <section>
-        <h2 style={{ marginBottom: '1rem' }}>
-          Community Reviews{community.reviewCount > 0 ? ` (${community.reviewCount})` : ''}
-        </h2>
-
-        {recentReviews.length === 0 ? (
-          <p style={{ color: 'var(--text-faint)' }}>No reviews yet.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {recentReviews.map((r) => (
-              <div
-                key={r.id}
-                style={{
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  padding: '1rem 1.25rem',
-                }}
-              >
-                {r.header && (
-                  <p style={{ fontWeight: 700, margin: '0 0 0.5rem', fontSize: '1rem' }}>
-                    {r.header}
-                  </p>
-                )}
-                {r.content && (
-                  <p style={{ margin: '0 0 0.75rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-                    {r.content}
-                  </p>
-                )}
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', margin: 0 }}>
-                  {r.author ? (r.author.display_name ?? r.author.username) : 'Anonymous'}
-                  {' · '}
-                  {new Date(r.createdAt).toLocaleDateString()}
-                  {' · '}
-                  ↑{r.upvotes} ↓{r.downvotes}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Interactive rating + reviews (client component, handles auth state) */}
+      <RatingSection
+        titleId={m.id}
+        mediaType={type as 'movie' | 'tv'}
+        initialReviews={recentReviews}
+        reviewCount={community.reviewCount}
+      />
     </main>
   )
 }

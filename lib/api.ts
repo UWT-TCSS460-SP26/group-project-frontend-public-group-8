@@ -19,6 +19,33 @@ export async function apiFetch<T>(path: string, token?: string): Promise<T> {
   return res.json() as Promise<T>
 }
 
+export async function apiMutate<T>(
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  path: string,
+  token: string,
+  body?: unknown,
+): Promise<T> {
+  const headers: HeadersInit = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  }
+
+  const res = await fetch(`${BASE}${path}`, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`${res.status}: ${text.slice(0, 200)}`)
+  }
+
+  return res.json() as Promise<T>
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 export interface MovieSummary {
   id: number
   title: string
@@ -140,4 +167,141 @@ export interface EnrichedMediaResponse {
   metadata: EnrichedMediaMetadata
   community: CommunityAggregate
   recentReviews: ReviewPreview[]
+}
+
+// ─── Ratings ─────────────────────────────────────────────────────────────────
+
+export interface RatingAuthor {
+  id: number
+  display_name: string | null
+}
+
+export interface Rating {
+  id: number
+  authorId: number
+  rating: number
+  title_id: number
+  author: RatingAuthor
+}
+
+export interface RatingResponse {
+  data: Rating
+}
+
+export interface MyRatingItem {
+  id: number
+  title_id: number
+  media_type: 'movie' | 'tv' | null
+  rating: number
+  metadata: EnrichedMediaMetadata | null
+}
+
+export interface MyRatingsResponse {
+  data: MyRatingItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
+}
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+
+export interface Review {
+  id: number
+  authorId: number | null
+  title_id: number
+  content: string
+  header: string | null
+  upvotes: number
+  downvotes: number
+  createdAt: string
+  author: ReviewAuthor | null
+}
+
+export interface MyReviewItem {
+  id: number
+  title_id: number
+  media_type: 'movie' | 'tv' | null
+  content: string | null
+  header: string | null
+  upvotes: number
+  downvotes: number
+  createdAt: string
+  metadata: EnrichedMediaMetadata | null
+}
+
+export interface MyReviewsResponse {
+  data: MyReviewItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
+}
+
+// ─── API helpers ─────────────────────────────────────────────────────────────
+
+export function submitRating(titleId: number, rating: number, token: string) {
+  return apiMutate<RatingResponse>('POST', `/v1/ratings/${titleId}`, token, { rating })
+}
+
+export function updateRating(titleId: number, rating: number, token: string) {
+  return apiMutate<RatingResponse>('PATCH', `/v1/ratings/${titleId}`, token, { rating })
+}
+
+export function deleteRating(titleId: number, token: string) {
+  return apiMutate<RatingResponse>('DELETE', `/v1/ratings/${titleId}`, token)
+}
+
+export function getUserRatingForTitle(authorId: number, titleId: number, token: string) {
+  return apiFetch<RatingResponse>(
+    `/v1/ratings/user/${authorId}/title/${titleId}`,
+    token,
+  )
+}
+
+export function createReview(
+  titleId: number,
+  mediaType: 'movie' | 'tv',
+  content: string,
+  header: string,
+  token: string,
+) {
+  return apiMutate<Review>('POST', `/v1/reviews`, token, {
+    title_id: titleId,
+    media_type: mediaType,
+    content,
+    header: header || undefined,
+  })
+}
+
+export function updateReview(reviewId: number, content: string, header: string, token: string) {
+  return apiMutate<Review>('PUT', `/v1/reviews/${reviewId}`, token, {
+    content,
+    header: header || undefined,
+  })
+}
+
+export function deleteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('DELETE', `/v1/reviews/${reviewId}`, token)
+}
+
+export function getMyRatings(token: string, page = 1) {
+  return apiFetch<MyRatingsResponse>(`/v1/users/me/ratings?page=${page}`, token)
+}
+
+export function getMyReviews(token: string, page = 1) {
+  return apiFetch<MyReviewsResponse>(`/v1/users/me/reviews?page=${page}`, token)
+}
+
+export function syncUser(
+  username: string,
+  email: string,
+  token: string,
+  display_name?: string,
+) {
+  return apiMutate('POST', '/v1/users', token, { username, email, display_name })
 }
