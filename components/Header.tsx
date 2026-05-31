@@ -27,9 +27,6 @@ export default async function Header() {
         >
           CineTrack
         </Link>
-        <Link href="/browse" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem', flexShrink: 0 }}>
-          Browse
-        </Link>
         <NavSearch />
       </div>
 

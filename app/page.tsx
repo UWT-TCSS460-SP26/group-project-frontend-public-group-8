@@ -1,37 +1,115 @@
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api'
+import type { PopularMoviesResponse, PopularTVResponse } from '@/lib/api'
 
-export default function Home() {
+const cardStyle: React.CSSProperties = {
+  border: '1px solid var(--border)',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  textDecoration: 'none',
+  color: 'inherit',
+  display: 'block',
+}
+
+const posterPlaceholderStyle: React.CSSProperties = {
+  width: '100%',
+  aspectRatio: '2/3',
+  background: 'var(--placeholder-bg)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '0.75rem',
+  color: 'var(--text-faint)',
+}
+
+const cardBodyStyle: React.CSSProperties = {
+  padding: '0.5rem 0.6rem 0.6rem',
+}
+
+const gridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+  gap: '1rem',
+}
+
+export default async function Home() {
+  const [moviesResult, tvResult] = await Promise.allSettled([
+    apiFetch<PopularMoviesResponse>('/v1/movies/popular'),
+    apiFetch<PopularTVResponse>('/v1/tv/popular'),
+  ])
+
+  const movies = moviesResult.status === 'fulfilled' ? moviesResult.value.results : []
+  const shows = tvResult.status === 'fulfilled' ? tvResult.value.results : []
+  const moviesError = moviesResult.status === 'rejected' ? String(moviesResult.reason) : null
+  const tvError = tvResult.status === 'rejected' ? String(tvResult.reason) : null
+
   return (
-    <main
-      style={{
-        maxWidth: '800px',
-        margin: '0 auto',
-        padding: '5rem 1.5rem',
-        textAlign: 'center',
-      }}
-    >
-      <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.2 }}>
-        Discover Movies &amp; Shows
-      </h1>
-      <p style={{ fontSize: '1.125rem', color: 'var(--text-muted)', marginBottom: '3rem', lineHeight: 1.6 }}>
-        Search, browse, and learn about the films and shows other people are watching. Find your new favorites and rate what you&apos;ve watched.
-      </p>
+    <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <section style={{ marginBottom: '3rem' }}>
+        <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>Popular Movies</h2>
+        {moviesError ? (
+          <p style={{ color: 'var(--error)' }}>Could not load movies: {moviesError}</p>
+        ) : movies.length === 0 ? (
+          <p style={{ color: 'var(--text-faint)' }}>No movies returned.</p>
+        ) : (
+          <div style={gridStyle}>
+            {movies.map((m) => (
+              <Link key={m.id} href={`/media/movie/${m.id}`} style={cardStyle}>
+                {m.posterUrl ? (
+                  <img
+                    src={m.posterUrl}
+                    alt={m.title}
+                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div style={posterPlaceholderStyle}>No poster</div>
+                )}
+                <div style={cardBodyStyle}>
+                  <p style={{ fontWeight: 600, fontSize: '0.85rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {m.title}
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                    {m.releaseDate?.slice(0, 4)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
-      <Link
-        href="/browse"
-        style={{
-          display: 'inline-block',
-          padding: '0.75rem 2rem',
-          background: 'var(--bg-muted)',
-          color: 'var(--text-secondary)',
-          borderRadius: '8px',
-          textDecoration: 'none',
-          fontWeight: 600,
-          fontSize: '0.95rem',
-        }}
-      >
-        Browse Popular →
-      </Link>
+      <section>
+        <h2 style={{ marginBottom: '1rem' }}>Popular TV Shows</h2>
+        {tvError ? (
+          <p style={{ color: 'var(--error)' }}>Could not load TV shows: {tvError}</p>
+        ) : shows.length === 0 ? (
+          <p style={{ color: 'var(--text-faint)' }}>No TV shows returned.</p>
+        ) : (
+          <div style={gridStyle}>
+            {shows.map((s) => (
+              <Link key={s.id} href={`/media/tv/${s.id}`} style={cardStyle}>
+                {s.posterUrl ? (
+                  <img
+                    src={s.posterUrl}
+                    alt={s.name}
+                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div style={posterPlaceholderStyle}>No poster</div>
+                )}
+                <div style={cardBodyStyle}>
+                  <p style={{ fontWeight: 600, fontSize: '0.85rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {s.name}
+                  </p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                    {s.firstAirDate?.slice(0, 4)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   )
 }
