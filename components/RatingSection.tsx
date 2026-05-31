@@ -10,9 +10,18 @@ import {
   createReview,
   updateReview,
   deleteReview,
-  type Review,
   type ReviewPreview,
 } from '@/lib/api'
+
+interface OwnedReview {
+  id: number
+  title_id: number
+  header: string | null
+  content: string | null
+  upvotes: number
+  downvotes: number
+  createdAt: string
+}
 
 interface RatingSectionProps {
   titleId: number
@@ -20,6 +29,8 @@ interface RatingSectionProps {
   initialReviews: ReviewPreview[]
   reviewCount: number
 }
+
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'
 
 export default function RatingSection({
   titleId,
@@ -38,70 +49,72 @@ export default function RatingSection({
   // ── Review state ──────────────────────────────────────────────────────────
   const [reviews, setReviews] = useState<ReviewPreview[]>(initialReviews)
   const [totalReviews, setTotalReviews] = useState(reviewCount)
-  const [myReview, setMyReview] = useState<Review | null>(null)
+  const [myReview, setMyReview] = useState<OwnedReview | null>(null)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [editingReview, setEditingReview] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
 
-  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'
-
-  // Fetch this user's existing rating and review using token-keyed routes
-  const fetchMyContent = useCallback(async () => {
-    if (!token) return
-
-    // Use /v1/users/me/ratings to find the rating for this title
+  // ── Fetch existing rating + review whenever the token changes ─────────────
+  const fetchMyContent = useCallback(async (tok: string) => {
+    // Rating: page through /v1/users/me/ratings until we find this title
     try {
       let page = 1
-      let found = false
-      while (!found) {
+      outer: while (true) {
         const res = await fetch(`${BASE}/v1/users/me/ratings?page=${page}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${tok}` },
         })
         if (!res.ok) break
         const body = await res.json()
-        const match = body.data?.find((r: { title_id: number; rating: number }) => r.title_id === titleId)
-        if (match) {
-          setCurrentRating(match.rating)
-          found = true
+        for (const r of body.data ?? []) {
+          if (Number(r.title_id) === titleId) {
+            setCurrentRating(Number(r.rating))
+            break outer
+          }
         }
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch {
-      // no existing rating is fine
-    }
+    } catch { /* no rating is fine */ }
 
-    // Find the user's review by fetching /v1/users/me/reviews
+    // Review: page through /v1/users/me/reviews until we find this title
     try {
       let page = 1
-      let found = false
-      while (!found) {
+      outer: while (true) {
         const res = await fetch(`${BASE}/v1/users/me/reviews?page=${page}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${tok}` },
         })
         if (!res.ok) break
         const body = await res.json()
-        const match = body.data?.find((r: Review) => r.title_id === titleId)
-        if (match) {
-          setMyReview(match)
-          found = true
+        for (const r of body.data ?? []) {
+          if (Number(r.title_id) === titleId) {
+            setMyReview({
+              id: r.id,
+              title_id: Number(r.title_id),
+              header: r.header ?? null,
+              content: r.content ?? null,
+              upvotes: r.upvotes ?? 0,
+              downvotes: r.downvotes ?? 0,
+              createdAt: r.createdAt,
+            })
+            break outer
+          }
         }
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch {
-      // ignore
-    }
-  }, [token, titleId, BASE])
+    } catch { /* no review is fine */ }
+  }, [titleId])
 
   useEffect(() => {
     if (!token) {
       setCurrentRating(null)
       setMyReview(null)
+      setShowReviewForm(false)
+      setEditingReview(false)
       return
     }
-    fetchMyContent()
+    fetchMyContent(token)
   }, [token, fetchMyContent])
 
   // ── Rating handlers ────────────────────────────────────────────────────────
@@ -142,7 +155,16 @@ export default function RatingSection({
     setReviewSubmitting(true)
     try {
       const created = await createReview(titleId, mediaType, content, header, token)
-      setMyReview(created)
+      const owned: OwnedReview = {
+        id: created.id,
+        title_id: created.title_id,
+        header: created.header,
+        content: created.content,
+        upvotes: created.upvotes,
+        downvotes: created.downvotes,
+        createdAt: created.createdAt,
+      }
+      setMyReview(owned)
       setReviews((prev) => [
         {
           id: created.id,
@@ -161,7 +183,10 @@ export default function RatingSection({
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Could not post review.'
       if (msg.includes('409')) {
-        setReviewError('You have already reviewed this title. Refresh to see your review.')
+        // Already reviewed — fetch and surface the existing review
+        setShowReviewForm(false)
+        setReviewError(null)
+        if (token) await fetchMyContent(token)
       } else if (msg.includes('401')) {
         setReviewError('Your session expired. Please sign in again.')
       } else {
@@ -178,7 +203,16 @@ export default function RatingSection({
     setReviewSubmitting(true)
     try {
       const updated = await updateReview(myReview.id, content, header, token)
-      setMyReview(updated)
+      const owned: OwnedReview = {
+        id: updated.id,
+        title_id: updated.title_id,
+        header: updated.header,
+        content: updated.content,
+        upvotes: updated.upvotes,
+        downvotes: updated.downvotes,
+        createdAt: updated.createdAt,
+      }
+      setMyReview(owned)
       setReviews((prev) =>
         prev.map((r) =>
           r.id === updated.id
@@ -204,9 +238,7 @@ export default function RatingSection({
       setReviews((prev) => prev.filter((r) => r.id !== myReview.id))
       setTotalReviews((n) => Math.max(0, n - 1))
       setMyReview(null)
-    } catch {
-      // ignore
-    } finally {
+    } catch { /* silent */ } finally {
       setReviewSubmitting(false)
     }
   }
@@ -282,7 +314,6 @@ export default function RatingSection({
           Community Reviews{totalReviews > 0 ? ` (${totalReviews})` : ''}
         </h2>
 
-        {/* Write / edit review */}
         {token && !myReview && !showReviewForm && (
           <button
             type="button"
