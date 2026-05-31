@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { auth, signIn, signOut } from '@/auth'
+import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import SignOutButton from '@/components/SignOutButton'
 
 export default async function Header() {
   const session = await auth()
@@ -46,27 +47,7 @@ export default async function Header() {
             >
               {session.user.email}
             </Link>
-            <form
-              action={async (_: FormData) => {
-                'use server'
-                await signOut({ redirectTo: '/' })
-              }}
-            >
-              <button
-                type="submit"
-                style={{
-                  cursor: 'pointer',
-                  padding: '0.375rem 0.75rem',
-                  border: '1px solid var(--border)',
-                  borderRadius: '6px',
-                  background: 'transparent',
-                  fontSize: '0.875rem',
-                  color: 'var(--text)',
-                }}
-              >
-                Sign Out
-              </button>
-            </form>
+            <SignOutButton />
           </>
         ) : (
           <form
