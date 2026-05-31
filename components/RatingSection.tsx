@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { useEffect, useState, useCallback } from 'react'
 import StarRating from './StarRating'
 import ReviewForm from './ReviewForm'
@@ -204,8 +204,9 @@ export default function RatingSection({
         <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Your Rating</h3>
 
         {!token ? (
-          <a
-            href="/api/auth/signin"
+          <button
+            type="button"
+            onClick={() => signIn('tcss460', { callbackUrl: window.location.href })}
             style={{
               display: 'inline-block',
               padding: '0.5rem 1rem',
@@ -213,12 +214,13 @@ export default function RatingSection({
               borderRadius: '6px',
               fontSize: '0.875rem',
               color: 'var(--text-muted)',
-              textDecoration: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
             }}
             aria-label="Sign in to rate this title"
           >
             Sign in to rate
-          </a>
+          </button>
         ) : (
           <div>
             <StarRating
@@ -302,13 +304,14 @@ export default function RatingSection({
 
         {!token && (
           <p style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            <a
-              href="/api/auth/signin"
-              style={{ color: 'var(--accent)', textDecoration: 'underline' }}
+            <button
+              type="button"
+              onClick={() => signIn('tcss460', { callbackUrl: window.location.href })}
+              style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}
               aria-label="Sign in to write a review"
             >
               Sign in
-            </a>{' '}
+            </button>{' '}
             to write a review.
           </p>
         )}
