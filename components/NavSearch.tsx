@@ -25,56 +25,53 @@ function NavSearchInner() {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flex: 1, minWidth: '220px', maxWidth: '560px' }}
+      style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flex: 1, minWidth: '200px', maxWidth: '700px' }}
     >
-      <div style={{ display: 'flex', flex: 1, border: '2px solid var(--accent)', borderRadius: '8px', overflow: 'hidden', background: 'var(--bg)' }}>
-        <input
-          type="search"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search movies & shows…"
-          aria-label="Search movies and TV shows"
-          style={{
-            flex: 1,
-            padding: '0.5rem 0.75rem',
-            border: 'none',
-            outline: 'none',
-            fontSize: '0.95rem',
-            background: 'transparent',
-            color: 'var(--text)',
-            minWidth: 0,
-          }}
-        />
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          aria-label="Media type filter"
-          style={{
-            padding: '0.5rem 0.5rem',
-            border: 'none',
-            borderLeft: '1px solid var(--border)',
-            outline: 'none',
-            fontSize: '0.875rem',
-            background: 'var(--bg-subtle)',
-            color: 'var(--text)',
-            cursor: 'pointer',
-          }}
-        >
-          <option value="all">All</option>
-          <option value="movie">Movies</option>
-          <option value="tv">TV</option>
-        </select>
-      </div>
+      <input
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search movies &amp; shows…"
+        aria-label="Search movies and TV shows"
+        style={{
+          flex: 1,
+          padding: '0.375rem 0.625rem',
+          border: '1px solid var(--border)',
+          borderRadius: '6px',
+          fontSize: '0.875rem',
+          background: 'var(--bg-subtle)',
+          color: 'var(--text)',
+          minWidth: 0,
+        }}
+      />
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+        aria-label="Media type filter"
+        style={{
+          padding: '0.375rem 0.5rem',
+          border: '1px solid var(--border)',
+          borderRadius: '6px',
+          fontSize: '0.875rem',
+          background: 'var(--bg-subtle)',
+          color: 'var(--text)',
+          flexShrink: 0,
+        }}
+      >
+        <option value="all">All</option>
+        <option value="movie">Movies</option>
+        <option value="tv">TV</option>
+      </select>
       <button
         type="submit"
         aria-label="Submit search"
         style={{
-          padding: '0.5rem 1rem',
+          padding: '0.375rem 0.75rem',
           background: 'var(--accent)',
           color: 'var(--accent-text)',
           border: 'none',
-          borderRadius: '8px',
-          fontSize: '0.9rem',
+          borderRadius: '6px',
+          fontSize: '0.875rem',
           fontWeight: 600,
           cursor: 'pointer',
           flexShrink: 0,

@@ -31,8 +31,6 @@ export default async function Header() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-        <ThemeToggle />
-
         {session?.user ? (
           <>
             <Link
@@ -42,30 +40,34 @@ export default async function Header() {
               Hi, {session.user.name?.split(' ')[0] ?? session.user.email}
             </Link>
             <SignOutButton />
+            <ThemeToggle />
           </>
         ) : (
-          <form
-            action={async (_: FormData) => {
-              'use server'
-              await signIn('tcss460')
-            }}
-          >
-            <button
-              type="submit"
-              style={{
-                cursor: 'pointer',
-                padding: '0.375rem 0.875rem',
-                background: 'var(--accent)',
-                color: 'var(--accent-text)',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: 600,
+          <>
+            <form
+              action={async (_: FormData) => {
+                'use server'
+                await signIn('tcss460')
               }}
             >
-              Sign In
-            </button>
-          </form>
+              <button
+                type="submit"
+                style={{
+                  cursor: 'pointer',
+                  padding: '0.375rem 0.875rem',
+                  background: 'var(--accent)',
+                  color: 'var(--accent-text)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                }}
+              >
+                Sign In
+              </button>
+            </form>
+            <ThemeToggle />
+          </>
         )}
       </div>
     </header>
