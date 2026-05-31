@@ -25,7 +25,7 @@ export default async function Header() {
           href="/"
           style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
         >
-          CineTrack
+          Screen8
         </Link>
         <NavSearch />
       </div>

@@ -4,8 +4,8 @@ import Header from "@/components/Header"
 import "@/styles/globals.css"
 
 export const metadata: Metadata = {
-  title: "Group 8 — TCSS 460",
-  description: "TCSS 460 Group 8 consumer frontend",
+  title: "Screen8",
+  description: "Discover, rate, and review movies and TV shows",
 }
 
 export default function RootLayout({
