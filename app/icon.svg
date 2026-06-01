@@ -2,7 +2,7 @@
   <!-- Ball -->
   <circle cx="50" cy="50" r="48" fill="#1a1a1a"/>
   <!-- White circle for the 8 -->
-  <circle cx="50" cy="50" r="33" fill="#ffffff"/>
+  <circle cx="50" cy="50" r="30" fill="#ffffff"/>
   <!-- Number 8 -->
   <text x="50" y="67" font-family="Courier New, monospace" font-size="50" font-weight="bold" fill="#1a1a1a" text-anchor="middle">8</text>
 </svg>
