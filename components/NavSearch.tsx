@@ -25,7 +25,7 @@ function NavSearchInner() {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flex: 1, minWidth: '200px', maxWidth: '700px' }}
+      style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flex: 1, minWidth: '200px', maxWidth: '700px', margin: '0 auto' }}
     >
       <input
         type="search"
@@ -42,6 +42,8 @@ function NavSearchInner() {
           background: 'var(--bg-subtle)',
           color: 'var(--text)',
           minWidth: 0,
+          height: '32px',
+          boxSizing: 'border-box' as const,
         }}
       />
       <select
@@ -49,13 +51,15 @@ function NavSearchInner() {
         onChange={(e) => setType(e.target.value)}
         aria-label="Media type filter"
         style={{
-          padding: '0.375rem 0.5rem',
+          padding: '0.375rem 0.625rem',
           border: '1px solid var(--border)',
           borderRadius: '6px',
           fontSize: '0.875rem',
           background: 'var(--bg-subtle)',
           color: 'var(--text)',
           flexShrink: 0,
+          height: '32px',
+          boxSizing: 'border-box' as const,
         }}
       >
         <option value="all">All</option>
