@@ -50,7 +50,7 @@ export default function RatingSection({
   const [reviews, setReviews] = useState<ReviewPreview[]>(initialReviews)
   const [totalReviews, setTotalReviews] = useState(reviewCount)
   const [myReview, setMyReview] = useState<OwnedReview | null>(null)
-  const [loadingMyContent, setLoadingMyContent] = useState(false)
+  const [loadingMyContent, setLoadingMyContent] = useState(true)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [editingReview, setEditingReview] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
@@ -68,7 +68,7 @@ export default function RatingSection({
         if (!res.ok) break
         const body = await res.json()
         for (const r of body.data ?? []) {
-          if (Number(r.title_id) === titleId) {
+          if (Number(r.title_id) === titleId || Number(r.metadata?.id) === titleId) {
             setCurrentRating(Number(r.rating))
             break outer
           }
@@ -88,7 +88,7 @@ export default function RatingSection({
         if (!res.ok) break
         const body = await res.json()
         for (const r of body.data ?? []) {
-          if (Number(r.title_id) === titleId) {
+          if (Number(r.title_id) === titleId || Number(r.metadata?.id) === titleId) {
             setMyReview({
               id: r.id,
               title_id: Number(r.title_id),
