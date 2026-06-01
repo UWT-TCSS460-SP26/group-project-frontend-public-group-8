@@ -78,34 +78,48 @@ export default function RatingSection({
       }
     } catch { /* no rating is fine */ }
 
-    // Review: page through /v1/users/me/reviews until we find this title
+    // Review: page through /v1/users/me/reviews and collect ALL of this user's
+    // reviews. We match this title two ways: by title_id/metadata.id, and by
+    // review id against the reviews already shown for this title (recentReviews).
+    // The id-based match is the reliable one when title_id schemes differ.
     try {
+      const myReviews: OwnedReview[] = []
       let page = 1
-      outer: while (true) {
+      while (true) {
         const res = await fetch(`${BASE}/v1/users/me/reviews?page=${page}`, {
           headers: { Authorization: `Bearer ${tok}` },
         })
         if (!res.ok) break
         const body = await res.json()
         for (const r of body.data ?? []) {
-          if (Number(r.title_id) === titleId || Number(r.metadata?.id) === titleId) {
-            setMyReview({
-              id: r.id,
-              title_id: Number(r.title_id),
-              header: r.header ?? null,
-              content: r.content ?? null,
-              upvotes: r.upvotes ?? 0,
-              downvotes: r.downvotes ?? 0,
-              createdAt: r.createdAt,
-            })
-            break outer
-          }
+          myReviews.push({
+            id: Number(r.id),
+            title_id: Number(r.title_id),
+            header: r.header ?? null,
+            content: r.content ?? null,
+            upvotes: r.upvotes ?? 0,
+            downvotes: r.downvotes ?? 0,
+            createdAt: r.createdAt,
+          })
         }
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
+
+      const myIds = new Set(myReviews.map((r) => r.id))
+      const mine =
+        myReviews.find((r) => r.title_id === titleId) ??
+        // Fall back to matching by review id against this title's reviews
+        myReviews.find((r) =>
+          initialReviews.some((pr) => Number(pr.id) === r.id),
+        )
+
+      if (mine) setMyReview(mine)
+      // Drop any of this user's reviews from the community list (own review
+      // renders separately in its own block)
+      setReviews((prev) => prev.filter((pr) => !myIds.has(Number(pr.id))))
     } catch { /* no review is fine */ }
-  }, [titleId])
+  }, [titleId, initialReviews])
 
   useEffect(() => {
     if (!token) {
