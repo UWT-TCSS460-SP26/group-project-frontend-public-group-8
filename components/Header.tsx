@@ -32,6 +32,11 @@ export default async function Header() {
           <Link href="/search" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             Search
           </Link>
+          {session?.user && (
+            <Link href="/profile" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+              Profile
+            </Link>
+          )}
         </nav>
       </div>
 

@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation'
+import { auth } from '@/auth'
 import { apiFetch } from '@/lib/api'
 import type { EnrichedMediaResponse } from '@/lib/api'
+import RateControl from '@/components/RateControl'
+import ReviewForm from '@/components/ReviewForm'
+import SignInPrompt from '@/components/SignInPrompt'
 
 interface Props {
   params: Promise<{ type: string; id: string }>
@@ -13,7 +17,7 @@ export default async function MediaDetailPage({ params }: Props) {
 
   let data: EnrichedMediaResponse
   try {
-    data = await apiFetch<EnrichedMediaResponse>(`/v1/media/${type}/${id}`)
+    data = await apiFetch<EnrichedMediaResponse>(`/v1/media/${type}/${id}`, { revalidate: false })
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e)
     if (msg.startsWith('404')) notFound()
@@ -24,12 +28,15 @@ export default async function MediaDetailPage({ params }: Props) {
     )
   }
 
+  const session = await auth()
+  const signedIn = Boolean(session?.accessToken)
   const { metadata: m, community, recentReviews } = data
+  const titleId = m.id
   const mediaLabel = type === 'tv' ? 'TV Show' : 'Movie'
+  const callbackUrl = `/media/${type}/${id}`
 
   return (
     <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Title + Poster */}
       <div
         style={{
           display: 'flex',
@@ -82,7 +89,7 @@ export default async function MediaDetailPage({ params }: Props) {
                 ★ {community.averageRating != null ? community.averageRating.toFixed(1) : '—'}
               </strong>
               <span style={{ color: 'var(--text-muted)', marginLeft: '0.5rem', fontSize: '0.875rem' }}>
-                community average &middot; {community.ratingCount} rating{community.ratingCount !== 1 ? 's' : ''}
+                community average · {community.ratingCount} rating{community.ratingCount !== 1 ? 's' : ''}
               </span>
             </p>
           ) : (
@@ -93,23 +100,22 @@ export default async function MediaDetailPage({ params }: Props) {
 
           <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{m.summary}</p>
 
-          <p
-            style={{
-              marginTop: '1.5rem',
-              padding: '0.75rem 1rem',
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              color: 'var(--text-muted)',
-            }}
-          >
-            Sign in to rate — rating &amp; reviews arrive in Sprint 7.
-          </p>
+          {signedIn ? (
+            <RateControl titleId={titleId} mediaType={type} />
+          ) : (
+            <SignInPrompt message="Sign in to rate this title." callbackUrl={callbackUrl} />
+          )}
         </div>
       </div>
 
-      {/* Reviews */}
+      <section style={{ marginBottom: '2.5rem' }}>
+        {signedIn ? (
+          <ReviewForm titleId={titleId} mediaType={type} />
+        ) : (
+          <SignInPrompt message="Sign in to write a review." callbackUrl={callbackUrl} />
+        )}
+      </section>
+
       <section>
         <h2 style={{ marginBottom: '1rem' }}>
           Community Reviews{community.reviewCount > 0 ? ` (${community.reviewCount})` : ''}
@@ -124,6 +130,7 @@ export default async function MediaDetailPage({ params }: Props) {
                 key={r.id}
                 style={{
                   border: '1px solid var(--border)',
+                  background: 'var(--card-bg)',
                   borderRadius: '8px',
                   padding: '1rem 1.25rem',
                 }}
