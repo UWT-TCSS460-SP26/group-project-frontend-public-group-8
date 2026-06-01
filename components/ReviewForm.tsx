@@ -27,7 +27,7 @@ export default function ReviewForm({
 
   const contentError = touched && content.trim().length === 0 ? 'Review text is required.' : null
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setTouched(true)
     if (!content.trim()) return

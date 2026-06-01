@@ -15,7 +15,7 @@ function NavSearchInner() {
     setType(searchParams.get('type') ?? 'all')
   }, [searchParams])
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const trimmed = q.trim()
     if (!trimmed) return
