@@ -3,36 +3,30 @@
 import { useEffect, useState } from 'react'
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
 
   useEffect(() => {
-    setDark(document.documentElement.getAttribute('data-theme') === 'dark')
+    const current = document.documentElement.getAttribute('data-theme')
+    setTheme(current === 'light' ? 'light' : 'dark')
   }, [])
 
   function toggle() {
-    const next = dark ? 'light' : 'dark'
+    const next = theme === 'dark' ? 'light' : 'dark'
     document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('theme', next)
-    setDark(!dark)
+    try {
+      localStorage.setItem('theme', next)
+    } catch {}
+    setTheme(next)
   }
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-      style={{
-        cursor: 'pointer',
-        background: 'transparent',
-        border: '1px solid var(--border)',
-        borderRadius: '6px',
-        padding: '0.375rem 0.625rem',
-        fontSize: '0.875rem',
-        color: 'var(--text)',
-        lineHeight: 1,
-        whiteSpace: 'nowrap',
-      }}
+      className="theme-toggle"
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
-      {dark ? 'Light mode' : 'Dark mode'}
+      {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
     </button>
   )
 }
