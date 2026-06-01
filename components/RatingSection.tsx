@@ -40,6 +40,7 @@ export default function RatingSection({
 }: RatingSectionProps) {
   const { data: session, status } = useSession()
   const token = session?.accessToken
+  const authorId = session?.authorId
 
   // ── Rating state ──────────────────────────────────────────────────────────
   const [currentRating, setCurrentRating] = useState<number | null>(null)
@@ -56,73 +57,73 @@ export default function RatingSection({
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
 
-  // ── Fetch existing rating + review whenever the token changes ─────────────
-  const fetchMyContent = useCallback(async (tok: string) => {
-    // Rating: page through /v1/users/me/ratings until we find this title
+  // ── Fetch existing rating + review whenever the token/authorId changes ──────
+  const fetchMyContent = useCallback(async (tok: string, uid: number) => {
+    // Rating: direct lookup by authorId + titleId
     try {
-      let page = 1
-      outer: while (true) {
-        const res = await fetch(`${BASE}/v1/users/me/ratings?page=${page}`, {
-          headers: { Authorization: `Bearer ${tok}` },
-        })
-        if (!res.ok) break
+      const res = await fetch(`${BASE}/v1/ratings/user/${uid}/title/${titleId}`, {
+        headers: { Authorization: `Bearer ${tok}` },
+      })
+      if (res.ok) {
         const body = await res.json()
-        for (const r of body.data ?? []) {
-          if (Number(r.title_id) === titleId || Number(r.metadata?.id) === titleId) {
-            setCurrentRating(Number(r.rating))
-            break outer
-          }
-        }
-        if (page >= (body.pagination?.totalPages ?? 1)) break
-        page++
+        const rating = body?.data?.rating ?? body?.rating
+        if (rating != null) setCurrentRating(Number(rating))
       }
     } catch { /* no rating is fine */ }
 
-    // Review: page through /v1/users/me/reviews and collect ALL of this user's
-    // reviews. We match this title two ways: by title_id/metadata.id, and by
-    // review id against the reviews already shown for this title (recentReviews).
-    // The id-based match is the reliable one when title_id schemes differ.
+    // Review: match authorId against this title's review list.
+    // First check the reviews already on the page; if not found, paginate
+    // GET /v1/reviews/title/{titleId} to find older reviews.
     try {
-      const myReviews: OwnedReview[] = []
-      let page = 1
-      while (true) {
-        const res = await fetch(`${BASE}/v1/users/me/reviews?page=${page}`, {
-          headers: { Authorization: `Bearer ${tok}` },
+      const findInList = (list: ReviewPreview[]) =>
+        list.find((r) => Number(r.authorId) === uid) ?? null
+
+      const fromInitial = findInList(initialReviews)
+      if (fromInitial) {
+        setMyReview({
+          id: fromInitial.id,
+          title_id: titleId,
+          header: fromInitial.header ?? null,
+          content: fromInitial.content ?? null,
+          upvotes: fromInitial.upvotes,
+          downvotes: fromInitial.downvotes,
+          createdAt: fromInitial.createdAt,
         })
+        setReviews((prev) => prev.filter((r) => r.id !== fromInitial.id))
+        return
+      }
+
+      // Not in recent list — paginate all reviews for this title
+      let page = 1
+      outer: while (true) {
+        const res = await fetch(
+          `${BASE}/v1/reviews/title/${titleId}?page=${page}&limit=25`,
+          { headers: { Authorization: `Bearer ${tok}` } },
+        )
         if (!res.ok) break
         const body = await res.json()
-        for (const r of body.data ?? []) {
-          myReviews.push({
-            id: Number(r.id),
-            title_id: Number(r.title_id),
-            header: r.header ?? null,
-            content: r.content ?? null,
-            upvotes: r.upvotes ?? 0,
-            downvotes: r.downvotes ?? 0,
-            createdAt: r.createdAt,
+        const found = findInList(body.data ?? [])
+        if (found) {
+          setMyReview({
+            id: found.id,
+            title_id: titleId,
+            header: found.header ?? null,
+            content: found.content ?? null,
+            upvotes: found.upvotes,
+            downvotes: found.downvotes,
+            createdAt: found.createdAt,
           })
+          setReviews((prev) => prev.filter((r) => r.id !== found.id))
+          break outer
         }
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-
-      const myIds = new Set(myReviews.map((r) => r.id))
-      const mine =
-        myReviews.find((r) => r.title_id === titleId) ??
-        // Fall back to matching by review id against this title's reviews
-        myReviews.find((r) =>
-          initialReviews.some((pr) => Number(pr.id) === r.id),
-        )
-
-      if (mine) setMyReview(mine)
-      // Drop any of this user's reviews from the community list (own review
-      // renders separately in its own block)
-      setReviews((prev) => prev.filter((pr) => !myIds.has(Number(pr.id))))
     } catch { /* no review is fine */ }
   }, [titleId, initialReviews])
 
   useEffect(() => {
-    if (!token) {
+    if (!token || !authorId) {
       setCurrentRating(null)
       setMyReview(null)
       setLoadingMyContent(false)
@@ -131,8 +132,8 @@ export default function RatingSection({
       return
     }
     setLoadingMyContent(true)
-    fetchMyContent(token).finally(() => setLoadingMyContent(false))
-  }, [token, fetchMyContent])
+    fetchMyContent(token, authorId).finally(() => setLoadingMyContent(false))
+  }, [token, authorId, fetchMyContent])
 
   // ── Rating handlers ────────────────────────────────────────────────────────
 
@@ -203,7 +204,7 @@ export default function RatingSection({
         // Already reviewed — fetch and surface the existing review
         setShowReviewForm(false)
         setReviewError(null)
-        if (token) await fetchMyContent(token)
+        if (token && authorId) await fetchMyContent(token, authorId)
       } else if (msg.includes('401')) {
         setReviewError('Your session expired. Please sign in again.')
       } else {
