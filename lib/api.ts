@@ -305,3 +305,39 @@ export function syncUser(
 ) {
   return apiMutate('POST', '/v1/users', token, { username, email, display_name })
 }
+
+/** Decode a JWT payload without verifying (browser-safe). */
+function decodeJwt(token: string): Record<string, unknown> | null {
+  try {
+    const part = token.split('.')[1]
+    const json = atob(part.replace(/-/g, '+').replace(/_/g, '/'))
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Resolve the signed-in user's database authorId. Syncs the user via
+ * POST /v1/users (idempotent) and returns the resulting id. Use this when
+ * the session does not already carry an authorId.
+ */
+export async function resolveAuthorId(token: string): Promise<number | null> {
+  const claims = decodeJwt(token)
+  if (!claims) return null
+  const sub = claims.sub as string | undefined
+  const email = (claims.email as string) ?? (sub ? `${sub}@unknown.local` : undefined)
+  const username =
+    (claims.preferred_username as string) ??
+    (email ? email.split('@')[0] : sub)
+  if (!username || !email) return null
+  try {
+    const user = await apiMutate<{ id: number }>('POST', '/v1/users', token, {
+      username,
+      email,
+    })
+    return user?.id ?? null
+  } catch {
+    return null
+  }
+}

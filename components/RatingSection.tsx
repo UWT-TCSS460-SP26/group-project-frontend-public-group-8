@@ -10,6 +10,7 @@ import {
   createReview,
   updateReview,
   deleteReview,
+  resolveAuthorId,
   type ReviewPreview,
 } from '@/lib/api'
 
@@ -123,7 +124,7 @@ export default function RatingSection({
   }, [titleId, initialReviews])
 
   useEffect(() => {
-    if (!token || !authorId) {
+    if (!token) {
       setCurrentRating(null)
       setMyReview(null)
       setLoadingMyContent(false)
@@ -131,8 +132,20 @@ export default function RatingSection({
       setEditingReview(false)
       return
     }
+    let cancelled = false
     setLoadingMyContent(true)
-    fetchMyContent(token, authorId).finally(() => setLoadingMyContent(false))
+    ;(async () => {
+      // authorId comes from the session when available; otherwise resolve it
+      // on the fly so existing sessions work without re-login.
+      const uid = authorId ?? (await resolveAuthorId(token))
+      if (cancelled || !uid) {
+        if (!cancelled) setLoadingMyContent(false)
+        return
+      }
+      await fetchMyContent(token, uid)
+      if (!cancelled) setLoadingMyContent(false)
+    })()
+    return () => { cancelled = true }
   }, [token, authorId, fetchMyContent])
 
   // ── Rating handlers ────────────────────────────────────────────────────────
@@ -204,7 +217,10 @@ export default function RatingSection({
         // Already reviewed — fetch and surface the existing review
         setShowReviewForm(false)
         setReviewError(null)
-        if (token && authorId) await fetchMyContent(token, authorId)
+        if (token) {
+          const uid = authorId ?? (await resolveAuthorId(token))
+          if (uid) await fetchMyContent(token, uid)
+        }
       } else if (msg.includes('401')) {
         setReviewError('Your session expired. Please sign in again.')
       } else {
