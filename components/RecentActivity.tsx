@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { getMyRatings } from '@/lib/api'
 import type { MyRatingItem } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
-import { getSession, signIn } from 'next-auth/react'
+import { getSession } from 'next-auth/react'
+import SignInButton from './SignInButton'
 
 const cardStyle: React.CSSProperties = {
   border: '1px solid var(--border)',
@@ -43,9 +44,11 @@ export default function RecentActivity() {
   const [hasMore, setHasMore] = useState(true)
   const [token, setToken] = useState<string | undefined>()
   const [isMounted, setIsMounted] = useState(false)
+  const [callbackUrl, setCallbackUrl] = useState('/')
 
   useEffect(() => {
     setIsMounted(true)
+    setCallbackUrl(window.location.href)
   }, [])
 
   useEffect(() => {
@@ -109,8 +112,8 @@ export default function RecentActivity() {
           <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
             Sign in to track your ratings and see your recent activity here.
           </p>
-          <button
-            onClick={() => signIn('tcss460')}
+          <SignInButton
+            callbackUrl={callbackUrl}
             style={{
               padding: '0.5rem 1rem',
               background: 'var(--accent)',
@@ -122,7 +125,7 @@ export default function RecentActivity() {
             }}
           >
             Sign In
-          </button>
+          </SignInButton>
         </div>
       ) : ratings.length === 0 && !loading ? (
         <div style={{

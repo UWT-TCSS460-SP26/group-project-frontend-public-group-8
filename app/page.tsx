@@ -29,7 +29,7 @@ export default function Home() {
       <GenreCarousel genre="documentary" title="Documentaries" />
       <GenreCarousel genre={['kids', 'family']} title="Kids & Family" />
       <GenreCarousel genre="reality" title="Reality TV" />
-      <GenreCarousel genre="sci-fi_fantasy" title="Sci-Fi & Fantasy" />
+      <GenreCarousel genre="sci_fi_fantasy" title="Sci-Fi & Fantasy" />
     </main>
   )
 }
