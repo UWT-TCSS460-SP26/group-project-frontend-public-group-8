@@ -1,225 +1,144 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { submitReview } from '@/lib/actions'
+import { useState } from 'react'
 
-const HEADER_MAX = 200
-const CONTENT_MAX = 5000
-
-interface Props {
-  titleId: number
-  mediaType: 'movie' | 'tv'
+interface ReviewFormProps {
+  initialHeader?: string
+  initialContent?: string
+  submitting?: boolean
+  error?: string | null
+  onSubmit: (header: string, content: string) => void
+  onCancel?: () => void
+  submitLabel?: string
 }
 
-export default function ReviewForm({ titleId, mediaType }: Props) {
-  const router = useRouter()
-  const [header, setHeader] = useState('')
-  const [content, setContent] = useState('')
-  const [fieldErr, setFieldErr] = useState<{ header?: string; content?: string }>({})
-  const [globalErr, setGlobalErr] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-  const [pending, startTransition] = useTransition()
-  const successRef = useRef<HTMLParagraphElement | null>(null)
-  const contentRef = useRef<HTMLTextAreaElement | null>(null)
-  const headerRef = useRef<HTMLInputElement | null>(null)
+export default function ReviewForm({
+  initialHeader = '',
+  initialContent = '',
+  submitting = false,
+  error = null,
+  onSubmit,
+  onCancel,
+  submitLabel = 'Post Review',
+}: ReviewFormProps) {
+  const [header, setHeader] = useState(initialHeader)
+  const [content, setContent] = useState(initialContent)
+  const [touched, setTouched] = useState(false)
 
-  function validate() {
-    const next: { header?: string; content?: string } = {}
-    if (!content.trim()) next.content = 'Review content is required.'
-    else if (content.length > CONTENT_MAX) next.content = `Must be ${CONTENT_MAX} characters or fewer.`
-    if (header.length > HEADER_MAX) next.header = `Title must be ${HEADER_MAX} characters or fewer.`
-    return next
-  }
+  const contentError = touched && content.trim().length === 0 ? 'Review text is required.' : null
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
-    setGlobalErr(null)
-    setSuccess(false)
-    const v = validate()
-    setFieldErr(v)
-    if (v.content) {
-      contentRef.current?.focus()
-      return
-    }
-    if (v.header) {
-      headerRef.current?.focus()
-      return
-    }
-
-    startTransition(async () => {
-      const res = await submitReview({
-        titleId,
-        mediaType,
-        content,
-        header: header || undefined,
-      })
-      if (res.ok) {
-        setHeader('')
-        setContent('')
-        setSuccess(true)
-        setTimeout(() => successRef.current?.focus(), 0)
-        router.refresh()
-      } else {
-        setGlobalErr(res.error)
-      }
-    })
+    setTouched(true)
+    if (!content.trim()) return
+    onSubmit(header.trim(), content.trim())
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      noValidate
-      aria-label="Write a review"
-      style={{
-        marginTop: '1.5rem',
-        padding: '1.25rem',
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-      }}
-    >
-      <h3 style={{ margin: '0 0 0.875rem', fontSize: '1.05rem' }}>Write a review</h3>
-
-      {success && (
-        <p
-          ref={successRef}
-          tabIndex={-1}
-          role="status"
-          style={{
-            margin: '0 0 0.875rem',
-            padding: '0.625rem 0.875rem',
-            background: 'rgba(56, 189, 248, 0.1)',
-            border: '1px solid var(--accent)',
-            borderRadius: '6px',
-            color: 'var(--text)',
-            fontSize: '0.875rem',
-          }}
+    <form onSubmit={handleSubmit} noValidate>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label
+          htmlFor="review-header"
+          style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.3rem' }}
         >
-          <strong>Thanks!</strong> Your review was posted.
-        </p>
-      )}
-
-      {globalErr && (
-        <p
-          role="alert"
-          style={{
-            margin: '0 0 0.875rem',
-            padding: '0.625rem 0.875rem',
-            background: 'rgba(248, 113, 113, 0.1)',
-            border: '1px solid var(--error)',
-            borderRadius: '6px',
-            color: 'var(--error)',
-            fontSize: '0.875rem',
-          }}
-        >
-          {globalErr}
-        </p>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.875rem' }}>
-        <label htmlFor="rev-header" style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.375rem' }}>
-          Title <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+          Title <span style={{ color: 'var(--text-faint)', fontWeight: 400 }}>(optional)</span>
         </label>
         <input
-          ref={headerRef}
-          id="rev-header"
-          name="header"
+          id="review-header"
           type="text"
           value={header}
-          onChange={(e) => {
-            setHeader(e.target.value)
-            if (fieldErr.header) setFieldErr((p) => ({ ...p, header: undefined }))
+          onChange={(e) => setHeader(e.target.value)}
+          placeholder="e.g. A must-watch"
+          disabled={submitting}
+          style={{
+            width: '100%',
+            padding: '0.5rem 0.75rem',
+            border: '1px solid var(--border)',
+            borderRadius: '6px',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+            fontSize: '0.9rem',
           }}
-          maxLength={HEADER_MAX}
-          placeholder="Short headline"
-          aria-invalid={fieldErr.header ? 'true' : undefined}
-          aria-describedby={fieldErr.header ? 'rev-header-err' : 'rev-header-count'}
-          style={inputStyle(!!fieldErr.header)}
         />
-        <span id="rev-header-count" style={counterStyle(header.length, HEADER_MAX)}>
-          {header.length} / {HEADER_MAX}
-        </span>
-        {fieldErr.header && (
-          <span id="rev-header-err" style={errStyle}>
-            {fieldErr.header}
-          </span>
-        )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.875rem' }}>
-        <label htmlFor="rev-content" style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.375rem' }}>
-          Review <span style={{ color: 'var(--error)' }} aria-hidden="true">*</span>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label
+          htmlFor="review-content"
+          style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.3rem' }}
+        >
+          Review <span style={{ color: 'var(--error)', fontSize: '0.8rem' }}>*</span>
         </label>
         <textarea
-          ref={contentRef}
-          id="rev-content"
-          name="content"
-          required
-          rows={5}
+          id="review-content"
           value={content}
-          onChange={(e) => {
-            setContent(e.target.value)
-            if (fieldErr.content) setFieldErr((p) => ({ ...p, content: undefined }))
+          onChange={(e) => { setContent(e.target.value); setTouched(true) }}
+          placeholder="Share your thoughts…"
+          rows={4}
+          disabled={submitting}
+          aria-describedby={contentError ? 'review-content-error' : undefined}
+          aria-invalid={!!contentError}
+          style={{
+            width: '100%',
+            padding: '0.5rem 0.75rem',
+            border: `1px solid ${contentError ? 'var(--error)' : 'var(--border)'}`,
+            borderRadius: '6px',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+            fontSize: '0.9rem',
+            resize: 'vertical',
           }}
-          maxLength={CONTENT_MAX}
-          placeholder="What did you think?"
-          aria-invalid={fieldErr.content ? 'true' : undefined}
-          aria-describedby={fieldErr.content ? 'rev-content-err' : 'rev-content-count'}
-          style={{ ...inputStyle(!!fieldErr.content), resize: 'vertical', minHeight: '90px', fontFamily: 'inherit' }}
         />
-        <span id="rev-content-count" style={counterStyle(content.length, CONTENT_MAX)}>
-          {content.length} / {CONTENT_MAX}
-        </span>
-        {fieldErr.content && (
-          <span id="rev-content-err" style={errStyle}>
-            {fieldErr.content}
-          </span>
+        {contentError && (
+          <p id="review-content-error" role="alert" style={{ color: 'var(--error)', fontSize: '0.8rem', margin: '0.25rem 0 0' }}>
+            {contentError}
+          </p>
         )}
       </div>
 
-      <button
-        type="submit"
-        disabled={pending}
-        style={{
-          background: 'var(--accent)',
-          color: 'var(--accent-text)',
-          border: 'none',
-          borderRadius: '8px',
-          padding: '0.625rem 1.25rem',
-          fontSize: '0.95rem',
-          fontWeight: 700,
-          cursor: pending ? 'wait' : 'pointer',
-          opacity: pending ? 0.7 : 1,
-        }}
-      >
-        {pending ? 'Posting…' : 'Post review'}
-      </button>
+      {error && (
+        <p role="alert" style={{ color: 'var(--error)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+          {error}
+        </p>
+      )}
+
+      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <button
+          type="submit"
+          disabled={submitting}
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: 'var(--accent)',
+            color: 'var(--accent-text)',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            cursor: submitting ? 'wait' : 'pointer',
+            opacity: submitting ? 0.7 : 1,
+          }}
+        >
+          {submitting ? 'Saving…' : submitLabel}
+        </button>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={submitting}
+            style={{
+              padding: '0.5rem 1rem',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              border: '1px solid var(--border)',
+              borderRadius: '6px',
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   )
-}
-
-function inputStyle(invalid: boolean): React.CSSProperties {
-  return {
-    background: 'var(--input-bg)',
-    border: `1px solid ${invalid ? 'var(--error)' : 'var(--input-border)'}`,
-    borderRadius: '8px',
-    padding: '0.625rem 0.75rem',
-    color: 'var(--input-text)',
-    font: 'inherit',
-    fontSize: '0.95rem',
-  }
-}
-function counterStyle(len: number, max: number): React.CSSProperties {
-  return {
-    fontSize: '0.75rem',
-    textAlign: 'right',
-    color: len >= max * 0.9 ? 'var(--error)' : 'var(--text-muted)',
-    marginTop: '0.25rem',
-  }
-}
-const errStyle: React.CSSProperties = {
-  color: 'var(--error)',
-  fontSize: '0.8rem',
-  marginTop: '0.375rem',
 }

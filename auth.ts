@@ -3,12 +3,27 @@ import NextAuth, { type DefaultSession } from "next-auth"
 declare module "next-auth" {
   interface Session extends DefaultSession {
     accessToken?: string
+    authorId?: number
+    accessTokenExpires?: number // Unix ms
   }
 }
 
 declare module "@auth/core/jwt" {
   interface JWT {
     accessToken?: string
+    authorId?: number
+    accessTokenExpires?: number
+  }
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const payload = token.split('.')[1]
+    return JSON.parse(Buffer.from(payload, 'base64url').toString())
+  } catch {
+    return null
   }
 }
 
@@ -32,14 +47,52 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   ],
   callbacks: {
-    jwt({ token, account }) {
+    async jwt({ token, account, profile }) {
       if (account?.access_token) {
         token.accessToken = account.access_token
+
+        // Store expiry from the access token's exp claim
+        const claims = decodeJwtPayload(account.access_token)
+        if (claims?.exp) {
+          token.accessTokenExpires = (claims.exp as number) * 1000
+        }
+
+        // Sync user with the API to obtain the database authorId
+        try {
+          const username =
+            (claims?.preferred_username as string) ??
+            (claims?.email as string)?.split('@')[0] ??
+            (claims?.sub as string)
+          const email =
+            (claims?.email as string) ?? `${claims?.sub}@unknown.local`
+          const display_name = (profile?.name as string) ?? null
+
+          const res = await fetch(`${API_BASE}/v1/users`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${account.access_token}`,
+            },
+            body: JSON.stringify({ username, email, display_name }),
+          })
+          if (res.ok) {
+            const user = await res.json()
+            token.authorId = user.id as number
+          }
+        } catch { /* continue without authorId */ }
       }
+
+      // Invalidate the session server-side when the access token has expired
+      if (token.accessTokenExpires && Date.now() > token.accessTokenExpires) {
+        return null
+      }
+
       return token
     },
     session({ session, token }) {
       session.accessToken = token.accessToken as string | undefined
+      session.authorId = token.authorId as number | undefined
+      session.accessTokenExpires = token.accessTokenExpires as number | undefined
       return session
     },
   },

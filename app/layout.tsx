@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
+import { SessionProvider } from "next-auth/react"
 import Header from "@/components/Header"
+import TokenExpiryWatcher from "@/components/TokenExpiryWatcher"
 import "@/styles/globals.css"
 
 export const metadata: Metadata = {
-  title: "Group 8 — TCSS 460",
-  description: "TCSS 460 Group 8 consumer frontend",
+  title: "Screen8",
+  description: "Discover, rate, and review movies and TV shows",
 }
 
 export default function RootLayout({
@@ -17,13 +19,16 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem('theme');var m=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches;document.documentElement.setAttribute('data-theme', s || (m?'light':'dark'));}catch(e){}})();`,
+            __html: `(function(){function a(){try{var s=localStorage.getItem('theme');var p=window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches;if(s==='light'||(s!=='dark'&&p)){document.documentElement.setAttribute('data-theme','light');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}}a();window.addEventListener('pageshow',function(e){if(e.persisted)a();});})();`,
           }}
         />
       </head>
       <body>
-        <Header />
-        {children}
+        <SessionProvider>
+          <TokenExpiryWatcher />
+          <Header />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   )

@@ -2,63 +2,49 @@ const BASE = (
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://tcss-460-group-7.onrender.com'
 ).replace(/\/$/, '')
 
-export class ApiError extends Error {
-  status: number
-  body: string
-  constructor(status: number, body: string) {
-    super(`${status}: ${body.slice(0, 200)}`)
-    this.status = status
-    this.body = body
-  }
-}
-
-export async function apiFetch<T>(
-  path: string,
-  opts: { token?: string; revalidate?: number | false } = {}
-): Promise<T> {
+export async function apiFetch<T>(path: string, token?: string): Promise<T> {
   const headers: HeadersInit = {}
-  if (opts.token) headers['Authorization'] = `Bearer ${opts.token}`
-
-  const next: { revalidate?: number } = {}
-  let cache: RequestCache | undefined
-  if (opts.revalidate === false) cache = 'no-store'
-  else next.revalidate = opts.revalidate ?? 60
-
-  const res = await fetch(`${BASE}${path}`, { headers, next, cache })
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new ApiError(res.status, text)
-  }
-  return res.json() as Promise<T>
-}
-
-export async function apiWrite<T>(
-  path: string,
-  opts: {
-    method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-    token: string
-    body?: unknown
-  }
-): Promise<T | null> {
-  const headers: HeadersInit = { Authorization: `Bearer ${opts.token}` }
-  if (opts.body !== undefined) headers['Content-Type'] = 'application/json'
+  if (token) headers['Authorization'] = `Bearer ${token}`
 
   const res = await fetch(`${BASE}${path}`, {
-    method: opts.method,
     headers,
-    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-    cache: 'no-store',
+    next: { revalidate: 60 },
   })
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new ApiError(res.status, text)
+    throw new Error(`${res.status}: ${text.slice(0, 200)}`)
   }
-  if (res.status === 204) return null
-  const text = await res.text()
-  return text ? (JSON.parse(text) as T) : null
+
+  return res.json() as Promise<T>
 }
+
+export async function apiMutate<T>(
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  path: string,
+  token: string,
+  body?: unknown,
+): Promise<T> {
+  const headers: HeadersInit = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  }
+
+  const res = await fetch(`${BASE}${path}`, {
+    method,
+    headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(`${res.status}: ${text.slice(0, 200)}`)
+  }
+
+  return res.json() as Promise<T>
+}
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface MovieSummary {
   id: number
@@ -120,18 +106,21 @@ export interface PopularMoviesResponse {
   totalResults: number
   results: MovieSummary[]
 }
+
 export interface PopularTVResponse {
   page: number
   totalPages: number
   totalResults: number
   results: TVSummary[]
 }
+
 export interface MovieSearchResponse {
   page: number
   totalPages: number
   totalResults: number
   results: MovieSearchResult[]
 }
+
 export interface TVSearchResponse {
   page: number
   totalPages: number
@@ -180,7 +169,26 @@ export interface EnrichedMediaResponse {
   recentReviews: ReviewPreview[]
 }
 
-export interface UserRating {
+// ─── Ratings ─────────────────────────────────────────────────────────────────
+
+export interface RatingAuthor {
+  id: number
+  display_name: string | null
+}
+
+export interface Rating {
+  id: number
+  authorId: number
+  rating: number
+  title_id: number
+  author: RatingAuthor
+}
+
+export interface RatingResponse {
+  data: Rating
+}
+
+export interface MyRatingItem {
   id: number
   title_id: number
   media_type: 'movie' | 'tv' | null
@@ -188,25 +196,148 @@ export interface UserRating {
   metadata: EnrichedMediaMetadata | null
 }
 
-export interface UserReview {
+export interface MyRatingsResponse {
+  data: MyRatingItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
+}
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+
+export interface Review {
+  id: number
+  authorId: number | null
+  title_id: number
+  content: string
+  header: string | null
+  upvotes: number
+  downvotes: number
+  createdAt: string
+  author: ReviewAuthor | null
+}
+
+export interface MyReviewItem {
   id: number
   title_id: number
   media_type: 'movie' | 'tv' | null
-  header: string | null
   content: string | null
+  header: string | null
   upvotes: number
   downvotes: number
   createdAt: string
   metadata: EnrichedMediaMetadata | null
 }
 
-export interface UserRatingsResponse {
-  data: UserRating[]
-  page?: number
-  totalPages?: number
+export interface MyReviewsResponse {
+  data: MyReviewItem[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+    totalPages: number
+  }
 }
-export interface UserReviewsResponse {
-  data: UserReview[]
-  page?: number
-  totalPages?: number
+
+// ─── API helpers ─────────────────────────────────────────────────────────────
+
+export function submitRating(titleId: number, rating: number, mediaType: 'movie' | 'tv', token: string) {
+  return apiMutate<RatingResponse>('POST', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
+}
+
+export function updateRating(titleId: number, rating: number, mediaType: 'movie' | 'tv', token: string) {
+  return apiMutate<RatingResponse>('PATCH', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
+}
+
+export function deleteRating(titleId: number, token: string) {
+  return apiMutate<RatingResponse>('DELETE', `/v1/ratings/${titleId}`, token)
+}
+
+export function getUserRatingForTitle(authorId: number, titleId: number, token: string) {
+  return apiFetch<RatingResponse>(
+    `/v1/ratings/user/${authorId}/title/${titleId}`,
+    token,
+  )
+}
+
+export function createReview(
+  titleId: number,
+  mediaType: 'movie' | 'tv',
+  content: string,
+  header: string,
+  token: string,
+) {
+  return apiMutate<Review>('POST', `/v1/reviews`, token, {
+    title_id: titleId,
+    media_type: mediaType,
+    content,
+    header: header || undefined,
+  })
+}
+
+export function updateReview(reviewId: number, content: string, header: string, token: string) {
+  return apiMutate<Review>('PUT', `/v1/reviews/${reviewId}`, token, {
+    content,
+    header: header || undefined,
+  })
+}
+
+export function deleteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('DELETE', `/v1/reviews/${reviewId}`, token)
+}
+
+export function getMyRatings(token: string, page = 1) {
+  return apiFetch<MyRatingsResponse>(`/v1/users/me/ratings?page=${page}`, token)
+}
+
+export function getMyReviews(token: string, page = 1) {
+  return apiFetch<MyReviewsResponse>(`/v1/users/me/reviews?page=${page}`, token)
+}
+
+export function syncUser(
+  username: string,
+  email: string,
+  token: string,
+  display_name?: string,
+) {
+  return apiMutate('POST', '/v1/users', token, { username, email, display_name })
+}
+
+/** Decode a JWT payload without verifying (browser-safe). */
+function decodeJwt(token: string): Record<string, unknown> | null {
+  try {
+    const part = token.split('.')[1]
+    const json = atob(part.replace(/-/g, '+').replace(/_/g, '/'))
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Resolve the signed-in user's database authorId. Syncs the user via
+ * POST /v1/users (idempotent) and returns the resulting id. Use this when
+ * the session does not already carry an authorId.
+ */
+export async function resolveAuthorId(token: string): Promise<number | null> {
+  const claims = decodeJwt(token)
+  if (!claims) return null
+  const sub = claims.sub as string | undefined
+  const email = (claims.email as string) ?? (sub ? `${sub}@unknown.local` : undefined)
+  const username =
+    (claims.preferred_username as string) ??
+    (email ? email.split('@')[0] : sub)
+  if (!username || !email) return null
+  try {
+    const user = await apiMutate<{ id: number }>('POST', '/v1/users', token, {
+      username,
+      email,
+    })
+    return user?.id ?? null
+  } catch {
+    return null
+  }
 }
