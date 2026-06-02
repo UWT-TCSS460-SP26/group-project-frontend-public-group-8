@@ -242,7 +242,52 @@ export interface MyReviewsResponse {
   }
 }
 
+// ─── Top Rated ───────────────────────────────────────────────────────────────
+
+export interface TopRatedItem {
+  rank: number
+  title_id: number
+  media_type: 'movie' | 'tv'
+  avgRating: number
+  ratingCount: number
+  metadata: EnrichedMediaMetadata | null
+}
+
+export interface TopRatedResponse {
+  data: TopRatedItem[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
 // ─── API helpers ─────────────────────────────────────────────────────────────
+
+export function getPopularMovies(page = 1) {
+  return apiFetch<PopularMoviesResponse>(`/v1/movies/popular?page=${page}`)
+}
+
+export function getPopularTV(page = 1) {
+  return apiFetch<PopularTVResponse>(`/v1/tv/popular?page=${page}`)
+}
+
+export function getTopRated(page = 1, limit = 20) {
+  return apiFetch<TopRatedResponse>(`/v1/community/top-rated?page=${page}&limit=${limit}`)
+}
+
+export function searchMovies(query: string, page = 1) {
+  return apiFetch<MovieSearchResponse>(`/v1/movie/search/title?q=${encodeURIComponent(query)}&page=${page}`)
+}
+
+export function searchTV(query: string, page = 1) {
+  return apiFetch<TVSearchResponse>(`/v1/tv/search/title?q=${encodeURIComponent(query)}&page=${page}`)
+}
+
+export function searchTVByGenre(genre: string, page = 1) {
+  return apiFetch<TVSearchResponse>(`/v1/tv/search/genre?q=${encodeURIComponent(genre)}&page=${page}`)
+}
 
 export function submitRating(titleId: number, rating: number, mediaType: 'movie' | 'tv', token: string) {
   return apiMutate<RatingResponse>('POST', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
