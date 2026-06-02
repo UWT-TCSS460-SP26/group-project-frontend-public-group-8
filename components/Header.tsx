@@ -25,7 +25,12 @@ export default async function Header() {
           href="/"
           style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
         >
-          Screen8
+          Screen
+          <img
+            src="/icon.svg"
+            alt="8"
+            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
+          />
         </Link>
         <NavSearch />
       </div>
