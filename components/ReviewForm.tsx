@@ -24,7 +24,6 @@ export default function ReviewForm({
   const [header, setHeader] = useState(initialHeader)
   const [content, setContent] = useState(initialContent)
   const [touched, setTouched] = useState(false)
-
   const contentError = touched && content.trim().length === 0 ? 'Review text is required.' : null
 
   function handleSubmit(e: React.SyntheticEvent) {
@@ -34,65 +33,67 @@ export default function ReviewForm({
     onSubmit(header.trim(), content.trim())
   }
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    border: '1px solid var(--input-border)',
+    borderRadius: '6px',
+    background: 'var(--bg)',
+    color: 'var(--text)',
+    fontSize: '0.9rem',
+    fontFamily: 'inherit',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
+    outline: 'none',
+    boxSizing: 'border-box',
+  }
+
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div style={{ marginBottom: '0.75rem' }}>
-        <label
-          htmlFor="review-header"
-          style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.3rem' }}
-        >
-          Title <span style={{ color: 'var(--text-faint)', fontWeight: 400 }}>(optional)</span>
+        <label htmlFor="review-header"
+          style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', letterSpacing: '0.03em' }}>
+          Title{' '}
+          <span style={{ color: 'var(--text-faint)', fontWeight: 400 }}>(optional)</span>
         </label>
         <input
           id="review-header"
           type="text"
           value={header}
-          onChange={(e) => setHeader(e.target.value)}
+          onChange={e => setHeader(e.target.value)}
           placeholder="e.g. A must-watch"
           disabled={submitting}
-          style={{
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
-            background: 'var(--bg)',
-            color: 'var(--text)',
-            fontSize: '0.9rem',
-            fontFamily: 'inherit',
-          }}
+          style={inputStyle}
+          onFocus={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-ring)' }}
+          onBlur={e => { e.currentTarget.style.borderColor = 'var(--input-border)'; e.currentTarget.style.boxShadow = 'none' }}
         />
       </div>
 
       <div style={{ marginBottom: '0.75rem' }}>
-        <label
-          htmlFor="review-content"
-          style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.3rem' }}
-        >
-          Review <span style={{ color: 'var(--error)', fontSize: '0.8rem' }}>*</span>
+        <label htmlFor="review-content"
+          style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.3rem', letterSpacing: '0.03em' }}>
+          Review{' '}
+          <span style={{ color: 'var(--error)', fontSize: '0.78rem' }}>*</span>
         </label>
         <textarea
           id="review-content"
           value={content}
-          onChange={(e) => { setContent(e.target.value); setTouched(true) }}
+          onChange={e => { setContent(e.target.value); setTouched(true) }}
           placeholder="Share your thoughts…"
           rows={4}
           disabled={submitting}
           aria-describedby={contentError ? 'review-content-error' : undefined}
           aria-invalid={!!contentError}
           style={{
-            width: '100%',
-            padding: '0.5rem 0.75rem',
-            border: `1px solid ${contentError ? 'var(--error)' : 'var(--border)'}`,
-            borderRadius: '6px',
-            background: 'var(--bg)',
-            color: 'var(--text)',
-            fontSize: '0.9rem',
-            fontFamily: 'inherit',
+            ...inputStyle,
+            border: `1px solid ${contentError ? 'var(--error)' : 'var(--input-border)'}`,
             resize: 'vertical',
           }}
+          onFocus={e => { e.currentTarget.style.borderColor = contentError ? 'var(--error)' : 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-ring)' }}
+          onBlur={e => { e.currentTarget.style.borderColor = contentError ? 'var(--error)' : 'var(--input-border)'; e.currentTarget.style.boxShadow = 'none' }}
         />
         {contentError && (
-          <p id="review-content-error" role="alert" style={{ color: 'var(--error)', fontSize: '0.8rem', margin: '0.25rem 0 0' }}>
+          <p id="review-content-error" role="alert"
+            style={{ color: 'var(--error)', fontSize: '0.78rem', margin: '0.25rem 0 0' }}>
             {contentError}
           </p>
         )}
@@ -104,39 +105,13 @@ export default function ReviewForm({
         </p>
       )}
 
-      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-        <button
-          type="submit"
-          disabled={submitting}
-          style={{
-            padding: '0.5rem 1.25rem',
-            background: 'var(--accent)',
-            color: 'var(--accent-text)',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            cursor: submitting ? 'wait' : 'pointer',
-            opacity: submitting ? 0.7 : 1,
-          }}
-        >
+      <div style={{ display: 'flex', gap: '0.625rem', alignItems: 'center' }}>
+        <button type="submit" disabled={submitting} className="btn-primary"
+          style={{ opacity: submitting ? 0.65 : 1, cursor: submitting ? 'wait' : 'pointer' }}>
           {submitting ? 'Saving…' : submitLabel}
         </button>
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={submitting}
-            style={{
-              padding: '0.5rem 1rem',
-              background: 'transparent',
-              color: 'var(--text-muted)',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              cursor: 'pointer',
-            }}
-          >
+          <button type="button" onClick={onCancel} disabled={submitting} className="btn-ghost">
             Cancel
           </button>
         )}
