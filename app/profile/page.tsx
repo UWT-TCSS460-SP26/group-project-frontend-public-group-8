@@ -15,6 +15,7 @@ import {
   type MyRatingItem,
   type MyReviewItem,
 } from '@/lib/api'
+import { signOutIfAuthError } from '@/lib/clientAuth'
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -37,7 +38,11 @@ export default function ProfilePage() {
         setRatings(r.data)
         setReviews(rv.data)
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load profile data.'))
+      .catch((e) => {
+        // An expired/invalid token signs the user out instead of showing a 401
+        if (signOutIfAuthError(e)) return
+        setError(e instanceof Error ? e.message : 'Failed to load profile data.')
+      })
       .finally(() => setLoading(false))
   }, [token])
 
@@ -47,8 +52,8 @@ export default function ProfilePage() {
       const item = ratings.find((r) => r.title_id === titleId)
       await submitRating(titleId, star, item?.media_type ?? 'movie', token)
       setRatings((prev) => prev.map((r) => (r.title_id === titleId ? { ...r, rating: star } : r)))
-    } catch {
-      // silent – user sees no change
+    } catch (e) {
+      signOutIfAuthError(e)
     }
   }
 
@@ -57,8 +62,8 @@ export default function ProfilePage() {
     try {
       await deleteRating(titleId, token)
       setRatings((prev) => prev.filter((r) => r.title_id !== titleId))
-    } catch {
-      // silent
+    } catch (e) {
+      signOutIfAuthError(e)
     }
   }
 
@@ -75,6 +80,7 @@ export default function ProfilePage() {
       )
       setEditingReviewId(null)
     } catch (e) {
+      if (signOutIfAuthError(e)) return
       setReviewError(e instanceof Error ? e.message : 'Could not update review.')
     } finally {
       setReviewSubmitting(false)
@@ -86,8 +92,8 @@ export default function ProfilePage() {
     try {
       await deleteReview(reviewId, token)
       setReviews((prev) => prev.filter((r) => r.id !== reviewId))
-    } catch {
-      // silent
+    } catch (e) {
+      signOutIfAuthError(e)
     }
   }
 

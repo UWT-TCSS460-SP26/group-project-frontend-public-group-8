@@ -14,6 +14,7 @@ import {
   getMyReviews,
   type ReviewPreview,
 } from '@/lib/api'
+import { signOutIfAuthError } from '@/lib/clientAuth'
 
 interface OwnedReview {
   id: number
@@ -78,7 +79,7 @@ export default function RatingSection({
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch { /* no rating is fine */ }
+    } catch (e) { signOutIfAuthError(e) /* otherwise: no rating is fine */ }
 
     // Review
     try {
@@ -104,7 +105,7 @@ export default function RatingSection({
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch { /* no review is fine */ }
+    } catch (e) { signOutIfAuthError(e) /* otherwise: no review is fine */ }
   }, [titleId])
 
   useEffect(() => {
@@ -134,6 +135,7 @@ export default function RatingSection({
       const { data } = await submitRating(titleId, star, mediaType, token)
       setCurrentRating(data.rating)
     } catch (e) {
+      if (signOutIfAuthError(e)) return
       setRatingError(e instanceof Error ? e.message : 'Could not save rating.')
     } finally {
       setRatingSubmitting(false)
@@ -148,6 +150,7 @@ export default function RatingSection({
       await deleteRating(titleId, token)
       setCurrentRating(null)
     } catch (e) {
+      if (signOutIfAuthError(e)) return
       setRatingError(e instanceof Error ? e.message : 'Could not remove rating.')
     } finally {
       setRatingSubmitting(false)
@@ -188,14 +191,13 @@ export default function RatingSection({
       setTotalReviews((n) => n + 1)
       setShowReviewForm(false)
     } catch (e) {
+      if (signOutIfAuthError(e)) return
       const msg = e instanceof Error ? e.message : 'Could not post review.'
       if (msg.includes('409')) {
         // Already reviewed — fetch and surface the existing review
         setShowReviewForm(false)
         setReviewError(null)
         if (token) await fetchMyContent(token)
-      } else if (msg.includes('401')) {
-        setReviewError('Your session expired. Please sign in again.')
       } else {
         setReviewError(msg)
       }
@@ -229,8 +231,8 @@ export default function RatingSection({
       )
       setEditingReview(false)
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Could not update review.'
-      setReviewError(msg.includes('401') ? 'Session expired. Please sign in again.' : msg)
+      if (signOutIfAuthError(e)) return
+      setReviewError(e instanceof Error ? e.message : 'Could not update review.')
     } finally {
       setReviewSubmitting(false)
     }
@@ -245,7 +247,9 @@ export default function RatingSection({
       setReviews((prev) => prev.filter((r) => r.id !== myReview.id))
       setTotalReviews((n) => Math.max(0, n - 1))
       setMyReview(null)
-    } catch { /* silent */ } finally {
+    } catch (e) {
+      signOutIfAuthError(e)
+    } finally {
       setReviewSubmitting(false)
     }
   }
