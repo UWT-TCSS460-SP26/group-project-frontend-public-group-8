@@ -19,22 +19,17 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     const element = ref.current
     if (!element) return
 
-    // Show arrows only if the content is scrollable
-    // A small timeout ensures the DOM has fully rendered the children before checking
     const checkScrollable = () => {
-       if (element.scrollWidth > element.clientWidth) {
-         setShowArrows(true)
-       }
+      if (element.scrollWidth > element.clientWidth) {
+        setShowArrows(true)
+      }
     }
     
-    // Initial check
     checkScrollable()
-    
-    // Also check after a brief delay in case images/content load asynchronously
     const timeoutId = setTimeout(checkScrollable, 500)
 
     let animationFrameId: number
-    let direction = 0 // -1 for left, 1 for right, 0 for none
+    let direction = 0
 
     const scrollLoop = () => {
       if (direction !== 0) {
@@ -83,37 +78,40 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     <div style={{ position: 'relative' }}>
       {showArrows && (
         <>
+          {/* Left Arrow */}
           <div style={{
             position: 'absolute',
             left: 0,
             top: 0,
-            bottom: '1rem', // Avoid covering the bottom padding/scrollbar area
-            width: '80px', // Wider gradient area
+            bottom: '1rem',
+            width: '80px',
             background: 'linear-gradient(to right, var(--background) 20%, transparent)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
             paddingLeft: '0.5rem',
             pointerEvents: 'none',
-            zIndex: 10, // Ensure it sits above the posters
+            zIndex: 10,
+            color: 'var(--foreground)', // Set color for currentColor to inherit
           }}>
             <svg 
               width="48" 
               height="48" 
               viewBox="0 0 24 24" 
               fill="none" 
-              stroke="var(--foreground)" 
+              stroke="currentColor" // Use currentColor
               strokeWidth="2" 
               strokeLinecap="round" 
               strokeLinejoin="round"
               style={{
-                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))', // Helps visibility on complex backgrounds
+                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
                 opacity: 0.8
               }}
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </div>
+          {/* Right Arrow */}
           <div style={{
             position: 'absolute',
             right: 0,
@@ -126,14 +124,15 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
             justifyContent: 'flex-end',
             paddingRight: '0.5rem',
             pointerEvents: 'none',
-            zIndex: 10, // Ensure it sits above the posters
+            zIndex: 10,
+            color: 'var(--foreground)', // Set color for currentColor to inherit
           }}>
             <svg 
               width="48" 
               height="48" 
               viewBox="0 0 24 24" 
               fill="none" 
-              stroke="var(--foreground)" 
+              stroke="currentColor" // Use currentColor
               strokeWidth="2" 
               strokeLinecap="round" 
               strokeLinejoin="round"
@@ -142,7 +141,7 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
                 opacity: 0.8
               }}
             >
-              <polyline points="9 18 15 12 9 6"></polyline>
+              <polyline points="9 6 15 12 9 18"></polyline>
             </svg>
           </div>
         </>
