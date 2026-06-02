@@ -6,16 +6,9 @@ export default function SignOutButton() {
   return (
     <button
       type="button"
+      className="btn-ghost"
       onClick={() => signOut({ callbackUrl: '/' })}
-      style={{
-        cursor: 'pointer',
-        padding: '0.375rem 0.75rem',
-        border: '1px solid var(--border)',
-        borderRadius: '6px',
-        background: 'transparent',
-        fontSize: '0.875rem',
-        color: 'var(--text)',
-      }}
+      style={{ height: '32px', padding: '0 0.75rem', fontSize: '0.8rem' }}
     >
       Sign Out
     </button>

@@ -13,17 +13,37 @@ export default async function Header() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '0.75rem 1.5rem',
-        borderBottom: '1px solid var(--border)',
+        padding: '0 1.5rem',
+        height: '56px',
+        borderBottom: '1px solid var(--accent)',
         gap: '1rem',
         flexWrap: 'wrap',
-        background: 'var(--bg)',
+        background: 'rgba(8, 13, 20, 0.92)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 1px 0 rgba(0, 229, 255, 0.08), 0 4px 24px rgba(0,0,0,0.4)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', flex: 1 }}>
+      {/* Left: logo + search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: 0 }}>
         <Link
           href="/"
-          style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
+          aria-label="Screen8 home"
+          style={{
+            fontWeight: 800,
+            fontSize: '1.15rem',
+            textDecoration: 'none',
+            color: 'var(--accent)',
+            flexShrink: 0,
+            letterSpacing: '0.04em',
+            textShadow: '0 0 12px rgba(0, 229, 255, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1px',
+          }}
         >
           Screen
           <img
@@ -35,14 +55,27 @@ export default async function Header() {
         <NavSearch />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+      {/* Right: user area */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
         {session?.user ? (
           <>
             <Link
               href="/profile"
-              style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '4px',
+                transition: 'color 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={undefined}
             >
-              Hi, {session.user.name?.split(' ')[0] ?? session.user.email}
+              Hi,{' '}
+              <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                {session.user.name?.split(' ')[0] ?? session.user.email}
+              </span>
             </Link>
             <SignOutButton />
             <ThemeToggle />
@@ -57,16 +90,8 @@ export default async function Header() {
             >
               <button
                 type="submit"
-                style={{
-                  cursor: 'pointer',
-                  padding: '0.375rem 0.875rem',
-                  background: 'var(--accent)',
-                  color: 'var(--accent-text)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                }}
+                className="btn-primary"
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.875rem' }}
               >
                 Sign In
               </button>

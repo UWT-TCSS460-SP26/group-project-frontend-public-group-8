@@ -9,7 +9,6 @@ function NavSearchInner() {
   const [q, setQ] = useState(searchParams?.get('q') ?? '')
   const [type, setType] = useState(searchParams?.get('type') ?? 'all')
 
-  // Keep fields in sync when the URL changes (e.g. browser back/forward)
   useEffect(() => {
     setQ(searchParams?.get('q') ?? '')
     setType(searchParams?.get('type') ?? 'all')
@@ -25,25 +24,35 @@ function NavSearchInner() {
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flex: 1, minWidth: '200px', maxWidth: '700px', margin: '0 auto' }}
+      style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flex: 1, minWidth: '160px', maxWidth: '560px' }}
     >
       <input
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search movies &amp; shows…"
+        placeholder="Search movies & shows…"
         aria-label="Search movies and TV shows"
         style={{
           flex: 1,
-          padding: '0.375rem 0.625rem',
-          border: '1px solid var(--border)',
+          padding: '0.35rem 0.625rem',
+          border: '1px solid var(--input-border)',
           borderRadius: '6px',
-          fontSize: '0.875rem',
+          fontSize: '0.85rem',
           background: 'var(--bg-subtle)',
           color: 'var(--text)',
           minWidth: 0,
           height: '32px',
-          boxSizing: 'border-box' as const,
+          boxSizing: 'border-box',
+          transition: 'border-color 0.15s, box-shadow 0.15s',
+          outline: 'none',
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = 'var(--accent)'
+          e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-ring)'
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = 'var(--input-border)'
+          e.currentTarget.style.boxShadow = 'none'
         }}
       />
       <select
@@ -51,15 +60,16 @@ function NavSearchInner() {
         onChange={(e) => setType(e.target.value)}
         aria-label="Media type filter"
         style={{
-          padding: '0.375rem 0.625rem',
-          border: '1px solid var(--border)',
+          padding: '0.35rem 0.5rem',
+          border: '1px solid var(--input-border)',
           borderRadius: '6px',
-          fontSize: '0.875rem',
+          fontSize: '0.8rem',
           background: 'var(--bg-subtle)',
           color: 'var(--text)',
           flexShrink: 0,
           height: '32px',
-          boxSizing: 'border-box' as const,
+          boxSizing: 'border-box',
+          cursor: 'pointer',
         }}
       >
         <option value="all">All</option>
@@ -69,17 +79,8 @@ function NavSearchInner() {
       <button
         type="submit"
         aria-label="Submit search"
-        style={{
-          padding: '0.375rem 0.75rem',
-          background: 'var(--accent)',
-          color: 'var(--accent-text)',
-          border: 'none',
-          borderRadius: '6px',
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          cursor: 'pointer',
-          flexShrink: 0,
-        }}
+        className="btn-primary"
+        style={{ height: '32px', padding: '0 0.75rem', fontSize: '0.8rem', flexShrink: 0 }}
       >
         Search
       </button>
