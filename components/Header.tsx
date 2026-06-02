@@ -1,9 +1,16 @@
 import Link from 'next/link'
 import { auth, signIn, signOut } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import NavSearch from '@/components/NavSearch'
 
 export default async function Header() {
   const session = await auth()
+
+  // First name for the signed-in user, falling back to the email handle.
+  const firstName =
+    session?.user?.name?.trim().split(/\s+/)[0] ||
+    session?.user?.email?.split('@')[0] ||
+    'Profile'
 
   return (
     <header
@@ -18,34 +25,26 @@ export default async function Header() {
         background: 'var(--bg)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <Link
-          href="/"
-          style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit' }}
-        >
-          CineTrack
-        </Link>
-        <nav style={{ display: 'flex', gap: '1.25rem' }}>
-          <Link href="/browse" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Browse
-          </Link>
-          <Link href="/search" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Search
-          </Link>
-          {session?.user && (
-            <Link href="/profile" style={{ textDecoration: 'none', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              Profile
-            </Link>
-          )}
-        </nav>
-      </div>
+      <Link
+        href="/"
+        style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
+      >
+        CineTrack
+      </Link>
+
+      <NavSearch />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <ThemeToggle />
 
         {session?.user ? (
           <>
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{session.user.email}</span>
+            <Link
+              href="/profile"
+              style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 600 }}
+            >
+              {firstName}
+            </Link>
             <form
               action={async (_: FormData) => {
                 'use server'
