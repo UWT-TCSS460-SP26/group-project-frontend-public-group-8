@@ -1,10 +1,11 @@
 'use client'
 
-import { useSession, signIn } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useEffect, useState, useCallback } from 'react'
 import StarRating from './StarRating'
 import ReviewForm from './ReviewForm'
 import ReviewVotes from './ReviewVotes'
+import SignInButton from './SignInButton'
 import {
   submitRating,
   deleteRating,
@@ -43,12 +44,10 @@ export default function RatingSection({
   const { data: session, status } = useSession()
   const token = session?.accessToken
 
-  // ── Rating state ──────────────────────────────────────────────────────────
   const [currentRating, setCurrentRating] = useState<number | null>(null)
   const [ratingSubmitting, setRatingSubmitting] = useState(false)
   const [ratingError, setRatingError] = useState<string | null>(null)
 
-  // ── Review state ──────────────────────────────────────────────────────────
   const [reviews, setReviews] = useState<ReviewPreview[]>(initialReviews)
   const [totalReviews, setTotalReviews] = useState(reviewCount)
   const [myReview, setMyReview] = useState<OwnedReview | null>(null)
@@ -57,16 +56,17 @@ export default function RatingSection({
   const [editingReview, setEditingReview] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
+  
+  const [callbackUrl, setCallbackUrl] = useState('/')
 
-  // ── Fetch the signed-in user's rating + review for this title ───────────────
-  // The token identifies the user, so /v1/users/me/{ratings,reviews} are the
-  // simplest source of truth. Each item is enriched with TMDB metadata, so we
-  // can match this title by title_id or metadata.id.
+  useEffect(() => {
+    setCallbackUrl(window.location.href)
+  }, [])
+
   const fetchMyContent = useCallback(async (tok: string) => {
     const matches = (titleIdField: number, metaId: number | undefined) =>
       Number(titleIdField) === titleId || Number(metaId) === titleId
 
-    // Rating
     try {
       let page = 1
       outer: while (true) {
@@ -80,9 +80,8 @@ export default function RatingSection({
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch (e) { signOutIfAuthError(e) /* otherwise: no rating is fine */ }
+    } catch (e) { signOutIfAuthError(e) }
 
-    // Review
     try {
       let page = 1
       outer: while (true) {
@@ -98,7 +97,6 @@ export default function RatingSection({
               downvotes: r.downvotes ?? 0,
               createdAt: r.createdAt,
             })
-            // Drop this title's own review from the community list
             setReviews((prev) => prev.filter((pr) => Number(pr.id) !== Number(r.id)))
             break outer
           }
@@ -106,27 +104,25 @@ export default function RatingSection({
         if (page >= (body.pagination?.totalPages ?? 1)) break
         page++
       }
-    } catch (e) { signOutIfAuthError(e) /* otherwise: no review is fine */ }
+    } catch (e) { signOutIfAuthError(e) }
   }, [titleId])
 
   useEffect(() => {
-    if (!token) {
+    if (status === 'authenticated' && token) {
+      let cancelled = false
+      setLoadingMyContent(true)
+      fetchMyContent(token).finally(() => {
+        if (!cancelled) setLoadingMyContent(false)
+      })
+      return () => { cancelled = true }
+    } else {
       setCurrentRating(null)
       setMyReview(null)
       setLoadingMyContent(false)
       setShowReviewForm(false)
       setEditingReview(false)
-      return
     }
-    let cancelled = false
-    setLoadingMyContent(true)
-    fetchMyContent(token).finally(() => {
-      if (!cancelled) setLoadingMyContent(false)
-    })
-    return () => { cancelled = true }
-  }, [token, fetchMyContent])
-
-  // ── Rating handlers ────────────────────────────────────────────────────────
+  }, [status, token, fetchMyContent])
 
   async function handleRatingChange(star: number) {
     if (!token) return
@@ -157,8 +153,6 @@ export default function RatingSection({
       setRatingSubmitting(false)
     }
   }
-
-  // ── Review handlers ────────────────────────────────────────────────────────
 
   async function handleReviewSubmit(header: string, content: string) {
     if (!token) return
@@ -195,7 +189,6 @@ export default function RatingSection({
       if (signOutIfAuthError(e)) return
       const msg = e instanceof Error ? e.message : 'Could not post review.'
       if (msg.includes('409')) {
-        // Already reviewed — fetch and surface the existing review
         setShowReviewForm(false)
         setReviewError(null)
         if (token) await fetchMyContent(token)
@@ -255,36 +248,41 @@ export default function RatingSection({
     }
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
-
   if (status === 'loading') {
     return <p style={{ color: 'var(--text-faint)', fontSize: '0.875rem' }}>Loading…</p>
   }
 
   return (
     <div>
-      {/* ── Rating control ── */}
+      {/* RATING SECTION */}
       <section style={{ marginBottom: '2rem' }}>
         <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Your Rating</h3>
-
-        {!token ? (
-          <button
-            type="button"
-            onClick={() => signIn('tcss460', { callbackUrl: window.location.href })}
-            style={{
-              display: 'inline-block',
-              padding: '0.5rem 1rem',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              fontSize: '0.875rem',
-              color: 'var(--text-muted)',
-              background: 'transparent',
-              cursor: 'pointer',
-            }}
-            aria-label="Sign in to rate this title"
-          >
-            Sign in to rate
-          </button>
+        {status === 'unauthenticated' ? (
+          <div style={{
+            padding: '1.5rem',
+            border: '1px dashed var(--border)',
+            borderRadius: '8px',
+            textAlign: 'center',
+            background: 'var(--bg-subtle)'
+          }}>
+            <p style={{ color: 'var(--text-muted)', margin: '0 0 1rem' }}>
+              Sign in to rate this title.
+            </p>
+            <SignInButton
+              callbackUrl={callbackUrl}
+              style={{
+                padding: '0.5rem 1rem',
+                background: 'var(--accent)',
+                color: 'var(--accent-text)',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              Sign In
+            </SignInButton>
+          </div>
         ) : (
           <div>
             <StarRating
@@ -320,13 +318,13 @@ export default function RatingSection({
         )}
       </section>
 
-      {/* ── Reviews ── */}
+      {/* REVIEW SECTION */}
       <section>
         <h2 style={{ marginBottom: '1rem' }}>
           Community Reviews{totalReviews > 0 ? ` (${totalReviews})` : ''}
         </h2>
 
-        {token && !myReview && !showReviewForm && !loadingMyContent && (
+        {status === 'authenticated' && !myReview && !showReviewForm && !loadingMyContent && (
           <button
             type="button"
             onClick={() => setShowReviewForm(true)}
@@ -346,7 +344,7 @@ export default function RatingSection({
           </button>
         )}
 
-        {token && !myReview && showReviewForm && !loadingMyContent && (
+        {status === 'authenticated' && !myReview && showReviewForm && !loadingMyContent && (
           <div
             style={{
               border: '1px solid var(--border)',
@@ -365,21 +363,18 @@ export default function RatingSection({
           </div>
         )}
 
-        {!token && (
+        {status === 'unauthenticated' && (
           <p style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            <button
-              type="button"
-              onClick={() => signIn('tcss460', { callbackUrl: window.location.href })}
+            <SignInButton
+              callbackUrl={callbackUrl}
               style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}
-              aria-label="Sign in to write a review"
             >
               Sign in
-            </button>{' '}
+            </SignInButton>{' '}
             to write a review.
           </p>
         )}
 
-        {/* User's own review */}
         {myReview && (
           <div
             style={{
@@ -435,7 +430,6 @@ export default function RatingSection({
           </div>
         )}
 
-        {/* Community reviews */}
         {reviews.length === 0 && !myReview ? (
           <p style={{ color: 'var(--text-faint)' }}>No reviews yet. Be the first!</p>
         ) : (

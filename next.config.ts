@@ -17,7 +17,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
+        // Don't proxy NextAuth routes
+        source: "/api/((?!auth/).*)",
         destination: "https://tcss-460-group-7.onrender.com/:path*",
       },
     ]
