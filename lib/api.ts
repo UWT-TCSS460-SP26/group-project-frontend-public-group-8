@@ -293,8 +293,16 @@ export function upvoteReview(reviewId: number, token: string) {
   return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/upvote`, token)
 }
 
+export function removeUpvoteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/remove-upvote`, token)
+}
+
 export function downvoteReview(reviewId: number, token: string) {
   return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/downvote`, token)
+}
+
+export function removeDownvoteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/remove-downvote`, token)
 }
 
 export function getMyRatings(token: string, page = 1) {
