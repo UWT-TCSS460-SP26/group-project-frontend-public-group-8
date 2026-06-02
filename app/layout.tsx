@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { SessionProvider } from "next-auth/react"
 import Header from "@/components/Header"
+import TokenExpiryWatcher from "@/components/TokenExpiryWatcher"
 import "@/styles/globals.css"
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
       </head>
       <body>
         <SessionProvider>
+          <TokenExpiryWatcher />
           <Header />
           {children}
         </SessionProvider>
