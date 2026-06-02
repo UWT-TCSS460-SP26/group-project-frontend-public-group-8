@@ -58,6 +58,7 @@ export default function ReviewForm({
             background: 'var(--bg)',
             color: 'var(--text)',
             fontSize: '0.9rem',
+            fontFamily: 'inherit',
           }}
         />
       </div>
@@ -86,6 +87,7 @@ export default function ReviewForm({
             background: 'var(--bg)',
             color: 'var(--text)',
             fontSize: '0.9rem',
+            fontFamily: 'inherit',
             resize: 'vertical',
           }}
         />
