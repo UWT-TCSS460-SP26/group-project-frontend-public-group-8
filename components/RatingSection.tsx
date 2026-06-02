@@ -4,6 +4,7 @@ import { useSession, signIn } from 'next-auth/react'
 import { useEffect, useState, useCallback } from 'react'
 import StarRating from './StarRating'
 import ReviewForm from './ReviewForm'
+import ReviewVotes from './ReviewVotes'
 import {
   submitRating,
   deleteRating,
@@ -458,13 +459,14 @@ export default function RatingSection({
                       {r.content}
                     </p>
                   )}
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', margin: 0 }}>
-                    {r.author ? (r.author.display_name ?? r.author.username) : 'Anonymous'}
-                    {' · '}
-                    {new Date(r.createdAt).toLocaleDateString()}
-                    {' · '}
-                    ↑{r.upvotes} ↓{r.downvotes}
-                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', margin: 0 }}>
+                      {r.author ? (r.author.display_name ?? r.author.username) : 'Anonymous'}
+                      {' · '}
+                      {new Date(r.createdAt).toLocaleDateString()}
+                    </p>
+                    <ReviewVotes reviewId={r.id} upvotes={r.upvotes} downvotes={r.downvotes} />
+                  </div>
                 </div>
               ))}
           </div>
