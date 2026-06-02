@@ -132,7 +132,7 @@ export default function RecentActivity() {
           textAlign: 'center',
           color: 'var(--text-muted)'
         }}>
-          You haven't rated anything yet. Start exploring to build your activity feed!
+          You haven&apos;t rated anything yet. Start exploring to build your activity feed!
         </div>
       ) : (
         <HoverCarousel onScrollEnd={handleScrollEnd}>

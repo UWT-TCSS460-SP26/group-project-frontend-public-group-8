@@ -68,8 +68,8 @@ const posterPlaceholderStyle: React.CSSProperties = {
 
 function SearchContent() {
   const searchParams = useSearchParams()
-  const q = searchParams.get('q') ?? ''
-  const type = searchParams.get('type') ?? 'all'
+  const q = searchParams?.get('q') ?? ''
+  const type = searchParams?.get('type') ?? 'all'
 
   const [movies, setMovies] = useState<MovieSearchResult[]>([])
   const [tvShows, setTvShows] = useState<TVSearchResult[]>([])

@@ -6,13 +6,13 @@ import { useState, useEffect, Suspense } from 'react'
 function NavSearchInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const [q, setQ] = useState(searchParams.get('q') ?? '')
-  const [type, setType] = useState(searchParams.get('type') ?? 'all')
+  const [q, setQ] = useState(searchParams?.get('q') ?? '')
+  const [type, setType] = useState(searchParams?.get('type') ?? 'all')
 
   // Keep fields in sync when the URL changes (e.g. browser back/forward)
   useEffect(() => {
-    setQ(searchParams.get('q') ?? '')
-    setType(searchParams.get('type') ?? 'all')
+    setQ(searchParams?.get('q') ?? '')
+    setType(searchParams?.get('type') ?? 'all')
   }, [searchParams])
 
   function handleSubmit(e: React.SyntheticEvent) {
