@@ -289,6 +289,14 @@ export function deleteReview(reviewId: number, token: string) {
   return apiMutate<Review>('DELETE', `/v1/reviews/${reviewId}`, token)
 }
 
+export function upvoteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/upvote`, token)
+}
+
+export function downvoteReview(reviewId: number, token: string) {
+  return apiMutate<Review>('POST', `/v1/reviews/${reviewId}/downvote`, token)
+}
+
 export function getMyRatings(token: string, page = 1) {
   return apiFetch<MyRatingsResponse>(`/v1/users/me/ratings?page=${page}`, token)
 }
