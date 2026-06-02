@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { searchTVByGenre } from '@/lib/api'
 import type { TVSearchResult } from '@/lib/api'
@@ -11,127 +11,99 @@ interface Props {
   title: string
 }
 
-const cardStyle: React.CSSProperties = {
-  border: '1px solid var(--border)',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  textDecoration: 'none',
-  color: 'inherit',
-  display: 'block',
-  minWidth: '150px',
-  maxWidth: '150px',
-  flexShrink: 0,
-}
+const CARD_WIDTH = 150
 
-const posterPlaceholderStyle: React.CSSProperties = {
-  width: '100%',
-  aspectRatio: '2/3',
-  background: 'var(--placeholder-bg)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '0.75rem',
-  color: 'var(--text-faint)',
-  textAlign: 'center',
-  padding: '1rem'
-}
-
-const cardBodyStyle: React.CSSProperties = {
-  padding: '0.5rem 0.6rem 0.6rem',
+function CardSkeleton() {
+  return (
+    <div style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
+      <div className="skeleton" style={{ width: '100%', aspectRatio: '2/3', borderRadius: '8px 8px 0 0' }} />
+      <div style={{ padding: '0.5rem 0.6rem 0.6rem', background: 'var(--card-bg)', borderRadius: '0 0 8px 8px', border: '1px solid var(--border)', borderTop: 'none' }}>
+        <div className="skeleton" style={{ height: '12px', width: '80%', marginBottom: '6px' }} />
+        <div className="skeleton" style={{ height: '10px', width: '40%' }} />
+      </div>
+    </div>
+  )
 }
 
 export default function GenreCarousel({ genre, title }: Props) {
   const [shows, setShows] = useState<TVSearchResult[]>([])
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [hasMore, setHasMore] = useState(true)
-
-  const genres = Array.isArray(genre) ? genre : [genre]
+  const genreKey = Array.isArray(genre) ? genre.join(',') : genre
+  const mounted = useRef(false)
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      setLoading(true)
-      try {
-        const responses = await Promise.all(
-          genres.map(g => searchTVByGenre(g, 1))
-        )
-        
-        const combinedResults = responses.flatMap(res => res.results)
-        const uniqueResults = Array.from(new Map(combinedResults.map(show => [show.id, show])).values())
-        
-        setShows(uniqueResults)
-        
-        // If any of the genres have more pages, we'll allow fetching more
-        const anyHasMore = responses.some(res => res.page < res.totalPages)
-        setHasMore(anyHasMore)
+    if (mounted.current) return
+    mounted.current = true
 
-      } catch (error) {
-        console.error(`Failed to fetch ${title} shows`, error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchInitialData()
-  }, [JSON.stringify(genres)]) // Effect dependencies need to handle array changes
+    const genres = Array.isArray(genre) ? genre : [genre]
+    setLoading(true)
+    Promise.all(genres.map(g => searchTVByGenre(g, 1)))
+      .then(responses => {
+        const combined = responses.flatMap(r => r.results)
+        const unique = Array.from(new Map(combined.map(s => [s.id, s])).values())
+        setShows(unique)
+        setHasMore(responses.some(r => r.page < r.totalPages))
+      })
+      .catch(() => { /* hide empty carousels via null render below */ })
+      .finally(() => setLoading(false))
+  // genreKey is a stable string derived from the prop; intentional dep
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [genreKey])
 
   const handleScrollEnd = async () => {
-    if (hasMore && !loading) {
-      setLoading(true)
-      try {
-        const nextPage = page + 1
-        const responses = await Promise.all(
-          genres.map(g => searchTVByGenre(g, nextPage))
-        )
-        
-        const combinedResults = responses.flatMap(res => res.results)
-
-        setShows(prev => {
-          const existingIds = new Set(prev.map(s => s.id))
-          const newShows = combinedResults.filter(s => !existingIds.has(s.id))
-          return [...prev, ...newShows]
-        })
-        
-        setPage(nextPage)
-        
-        const anyHasMore = responses.some(res => res.page < res.totalPages)
-        setHasMore(anyHasMore)
-
-      } catch (error) {
-        console.error(`Failed to load more ${title} shows`, error)
-      } finally {
-        setLoading(false)
-      }
-    }
+    if (!hasMore || loading) return
+    const genres = Array.isArray(genre) ? genre : [genre]
+    setLoading(true)
+    try {
+      const next = page + 1
+      const responses = await Promise.all(genres.map(g => searchTVByGenre(g, next)))
+      setShows(prev => {
+        const existingIds = new Set(prev.map(s => s.id))
+        return [...prev, ...responses.flatMap(r => r.results).filter(s => !existingIds.has(s.id))]
+      })
+      setPage(next)
+      setHasMore(responses.some(r => r.page < r.totalPages))
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
   if (shows.length === 0 && !loading) return null
 
   return (
-    <section style={{ marginBottom: '3rem' }}>
-      <h2 style={{ marginBottom: '1rem' }}>{title}</h2>
+    <section style={{ marginBottom: '2.5rem' }}>
+      <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+        {title}
+      </h3>
       <HoverCarousel onScrollEnd={handleScrollEnd}>
-        {shows.map((s) => (
-          <Link key={s.id} href={`/media/tv/${s.id}`} style={cardStyle}>
-            {s.posterUrl ? (
-              <img
-                src={s.posterUrl}
-                alt={s.name}
-                style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
-              />
-            ) : (
-              <div style={posterPlaceholderStyle}>{s.name}</div>
-            )}
-            <div style={cardBodyStyle}>
-              <p style={{ fontWeight: 600, fontSize: '0.85rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {s.name}
-              </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
-                {s.firstAirDate?.slice(0, 4)}
-              </p>
-            </div>
-          </Link>
-        ))}
-        {loading && <div style={{ minWidth: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}
+        {loading && shows.length === 0
+          ? Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)
+          : shows.map(s => (
+            <Link key={s.id} href={`/media/tv/${s.id}`} className="media-card"
+              style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
+              {s.posterUrl ? (
+                <img src={s.posterUrl} alt={s.name}
+                  style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>
+                  {s.name}
+                </div>
+              )}
+              <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
+                <p style={{ fontWeight: 600, fontSize: '0.82rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {s.name}
+                </p>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                  {s.firstAirDate?.slice(0, 4)}
+                </p>
+              </div>
+            </Link>
+          ))}
+        {loading && shows.length > 0 && (
+          <div style={{ minWidth: CARD_WIDTH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-faint)', fontSize: '0.8rem' }}>
+            Loading…
+          </div>
+        )}
       </HoverCarousel>
     </section>
   )
