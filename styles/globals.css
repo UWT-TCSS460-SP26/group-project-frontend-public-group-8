@@ -3,49 +3,49 @@
 /* ─── Dark theme (default) ────────────────────────────────────────────────── */
 :root {
   /* Backgrounds */
-  --bg:           #080d14;
-  --bg-subtle:    #0f1923;
-  --bg-muted:     #1a2535;
-  --surface:      #0f1923;
-  --card-bg:      #0f1923;
+  --bg:           #020810;
+  --bg-subtle:    #080f1a;
+  --bg-muted:     #0d1a2a;
+  --surface:      #080f1a;
+  --card-bg:      #070d18;
 
   /* Borders */
-  --border:       #1e2d42;
+  --border:       #0d2035;
 
   /* Text */
-  --text:         #e2e8f0;
-  --text-secondary: #cbd5e1;
-  --text-muted:   #7a90a8;
-  --text-faint:   #4a6078;
+  --text:         #e8f0f8;
+  --text-secondary: #b8cfe0;
+  --text-muted:   #6080a0;
+  --text-faint:   #304860;
 
   /* Inputs */
-  --input-bg:     #080d14;
-  --input-border: #2a3f58;
-  --input-text:   #f1f5f9;
+  --input-bg:     #020810;
+  --input-border: #1a3050;
+  --input-text:   #e8f0f8;
 
-  /* Accents — cyberpunk neon */
-  --accent:       #00e5ff;
-  --accent-dim:   #00b8d4;
-  --accent-text:  #080d14;
-  --accent-ring:  rgba(0, 229, 255, 0.22);
-  --accent-glow:  0 0 16px rgba(0, 229, 255, 0.18);
+  /* Accents — strong cyberpunk neon */
+  --accent:       #00ffff;
+  --accent-dim:   #00ccdd;
+  --accent-text:  #020810;
+  --accent-ring:  rgba(0, 255, 255, 0.25);
+  --accent-glow:  0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.2);
 
-  --violet:       #bf00ff;
-  --violet-glow:  0 0 12px rgba(191, 0, 255, 0.2);
+  --violet:       #ff00cc;
+  --violet-glow:  0 0 20px rgba(255, 0, 204, 0.5), 0 0 40px rgba(255, 0, 204, 0.2);
 
   /* Utility */
-  --placeholder-bg: #1a2535;
-  --danger:       #f87171;
-  --error:        #f87171;
-  --shadow:       0 2px 8px rgba(0, 0, 0, 0.5);
+  --placeholder-bg: #0d1a2a;
+  --danger:       #ff3355;
+  --error:        #ff3355;
+  --shadow:       0 4px 20px rgba(0, 0, 0, 0.85);
 
   /* Card hover */
-  --card-hover-shadow: 0 8px 32px rgba(0, 229, 255, 0.10), 0 2px 8px rgba(0,0,0,0.5);
-  --card-hover-border: #00e5ff;
+  --card-hover-shadow: 0 0 28px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0,0,0,0.9);
+  --card-hover-border: #00ffff;
 
   /* Skeleton animation base */
-  --skeleton-from: #1a2535;
-  --skeleton-to:   #243347;
+  --skeleton-from: #0d1a2a;
+  --skeleton-to:   #162438;
 
   /* ── Aliases for merged components that use different var names ── */
   --background:   var(--bg);
@@ -110,6 +110,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Scanline overlay — dark mode only */
+:root:not([data-theme="light"]) body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.07) 3px,
+    rgba(0, 0, 0, 0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -120,7 +136,7 @@ a {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 4px;
   padding: 6px 14px;
   font-size: 13px;
   font-weight: 600;
@@ -131,10 +147,12 @@ a {
   line-height: 1;
   white-space: nowrap;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  letter-spacing: 0.04em;
 }
 
 .theme-toggle:hover {
   border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
 }
 
 .theme-toggle:focus-visible {
@@ -148,7 +166,6 @@ a {
   outline-offset: 2px;
 }
 
-/* Buttons and links that manage their own focus style can suppress this */
 button:focus-visible,
 a:focus-visible {
   outline: none;
@@ -176,8 +193,8 @@ a:focus-visible {
 
 /* ─── Media card ─────────────────────────────────────────────────────────── */
 .media-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 255, 0.12);
+  border-radius: 4px;
   overflow: hidden;
   text-decoration: none;
   color: inherit;
@@ -187,8 +204,13 @@ a:focus-visible {
   will-change: transform;
 }
 
+:root[data-theme="light"] .media-card {
+  border-color: var(--border);
+  border-radius: 8px;
+}
+
 .media-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(1.02);
   box-shadow: var(--card-hover-shadow);
   border-color: var(--card-hover-border);
 }
@@ -202,12 +224,22 @@ a:focus-visible {
 
 /* ─── Section heading ────────────────────────────────────────────────────── */
 .section-heading {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-family: var(--font-orbitron, 'Orbitron', monospace);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.7), 0 0 24px rgba(0, 255, 255, 0.35);
   margin: 0 0 1rem;
+}
+
+:root[data-theme="light"] .section-heading {
+  text-shadow: none;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  font-family: inherit;
 }
 
 /* ─── Neon button ────────────────────────────────────────────────────────── */
@@ -218,18 +250,20 @@ a:focus-visible {
   padding: 0.5rem 1.25rem;
   background: var(--accent);
   color: var(--accent-text);
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 14px rgba(0, 255, 255, 0.4), 0 0 28px rgba(0, 255, 255, 0.15);
 }
 
 .btn-primary:hover {
   background: var(--accent-dim);
-  box-shadow: var(--accent-glow);
+  box-shadow: 0 0 22px rgba(0, 255, 255, 0.65), 0 0 50px rgba(0, 255, 255, 0.25);
 }
 
 .btn-primary:focus-visible {
@@ -238,7 +272,7 @@ a:focus-visible {
 }
 
 .btn-primary:disabled {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -252,7 +286,7 @@ a:focus-visible {
   background: transparent;
   color: var(--text-muted);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 0.875rem;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
@@ -261,6 +295,7 @@ a:focus-visible {
 .btn-ghost:hover {
   border-color: var(--accent);
   color: var(--accent);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
 }
 
 .btn-ghost:focus-visible {

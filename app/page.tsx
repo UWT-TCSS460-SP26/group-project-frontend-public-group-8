@@ -17,11 +17,11 @@ export default function Home() {
 
       {/* Genre section divider */}
       <div style={{ margin: '1.5rem 0 2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, var(--accent), transparent)' }} />
-        <h2 style={{ margin: 0, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', whiteSpace: 'nowrap' }}>
+        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, var(--accent), transparent)', boxShadow: '0 0 6px rgba(0,255,255,0.4)' }} />
+        <h2 className="section-heading" style={{ margin: 0, whiteSpace: 'nowrap' }}>
           Browse by Genre
         </h2>
-        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to left, var(--accent), transparent)' }} />
+        <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to left, var(--accent), transparent)', boxShadow: '0 0 6px rgba(0,255,255,0.4)' }} />
       </div>
 
       <GenreCarousel genre="animation"       title="Animation" />

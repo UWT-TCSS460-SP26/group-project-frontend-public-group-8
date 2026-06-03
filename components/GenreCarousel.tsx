@@ -72,7 +72,7 @@ export default function GenreCarousel({ genre, title }: Props) {
 
   return (
     <section style={{ marginBottom: '2.5rem' }}>
-      <h3 style={{ margin: '0 0 0.75rem', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+      <h3 className="section-heading" style={{ margin: '0 0 0.75rem' }}>
         {title}
       </h3>
       <HoverCarousel onScrollEnd={handleScrollEnd}>

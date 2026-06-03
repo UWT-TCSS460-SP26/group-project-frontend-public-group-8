@@ -68,7 +68,7 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Left fade + arrow */}
+      {/* Left neon arrow — thin transparent fade, no card-obscuring shader */}
       {showArrows && (
         <div
           aria-hidden="true"
@@ -77,26 +77,26 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
             left: 0,
             top: 0,
             bottom: '1rem',
-            width: '72px',
-            background: 'linear-gradient(to right, var(--bg) 20%, transparent)',
+            width: '40px',
+            background: 'linear-gradient(to right, rgba(2,8,16,0.75) 0%, transparent 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            paddingLeft: '0.4rem',
+            paddingLeft: '2px',
             pointerEvents: 'none',
             zIndex: 10,
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0 0 6px rgba(0,229,255,0.5))', opacity: 0.85 }}
+            style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>
         </div>
       )}
 
-      {/* Right fade + arrow */}
+      {/* Right neon arrow — thin transparent fade, no card-obscuring shader */}
       {showArrows && (
         <div
           aria-hidden="true"
@@ -105,19 +105,19 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
             right: 0,
             top: 0,
             bottom: '1rem',
-            width: '72px',
-            background: 'linear-gradient(to left, var(--bg) 20%, transparent)',
+            width: '40px',
+            background: 'linear-gradient(to left, rgba(2,8,16,0.75) 0%, transparent 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
-            paddingRight: '0.4rem',
+            paddingRight: '2px',
             pointerEvents: 'none',
             zIndex: 10,
           }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-            style={{ filter: 'drop-shadow(0 0 6px rgba(0,229,255,0.5))', opacity: 0.85 }}
+            style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
           >
             <polyline points="9 6 15 12 9 18" />
           </svg>

@@ -49,26 +49,35 @@ export default function HeroSearch() {
         borderRadius: '12px',
         overflow: 'hidden',
         position: 'relative',
-        background: 'linear-gradient(135deg, #080d14 0%, #0f1923 40%, #0a1220 70%, #080d14 100%)',
+        background: 'linear-gradient(135deg, #020810 0%, #080f1a 40%, #050c18 70%, #020810 100%)',
         border: '1px solid var(--border)',
       }}
     >
-      {/* Subtle grid texture overlay */}
+      {/* Cyberpunk grid texture */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(0,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.07) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
           pointerEvents: 'none',
         }}
       />
-      {/* Top neon accent line */}
+      {/* Top neon accent line — cyan → magenta */}
       <div
         aria-hidden="true"
         style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
-          background: 'linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--violet) 60%, transparent 100%)',
+          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+          background: 'linear-gradient(90deg, transparent 0%, var(--accent) 30%, var(--violet) 70%, transparent 100%)',
+          boxShadow: '0 0 12px rgba(0,255,255,0.5), 0 0 24px rgba(255,0,204,0.3)',
+        }}
+      />
+      {/* Bottom neon accent line */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,255,0.3) 40%, rgba(255,0,204,0.3) 60%, transparent 100%)',
         }}
       />
 
@@ -78,7 +87,7 @@ export default function HeroSearch() {
         </p>
         <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', margin: '0 0 0.5rem', lineHeight: 1.15, fontWeight: 800, letterSpacing: '-0.01em' }}>
           Find your next{' '}
-          <span style={{ color: 'var(--accent)', textShadow: '0 0 20px rgba(0,229,255,0.4)' }}>
+          <span style={{ color: 'var(--accent)', textShadow: '0 0 16px rgba(0,255,255,0.7), 0 0 36px rgba(0,255,255,0.35)' }}>
             favorite
           </span>
         </h1>
@@ -109,7 +118,7 @@ export default function HeroSearch() {
             onFocus={(e) => {
               if (query.trim().length >= 2) setShowDropdown(true)
               e.currentTarget.style.borderColor = 'var(--accent)'
-              e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-ring), 0 0 20px rgba(0,229,255,0.08)'
+              e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent), 0 0 20px rgba(0,255,255,0.2), 0 0 40px rgba(0,255,255,0.08)'
             }}
             onBlur={(e) => {
               e.currentTarget.style.borderColor = 'var(--input-border)'
