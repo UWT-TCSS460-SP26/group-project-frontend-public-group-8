@@ -3,6 +3,9 @@ import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
 import NavSearch from '@/components/NavSearch'
+import { Playfair_Display } from 'next/font/google'
+
+const playfair = Playfair_Display({ subsets: ['latin'], weight: '700' })
 
 export default async function Header() {
   const session = await auth()
@@ -20,27 +23,57 @@ export default async function Header() {
         background: 'var(--bg)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', flex: 1 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          flex: 1,
+        }}
+      >
         <Link
           href="/"
-          style={{ fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none', color: 'inherit', flexShrink: 0 }}
+          style={{
+            fontFamily: playfair.style.fontFamily,
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            textDecoration: 'none',
+            color: 'inherit',
+            flexShrink: 0,
+          }}
         >
           Screen
           <img
             src="/icon.svg"
             alt="8"
-            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
+            style={{
+              height: '1em',
+              verticalAlign: 'middle',
+              marginTop: '-0.1em',
+            }}
           />
         </Link>
         <NavSearch />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          flexShrink: 0,
+        }}
+      >
         {session?.user ? (
           <>
             <Link
               href="/profile"
-              style={{ fontSize: '0.875rem', color: 'var(--text-muted)', textDecoration: 'none' }}
+              style={{
+                fontSize: '0.875rem',
+                color: 'var(--text-muted)',
+                textDecoration: 'none',
+              }}
             >
               Hi, {session.user.name?.split(' ')[0] ?? session.user.email}
             </Link>
