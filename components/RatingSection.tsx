@@ -266,7 +266,7 @@ export default function RatingSection({
             background: 'var(--bg-subtle)'
           }}>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 1rem' }}>
-              Sign in to rate this title.
+              Sign in to rate and review this title.
             </p>
             <SignInButton
               callbackUrl={callbackUrl}
@@ -361,18 +361,6 @@ export default function RatingSection({
               onCancel={() => { setShowReviewForm(false); setReviewError(null) }}
             />
           </div>
-        )}
-
-        {status === 'unauthenticated' && (
-          <p style={{ marginBottom: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-            <SignInButton
-              callbackUrl={callbackUrl}
-              style={{ background: 'none', border: 'none', padding: 0, color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}
-            >
-              Sign in
-            </SignInButton>{' '}
-            to write a review.
-          </p>
         )}
 
         {myReview && (
