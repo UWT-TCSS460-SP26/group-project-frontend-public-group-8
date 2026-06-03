@@ -1,4 +1,5 @@
 import NextAuth, { type DefaultSession } from "next-auth"
+import { authConfig } from './auth.config'
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -28,7 +29,9 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   pages: {
+    signIn: '/',
     error: '/auth-error',
   },
   providers: [
@@ -50,17 +53,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   ],
   callbacks: {
+    ...authConfig.callbacks, // Inherit the authorized callback
+    
     async jwt({ token, account, profile }) {
       if (account?.access_token) {
         token.accessToken = account.access_token
 
-        // Store expiry from the access token's exp claim
         const claims = decodeJwtPayload(account.access_token)
         if (claims?.exp) {
           token.accessTokenExpires = (claims.exp as number) * 1000
         }
 
-        // Sync user with the API to obtain the database authorId
         try {
           const username =
             (claims?.preferred_username as string) ??
@@ -85,7 +88,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } catch { /* continue without authorId */ }
       }
 
-      // Invalidate the session server-side when the access token has expired
       if (token.accessTokenExpires && Date.now() > token.accessTokenExpires) {
         return null
       }

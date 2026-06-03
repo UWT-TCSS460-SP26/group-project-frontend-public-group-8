@@ -3,6 +3,9 @@ import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
 import NavSearch from '@/components/NavSearch'
+import { Playfair_Display } from 'next/font/google'
+
+const playfair = Playfair_Display({ subsets: ['latin'], weight: '700' })
 
 export default async function Header() {
   const session = await auth()
@@ -33,12 +36,12 @@ export default async function Header() {
           href="/"
           aria-label="Screen8 home"
           style={{
-            fontWeight: 800,
+            fontFamily: playfair.style.fontFamily,
+            fontWeight: 700,
             fontSize: '1.15rem',
             textDecoration: 'none',
             color: 'var(--accent)',
             flexShrink: 0,
-            letterSpacing: '0.04em',
             textShadow: '0 0 12px rgba(0, 229, 255, 0.35)',
             display: 'flex',
             alignItems: 'center',
@@ -65,12 +68,8 @@ export default async function Header() {
                 fontSize: '0.875rem',
                 color: 'var(--text-muted)',
                 textDecoration: 'none',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '4px',
-                transition: 'color 0.15s ease',
                 whiteSpace: 'nowrap',
               }}
-              onMouseEnter={undefined}
             >
               Hi,{' '}
               <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
