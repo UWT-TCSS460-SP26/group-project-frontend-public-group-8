@@ -1,19 +1,27 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  // Not required for Vercel, but good practice for local dev
-  // to ensure the root is correctly identified.
   turbopack: {
     root: __dirname,
   },
 
-  // Turn off since we're deploying to Vercel, which has its own indicators
   devIndicators: false,
-
-  // We don't need to expose source maps in production
   productionBrowserSourceMaps: false,
 
-  // Proxy API requests to the backend to avoid CORS issues
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'image.tmdb.org',
+        pathname: '/t/p/**',
+      },
+    ],
+    minimumCacheTTL: 3600,
+  },
+
+  // Proxy API requests to the backend for local dev convenience.
+  // NOTE: Next.js App Router route handlers (e.g. /api/auth/*) take strict
+  // precedence over rewrites, so NextAuth callbacks are NOT affected.
   async rewrites() {
     return [
       {
