@@ -28,6 +28,9 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  pages: {
+    error: '/auth-error',
+  },
   providers: [
     {
       id: "tcss460",

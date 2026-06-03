@@ -293,10 +293,6 @@ export function submitRating(titleId: number, rating: number, mediaType: 'movie'
   return apiMutate<RatingResponse>('POST', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
 }
 
-export function updateRating(titleId: number, rating: number, mediaType: 'movie' | 'tv', token: string) {
-  return apiMutate<RatingResponse>('PATCH', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
-}
-
 export function deleteRating(titleId: number, token: string) {
   return apiMutate<RatingResponse>('DELETE', `/v1/ratings/${titleId}`, token)
 }
