@@ -12,17 +12,6 @@ const nextConfig: NextConfig = {
 
   // We don't need to expose source maps in production
   productionBrowserSourceMaps: false,
-
-  // Proxy API requests to the backend to avoid CORS issues
-  async rewrites() {
-    return [
-      {
-        // Don't proxy NextAuth routes
-        source: "/api/((?!auth/).*)",
-        destination: "https://tcss-460-group-7.onrender.com/:path*",
-      },
-    ]
-  },
 }
 
 export default nextConfig
