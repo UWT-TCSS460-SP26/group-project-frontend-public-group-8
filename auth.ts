@@ -30,12 +30,10 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  
-  // Add the pages config here
   pages: {
     signIn: '/',
+    error: '/auth-error',
   },
-
   providers: [
     {
       id: "tcss460",

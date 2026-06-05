@@ -20,17 +20,17 @@ export default async function MediaDetailPage({ params }: Props) {
     if (msg.startsWith('404')) notFound()
     return (
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-        <p style={{ color: 'var(--error)' }}>Could not load details: {msg}</p>
+        <p role="alert" style={{ color: 'var(--error)' }}>Could not load details: {msg}</p>
       </main>
     )
   }
 
   const { metadata: m, community, recentReviews } = data
-  const mediaLabel = type === 'tv' ? 'TV Show' : 'Movie'
+  const isTV = type === 'tv'
 
   return (
-    <main style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-      {/* Title + Poster */}
+    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+      {/* ── Hero row ── */}
       <div
         style={{
           display: 'flex',
@@ -40,63 +40,104 @@ export default async function MediaDetailPage({ params }: Props) {
           alignItems: 'flex-start',
         }}
       >
-        {m.poster_url ? (
-          <img
-            src={m.poster_url}
-            alt={m.title}
-            style={{ width: '220px', borderRadius: '8px', flexShrink: 0 }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '220px',
-              aspectRatio: '2/3',
-              background: 'var(--placeholder-bg)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-faint)',
-              flexShrink: 0,
-            }}
-          >
-            No poster
-          </div>
-        )}
+        {/* Poster */}
+        <div style={{ flexShrink: 0, position: 'relative' }}>
+          {m.poster_url ? (
+            <img
+              src={m.poster_url}
+              alt={m.title}
+              style={{
+                width: '200px',
+                borderRadius: '10px',
+                display: 'block',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--border)',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: '200px',
+                aspectRatio: '2/3',
+                background: 'var(--placeholder-bg)',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-faint)',
+                fontSize: '0.8rem',
+                border: '1px solid var(--border)',
+              }}
+            >
+              No poster
+            </div>
+          )}
+        </div>
 
-        <div style={{ flex: 1, minWidth: '260px' }}>
-          <p style={{ margin: '0 0 0.25rem', fontSize: '0.8rem', color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {mediaLabel}
+        {/* Metadata */}
+        <div style={{ flex: 1, minWidth: '240px' }}>
+          <p style={{
+            margin: '0 0 0.4rem',
+            fontSize: '0.68rem',
+            fontWeight: 700,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: isTV ? 'var(--violet)' : 'var(--accent)',
+          }}>
+            {isTV ? 'TV Show' : 'Movie'}
           </p>
-          <h1 style={{ margin: '0 0 0.5rem', lineHeight: 1.2 }}>{m.title}</h1>
 
-          <p style={{ margin: '0 0 0.75rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+          <h1 style={{ margin: '0 0 0.5rem', lineHeight: 1.15, fontWeight: 800, fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}>
+            {m.title}
+          </h1>
+
+          <p style={{ margin: '0 0 1rem', color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.5 }}>
             {m.year}
             {m.genre ? ` · ${m.genre}` : ''}
-            {type === 'tv' && m.seasons != null && ` · ${m.seasons} season${m.seasons !== 1 ? 's' : ''}`}
-            {type === 'tv' && m.episodes != null && `, ${m.episodes} ep.`}
+            {isTV && m.seasons != null && ` · ${m.seasons} season${m.seasons !== 1 ? 's' : ''}`}
+            {isTV && m.episodes != null && `, ${m.episodes} ep.`}
           </p>
 
+          {/* Community aggregate */}
           {community.ratingCount > 0 ? (
-            <p style={{ margin: '0 0 1rem', fontSize: '1rem' }}>
-              <strong style={{ fontSize: '1.1rem' }}>
-                ★ {community.averageRating != null ? community.averageRating.toFixed(1) : '—'}
-              </strong>
-              <span style={{ color: 'var(--text-muted)', marginLeft: '0.5rem', fontSize: '0.875rem' }}>
-                community average &middot; {community.ratingCount} rating{community.ratingCount !== 1 ? 's' : ''}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.4rem 0.875rem',
+              background: 'var(--bg-subtle)',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              marginBottom: '1.25rem',
+            }}>
+              <span style={{ color: '#f59e0b', fontSize: '1.1rem' }}>★</span>
+              <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>
+                {community.averageRating != null ? community.averageRating.toFixed(1) : '—'}
               </span>
-            </p>
+              <span style={{ color: 'var(--text-faint)', fontSize: '0.8rem' }}>
+                {community.ratingCount} rating{community.ratingCount !== 1 ? 's' : ''}
+              </span>
+              {community.reviewCount > 0 && (
+                <span style={{ color: 'var(--text-faint)', fontSize: '0.8rem' }}>
+                  · {community.reviewCount} review{community.reviewCount !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
           ) : (
-            <p style={{ margin: '0 0 1rem', color: 'var(--text-faint)', fontSize: '0.875rem' }}>
+            <p style={{ margin: '0 0 1.25rem', color: 'var(--text-faint)', fontSize: '0.85rem' }}>
               No community ratings yet.
             </p>
           )}
 
-          <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{m.summary}</p>
+          <p style={{ margin: 0, lineHeight: 1.75, color: 'var(--text-secondary)', fontSize: '0.93rem' }}>
+            {m.summary}
+          </p>
         </div>
       </div>
 
-      {/* Interactive rating + reviews (client component, handles auth state) */}
+      {/* Divider */}
+      <div style={{ height: '1px', background: 'linear-gradient(to right, var(--accent), transparent)', marginBottom: '2rem', opacity: 0.4 }} />
+
+      {/* Interactive section */}
       <RatingSection
         titleId={m.id}
         mediaType={type as 'movie' | 'tv'}

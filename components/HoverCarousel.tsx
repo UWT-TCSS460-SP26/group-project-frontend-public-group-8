@@ -20,11 +20,9 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     if (!element) return
 
     const checkScrollable = () => {
-      if (element.scrollWidth > element.clientWidth) {
-        setShowArrows(true)
-      }
+      setShowArrows(element.scrollWidth > element.clientWidth)
     }
-    
+
     checkScrollable()
     const timeoutId = setTimeout(checkScrollable, 500)
 
@@ -35,7 +33,6 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
       if (direction !== 0) {
         element.scrollLeft += direction * scrollSpeed
       }
-
       const atEnd = element.scrollLeft >= element.scrollWidth - element.clientWidth - 1
       if (atEnd && !isAtEnd.current) {
         isAtEnd.current = true
@@ -43,7 +40,6 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
       } else if (!atEnd) {
         isAtEnd.current = false
       }
-
       animationFrameId = requestAnimationFrame(scrollLoop)
     }
 
@@ -51,19 +47,15 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
       const { clientX } = e
       const { left, width } = element.getBoundingClientRect()
       const x = clientX - left
-
       if (x < edgeThreshold) direction = -1
       else if (x > width - edgeThreshold) direction = 1
       else direction = 0
     }
 
-    const handleMouseLeave = () => {
-      direction = 0
-    }
+    const handleMouseLeave = () => { direction = 0 }
 
     element.addEventListener('mousemove', handleMouseMove)
     element.addEventListener('mouseleave', handleMouseLeave)
-    
     animationFrameId = requestAnimationFrame(scrollLoop)
 
     return () => {
@@ -76,82 +68,71 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
 
   return (
     <div style={{ position: 'relative' }}>
+      {/* Left neon arrow — thin transparent fade, no card-obscuring shader */}
       {showArrows && (
-        <>
-          {/* Left Arrow */}
-          <div style={{
+        <div
+          aria-hidden="true"
+          style={{
             position: 'absolute',
             left: 0,
             top: 0,
             bottom: '1rem',
-            width: '80px',
-            background: 'linear-gradient(to right, var(--background) 20%, transparent)',
+            width: '40px',
+            background: 'linear-gradient(to right, rgba(2,8,16,0.75) 0%, transparent 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            paddingLeft: '0.5rem',
+            paddingLeft: '2px',
             pointerEvents: 'none',
             zIndex: 10,
-            color: 'var(--foreground)', // Set color for currentColor to inherit
-          }}>
-            <svg 
-              width="48" 
-              height="48" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" // Use currentColor
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              style={{
-                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
-                opacity: 0.8
-              }}
-            >
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </div>
-          {/* Right Arrow */}
-          <div style={{
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </div>
+      )}
+
+      {/* Right neon arrow — thin transparent fade, no card-obscuring shader */}
+      {showArrows && (
+        <div
+          aria-hidden="true"
+          style={{
             position: 'absolute',
             right: 0,
             top: 0,
             bottom: '1rem',
-            width: '80px',
-            background: 'linear-gradient(to left, var(--background) 20%, transparent)',
+            width: '40px',
+            background: 'linear-gradient(to left, rgba(2,8,16,0.75) 0%, transparent 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
-            paddingRight: '0.5rem',
+            paddingRight: '2px',
             pointerEvents: 'none',
             zIndex: 10,
-            color: 'var(--foreground)', // Set color for currentColor to inherit
-          }}>
-            <svg 
-              width="48" 
-              height="48" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" // Use currentColor
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              style={{
-                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))',
-                opacity: 0.8
-              }}
-            >
-              <polyline points="9 6 15 12 9 18"></polyline>
-            </svg>
-          </div>
-        </>
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+            stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
+          >
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+        </div>
       )}
-      <div ref={ref} style={{
-        display: 'flex',
-        overflowX: 'hidden',
-        gap: '1rem',
-        paddingBottom: '1rem',
-      }}>
+
+      <div
+        ref={ref}
+        style={{
+          display: 'flex',
+          overflowX: 'hidden',
+          gap: '0.875rem',
+          paddingBottom: '0.75rem',
+        }}
+      >
         {children}
       </div>
     </div>

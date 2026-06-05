@@ -8,33 +8,18 @@ import HoverCarousel from './HoverCarousel'
 import { getSession } from 'next-auth/react'
 import SignInButton from './SignInButton'
 
-const cardStyle: React.CSSProperties = {
-  border: '1px solid var(--border)',
-  borderRadius: '8px',
-  overflow: 'hidden',
-  textDecoration: 'none',
-  color: 'inherit',
-  display: 'block',
-  minWidth: '150px',
-  maxWidth: '150px',
-  flexShrink: 0,
-}
+const CARD_WIDTH = 150
 
-const posterPlaceholderStyle: React.CSSProperties = {
-  width: '100%',
-  aspectRatio: '2/3',
-  background: 'var(--placeholder-bg)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '0.75rem',
-  color: 'var(--text-faint)',
-  textAlign: 'center',
-  padding: '1rem'
-}
-
-const cardBodyStyle: React.CSSProperties = {
-  padding: '0.5rem 0.6rem 0.6rem',
+function CardSkeleton() {
+  return (
+    <div style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
+      <div className="skeleton" style={{ width: '100%', aspectRatio: '2/3', borderRadius: '8px 8px 0 0' }} />
+      <div style={{ padding: '0.5rem 0.6rem 0.6rem', background: 'var(--card-bg)', borderRadius: '0 0 8px 8px', border: '1px solid var(--border)', borderTop: 'none' }}>
+        <div className="skeleton" style={{ height: '12px', width: '80%', marginBottom: '6px' }} />
+        <div className="skeleton" style={{ height: '10px', width: '50%' }} />
+      </div>
+    </div>
+  )
 }
 
 export default function RecentActivity() {
@@ -53,124 +38,111 @@ export default function RecentActivity() {
 
   useEffect(() => {
     if (!isMounted) return
-
-    const checkAuthAndFetch = async () => {
+    let cancelled = false
+    const run = async () => {
       setLoading(true)
       const session = await getSession()
+      if (cancelled) return
       if (session?.accessToken) {
         setToken(session.accessToken)
         try {
           const res = await getMyRatings(session.accessToken, 1)
-          setRatings(res.data)
-          setHasMore(res.pagination.page < res.pagination.totalPages)
-        } catch (error) {
-          console.error("Failed to fetch recent activity", error)
-        }
+          if (!cancelled) {
+            setRatings(res.data)
+            setHasMore(res.pagination.page < res.pagination.totalPages)
+          }
+        } catch { /* silent */ }
       }
-      setLoading(false)
+      if (!cancelled) setLoading(false)
     }
-    checkAuthAndFetch()
+    run()
+    return () => { cancelled = true }
   }, [isMounted])
 
   const handleScrollEnd = async () => {
-    if (hasMore && !loading && token) {
-      setLoading(true)
-      try {
-        const nextPage = page + 1
-        const res = await getMyRatings(token, nextPage)
-        setRatings(prev => {
-          const existingIds = new Set(prev.map(r => r.id))
-          const newRatings = res.data.filter(r => !existingIds.has(r.id))
-          return [...prev, ...newRatings]
-        })
-        setPage(nextPage)
-        setHasMore(res.pagination.page < res.pagination.totalPages)
-      } catch (error) {
-        console.error("Failed to load more activity", error)
-      } finally {
-        setLoading(false)
-      }
-    }
+    if (!hasMore || loading || !token) return
+    setLoading(true)
+    try {
+      const next = page + 1
+      const res = await getMyRatings(token, next)
+      setRatings(prev => {
+        const existing = new Set(prev.map(r => r.id))
+        return [...prev, ...res.data.filter(r => !existing.has(r.id))]
+      })
+      setPage(next)
+      setHasMore(res.pagination.page < res.pagination.totalPages)
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
-  if (!isMounted) {
-    return null
-  }
+  if (!isMounted) return null
 
   return (
     <section style={{ marginBottom: '3rem' }}>
-      <h2 style={{ marginBottom: '1rem' }}>Your Recent Activity</h2>
-      
+      <h2 className="section-heading" style={{ marginBottom: '1rem' }}>Your Recent Activity</h2>
+
       {!token ? (
         <div style={{
-          padding: '2rem',
+          padding: '1.75rem 2rem',
           border: '1px dashed var(--border)',
           borderRadius: '8px',
           textAlign: 'center',
-          background: 'var(--bg-subtle)'
+          background: 'var(--bg-subtle)',
         }}>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
             Sign in to track your ratings and see your recent activity here.
           </p>
-          <SignInButton
-            callbackUrl={callbackUrl}
-            style={{
-              padding: '0.5rem 1rem',
-              background: 'var(--accent)',
-              color: 'var(--accent-text)',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontWeight: 600
-            }}
-          >
+          <SignInButton callbackUrl={callbackUrl} className="btn-primary">
             Sign In
           </SignInButton>
         </div>
-      ) : ratings.length === 0 && !loading ? (
+      ) : loading && ratings.length === 0 ? (
+        <HoverCarousel>
+          {Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
+        </HoverCarousel>
+      ) : ratings.length === 0 ? (
         <div style={{
-          padding: '2rem',
+          padding: '1.75rem 2rem',
           border: '1px dashed var(--border)',
           borderRadius: '8px',
           textAlign: 'center',
-          color: 'var(--text-muted)'
+          color: 'var(--text-muted)',
+          fontSize: '0.9rem',
         }}>
-          You haven't rated anything yet. Start exploring to build your activity feed!
+          You haven&apos;t rated anything yet. Start exploring to build your activity feed!
         </div>
       ) : (
         <HoverCarousel onScrollEnd={handleScrollEnd}>
-          {ratings.map((item) => {
+          {ratings.map(item => {
             const meta = item.metadata
             if (!meta) return null
             return (
-              <Link key={item.id} href={`/media/${item.media_type}/${item.title_id}`} style={cardStyle}>
+              <Link key={item.id} href={`/media/${item.media_type ?? 'movie'}/${item.title_id}`}
+                className="media-card"
+                style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
                 {meta.poster_url ? (
-                  <img
-                    src={meta.poster_url}
-                    alt={meta.title}
-                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
-                  />
+                  <img src={meta.poster_url} alt={meta.title}
+                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
                 ) : (
-                  <div style={posterPlaceholderStyle}>{meta.title}</div>
-                )}
-                <div style={cardBodyStyle}>
-                  <p style={{ fontWeight: 600, fontSize: '0.85rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>
                     {meta.title}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.4rem' }}>
-                    <span style={{ color: '#eab308', fontSize: '0.85rem' }}>★</span>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>
-                      {item.rating}
-                    </span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                      Your Rating
-                    </span>
+                  </div>
+                )}
+                <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
+                  <p style={{ fontWeight: 600, fontSize: '0.82rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.title}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.3rem' }}>
+                    <span style={{ color: '#f59e0b', fontSize: '0.8rem' }}>★</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)' }}>{item.rating}</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-faint)' }}>/ 5</span>
                   </div>
                 </div>
               </Link>
             )
           })}
-          {loading && ratings.length > 0 && <div style={{ minWidth: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}
+          {loading && ratings.length > 0 && (
+            <div style={{ minWidth: CARD_WIDTH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-faint)', fontSize: '0.8rem' }}>
+              Loading…
+            </div>
+          )}
         </HoverCarousel>
       )}
     </section>

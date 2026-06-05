@@ -16,55 +16,50 @@ export default async function Header() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '0.75rem 1.5rem',
-        borderBottom: '1px solid var(--border)',
+        padding: '0 1.5rem',
+        height: '56px',
+        borderBottom: '1px solid rgba(0,255,255,0.4)',
         gap: '1rem',
         flexWrap: 'wrap',
-        background: 'var(--bg)',
+        background: 'rgba(2, 8, 16, 0.95)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 1px 0 rgba(0,255,255,0.15), 0 0 30px rgba(0,255,255,0.06), 0 4px 24px rgba(0,0,0,0.8)',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1.25rem',
-          flexWrap: 'wrap',
-          flex: 1,
-        }}
-      >
+      {/* Left: logo + search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: 0 }}>
         <Link
           href="/"
+          aria-label="Screen8 home"
           style={{
             fontFamily: playfair.style.fontFamily,
             fontWeight: 700,
-            fontSize: '1.1rem',
+            fontSize: '1.15rem',
             textDecoration: 'none',
-            color: 'inherit',
+            color: 'var(--accent)',
             flexShrink: 0,
+            textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1px',
           }}
         >
           Screen
           <img
             src="/icon.svg"
             alt="8"
-            style={{
-              height: '1em',
-              verticalAlign: 'middle',
-              marginTop: '-0.1em',
-            }}
+            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
           />
         </Link>
         <NavSearch />
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-          flexShrink: 0,
-        }}
-      >
+      {/* Right: user area */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
         {session?.user ? (
           <>
             <Link
@@ -73,9 +68,13 @@ export default async function Header() {
                 fontSize: '0.875rem',
                 color: 'var(--text-muted)',
                 textDecoration: 'none',
+                whiteSpace: 'nowrap',
               }}
             >
-              Hi, {session.user.name?.split(' ')[0] ?? session.user.email}
+              Hi,{' '}
+              <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                {session.user.name?.split(' ')[0] ?? session.user.email}
+              </span>
             </Link>
             <SignOutButton />
             <ThemeToggle />
@@ -90,16 +89,8 @@ export default async function Header() {
             >
               <button
                 type="submit"
-                style={{
-                  cursor: 'pointer',
-                  padding: '0.375rem 0.875rem',
-                  background: 'var(--accent)',
-                  color: 'var(--accent-text)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                }}
+                className="btn-primary"
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.875rem' }}
               >
                 Sign In
               </button>

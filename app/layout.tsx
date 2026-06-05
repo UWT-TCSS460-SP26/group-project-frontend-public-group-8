@@ -2,7 +2,15 @@ import type { Metadata } from "next"
 import { SessionProvider } from "next-auth/react"
 import Header from "@/components/Header"
 import TokenExpiryWatcher from "@/components/TokenExpiryWatcher"
+import { Orbitron } from "next/font/google"
 import "@/styles/globals.css"
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+  variable: "--font-orbitron",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "Screen8",
@@ -15,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={orbitron.variable}>
       <head>
         <script
           dangerouslySetInnerHTML={{
