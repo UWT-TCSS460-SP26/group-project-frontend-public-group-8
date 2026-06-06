@@ -82,3 +82,94 @@ Decided process:
 _Brainstorming_
 
 All ideas posted in the brainstorming channel of our discord server. Ideas included themes, a name for the db, and what to use for the favicon.
+
+
+# Sprint-8 Meeting
+
+6/5/2026
+
+3:40pm - 5:30pm
+
+Attending: All
+
+Meeting Manager: Caleb Ernst
+
+Meeting Scribe: Charlene Jarrell
+
+## Agenda Item 1:
+
+_Pre-Sprint Tasks_
+
+1. Fix hero search so the drop-down overlaps the page (instead of being see-through)
+2. Add warning window for deleting reviews and ratings. Use non-native prompt (one we design)
+3. Let non-developers test the API. Ensure that it is intuitive
+4. Fix nav bar so on a phone screen, the search bar is not overlapping the sign-in button
+5. Style light mode
+6. Be able to scroll movies in safari browser
+7. Recommendation system
+
+## Agenda Item 2:
+
+_Follow-up on Creative Contributions_
+
+Mansur - play trailors - in-progress
+Caleb - cyberpunk theme - merged to main
+Group - magic 8 ball
+
+## Agenda Item 3:
+
+_Follow-up on active bug reports to Group 7_
+
+1. Request for routes to search movies by genre and cast (same that TV shows has)
+2. Request for pulling user upvotes and downvotes on their movies and shows
+
+## Agenda Item 4:
+
+_Reflect on Quarter_
+
+1. What went well across the ten weeks
+
+We built a full stack web application! We recieved high scores on our sprints each week.
+We were accomodating of each other's schedules.
+We delegated work well throughout the quarter based on each person's availablility. Some weeks certain teammates did more work because they were available, but the other teammates did more the next week.
+We worked well as a team under pressue and remained respectful of each other.
+We communicated well through discord and virtual meetings.
+We did well documenting what we didn't know so we could research it together. Everyone felt comfortable admiting if they didn't understand something and the rest of the team was able to explain in a way that helped.
+
+2. What you'd do differently if you were starting the quarter again
+
+Start the check-offs a week sooner. 
+Make a personal due date of one day earlier--once we got behind we got really got behind. Allow more time to study before completing the sprint objectives.
+Getting buy-in from the team for unique ideas by providing more details and research-backed information.
+Speaking up when the workload is too much.
+
+3. What surprised you about working on someone else's API and having someone else work on yours
+
+Surprised the group using our backend didn't submit any bug reports.
+Working on someone else's frontend helped us to understand what a frontend developer would want from a backend.
+Initial hurdle of granting permissions through CORS list. 
+We liked some of the extra features the backend added (search by genre, upvote/downvote) and we would like to add them to ours.
+
+4. What you learned about working with AI coding agents that you didn't know in Week 1
+
+Using code-based AI for first time. Used sandbox where it pulled from github branch only.
+Used code-based Claude for the first time and realized why people like it. More accurate and increased production.
+Learned how to prompt better.
+More risk is more reward. More access gets better results, but exposes your system.
+AI browser was more learning oriented while AI code agent was more implementation oriented without explaination.
+
+## Agenda Item 5:
+
+_Accessibility Check_
+
+Everyone ran lighthouse tool on homepage light and dark mode as well as detail page. Upload results to repo.
+
+## Agenda Item 5:
+
+_Team availability_
+
+Christina - final on thursday, multiple assignments due by sunday
+Caleb - final on tuesday, multiple assignment due tonight (friday)
+Mansur - project due sunday next week
+Charlene - not available monday
+All - preparing for commencement ceremony
