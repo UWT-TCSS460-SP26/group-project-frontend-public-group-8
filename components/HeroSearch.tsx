@@ -52,18 +52,7 @@ export default function HeroSearch() {
         border: '1px solid var(--border)',
       }}
     >
-      {/* Cyberpunk grid texture — clipped to section bounds */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          pointerEvents: 'none',
-          borderRadius: '12px',
-          overflow: 'hidden',
-        }}
-      />
+      {/* Cyberpunk grid texture — clipped to section bounds — REMOVED for cleaner look */}
       {/* Top neon accent line — cyan → magenta */}
       <div
         aria-hidden="true"

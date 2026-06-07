@@ -3,139 +3,345 @@
 /* ─── Dark theme (default) ────────────────────────────────────────────────── */
 :root {
   /* Backgrounds */
-  --bg:           #020810;
-  --bg-subtle:    #080f1a;
-  --bg-muted:     #0d1a2a;
-  --surface:      #080f1a;
-  --card-bg:      #070d18;
+  --bg:             #020810;
+  --bg-subtle:      #050d1a;
+  --bg-muted:       #080f1a;
+  --surface:        #060c18;
+  --card-bg:        #040a15;
 
   /* Borders */
-  --border:       #0d2035;
+  --border:         #0d2038;
 
-  /* Text */
-  --text:         #e8f0f8;
-  --text-secondary: #b8cfe0;
-  --text-muted:   #6080a0;
-  --text-faint:   #304860;
+  /* Text — high contrast on dark */
+  --text:           #ddeeff;
+  --text-secondary: #9abdd8;
+  --text-muted:     #5a7a9a;
+  --text-faint:     #2a4060;
 
   /* Inputs */
-  --input-bg:     #020810;
-  --input-border: #1a3050;
-  --input-text:   #e8f0f8;
+  --input-bg:       #030a18;
+  --input-border:   #1a3555;
+  --input-text:     #ddeeff;
 
-  /* Accents — strong cyberpunk neon */
-  --accent:       #00ffff;
-  --accent-dim:   #00ccdd;
-  --accent-text:  #020810;
-  --accent-ring:  rgba(0, 255, 255, 0.25);
-  --accent-glow:  0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(0, 255, 255, 0.2);
+  /* Cyan: electric neon primary */
+  --accent:         #00d4ff;
+  --accent-dim:     #009ec0;
+  --accent-text:    #010810;
+  --accent-ring:    rgba(0, 212, 255, 0.30);
+  --accent-glow:    0 0 16px rgba(0,212,255,0.60), 0 0 36px rgba(0,212,255,0.25);
 
-  --violet:       #ff00cc;
-  --violet-glow:  0 0 20px rgba(255, 0, 204, 0.5), 0 0 40px rgba(255, 0, 204, 0.2);
+  /* Magenta: neon secondary */
+  --violet:         #ff2aad;
+  --violet-dim:     #cc1e88;
+  --violet-glow:    0 0 14px rgba(255,42,173,0.55), 0 0 32px rgba(255,42,173,0.22);
 
   /* Utility */
-  --placeholder-bg: #0d1a2a;
-  --danger:       #ff3355;
-  --error:        #ff3355;
-  --shadow:       0 4px 20px rgba(0, 0, 0, 0.85);
+  --placeholder-bg: #0a1828;
+  --danger:         #ff3355;
+  --error:          #ff3355;
+  --shadow:         0 4px 24px rgba(0,0,0,0.85);
 
-  /* Card hover */
-  --card-hover-shadow: 0 0 28px rgba(0, 255, 255, 0.3), 0 0 60px rgba(0, 255, 255, 0.1), 0 8px 32px rgba(0,0,0,0.9);
-  --card-hover-border: #00ffff;
+  /* Card shadows — distinct for hover vs active vs active+hover */
+  --card-hover-shadow:
+    0 0 22px rgba(0,212,255,0.80),
+    0 0 55px rgba(0,212,255,0.32),
+    0 14px 44px rgba(0,0,0,0.95);
+  --card-hover-border:  rgba(0,212,255,0.95);
 
-  /* Skeleton animation base */
-  --skeleton-from: #0d1a2a;
-  --skeleton-to:   #162438;
+  --card-active-shadow:
+    0 0 16px rgba(0,212,255,0.60),
+    0 0 38px rgba(0,212,255,0.24),
+    0 10px 34px rgba(0,0,0,0.90);
+  --card-active-border: rgba(0,212,255,0.70);
 
-  /* Carousel edge fade color */
-  --carousel-fade: rgba(2, 8, 16, 0.85);
+  --card-peak-shadow:
+    0 0 28px rgba(0,212,255,0.90),
+    0 0 72px rgba(0,212,255,0.38),
+    0 0 32px rgba(255,42,173,0.28),
+    0 18px 52px rgba(0,0,0,0.98);
 
-  /* Cyberpunk grid line color */
-  --grid-line: rgba(0, 255, 255, 0.028);
+  /* Skeleton */
+  --skeleton-from:  #0a1828;
+  --skeleton-to:    #122038;
 
-  /* ── Aliases for merged components that use different var names ── */
-  --background:   var(--bg);
-  --foreground:   var(--text);
+  /* Carousel edge fade */
+  --carousel-fade:  rgba(2,8,16,0.94);
+  --carousel-mid:   rgba(2,8,16,0.50);
+
+  /* Section panels */
+  --panel-bg:       rgba(3,10,22,0.80);
+  --panel-border:   rgba(0,212,255,0.30);
+  --panel-shadow:
+    0 0 0 1px rgba(0,212,255,0.08),
+    0 0 45px rgba(0,212,255,0.12),
+    0 8px 48px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(0,212,255,0.22);
+  --panel-top-accent:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(0,212,255,0.95) 30%,
+      rgba(255,42,173,0.80) 70%,
+      transparent 100%);
+
+  /* Aliases (Next.js) */
+  --background: var(--bg);
+  --foreground: var(--text);
 }
 
 /* ─── Light theme ─────────────────────────────────────────────────────────── */
 :root[data-theme="light"] {
-  --bg:           #eef2f8;
-  --bg-subtle:    #e2eaf4;
-  --bg-muted:     #d4dff0;
-  --surface:      #f8fafc;
-  --card-bg:      #f8fafc;
-  --border:       #b8ccdf;
-  --text:         #0f172a;
-  --text-secondary: #1e3a5f;
-  --text-muted:   #3d5a7a;
-  --text-faint:   #6a85a0;
-  --input-bg:     #f8fafc;
-  --input-border: #8aaac8;
-  --input-text:   #0f172a;
-  /* Darker teal for 5.5:1+ contrast on light bg */
-  --accent:       #005f7a;
-  --accent-dim:   #004d63;
-  --accent-text:  #ffffff;
-  --accent-ring:  rgba(0, 95, 122, 0.22);
-  --accent-glow:  0 0 10px rgba(0, 95, 122, 0.18);
-  /* Deeper violet for contrast */
-  --violet:       #6600aa;
-  --violet-glow:  0 0 10px rgba(102, 0, 170, 0.18);
-  --placeholder-bg: #d4dff0;
-  --danger:       #b91c1c;
-  --error:        #b91c1c;
-  --shadow:       0 2px 8px rgba(15, 23, 42, 0.12);
-  --card-hover-shadow: 0 8px 24px rgba(0, 95, 122, 0.14), 0 2px 6px rgba(15,23,42,0.08);
-  --card-hover-border: #005f7a;
-  --skeleton-from: #d4dff0;
-  --skeleton-to:   #c0d0e6;
-  --carousel-fade: rgba(238, 242, 248, 0.92);
-  --grid-line: rgba(0, 95, 122, 0.055);
-  --background:   var(--bg);
-  --foreground:   var(--text);
+  --bg:             #e8eef8;
+  --bg-subtle:      #dde6f4;
+  --bg-muted:       #d0daee;
+  --surface:        #f4f8fe;
+  --card-bg:        #f8fbff;
+  --border:         #a8c2dc;
+  --text:           #0c1625;
+  --text-secondary: #1a3050;
+  --text-muted:     #38587a;
+  --text-faint:     #5c7a98;
+  --input-bg:       #f5f8fd;
+  --input-border:   #7ea8c8;
+  --input-text:     #0c1625;
+  /* Teal — ≥5.5:1 contrast on #e8eef8 */
+  --accent:         #005e78;
+  --accent-dim:     #004b60;
+  --accent-text:    #ffffff;
+  --accent-ring:    rgba(0,94,120,0.25);
+  --accent-glow:    0 0 10px rgba(0,94,120,0.24), 0 0 22px rgba(0,94,120,0.10);
+  /* Violet — ≥4.8:1 contrast */
+  --violet:         #6200a8;
+  --violet-dim:     #4e0088;
+  --violet-glow:    0 0 10px rgba(98,0,168,0.20);
+  --placeholder-bg: #c5d8ec;
+  --danger:         #b91c1c;
+  --error:          #b91c1c;
+  --shadow:         0 2px 12px rgba(12,22,38,0.12);
+  --card-hover-shadow:  0 12px 32px rgba(0,94,120,0.26), 0 3px 10px rgba(12,22,38,0.12);
+  --card-hover-border:  #005e78;
+  --card-active-shadow: 0 10px 26px rgba(0,94,120,0.32), 0 3px 10px rgba(12,22,38,0.12);
+  --card-active-border: rgba(0,94,120,0.68);
+  --card-peak-shadow:   0 14px 38px rgba(0,94,120,0.40), 0 4px 14px rgba(12,22,38,0.14);
+  --skeleton-from:  #c8d8ec;
+  --skeleton-to:    #b5cae0;
+  --carousel-fade:  rgba(232,238,248,0.96);
+  --carousel-mid:   rgba(232,238,248,0.55);
+  --panel-bg:       rgba(248,252,255,0.86);
+  --panel-border:   rgba(0,94,120,0.24);
+  --panel-shadow:
+    0 2px 20px rgba(0,94,120,0.11),
+    0 1px 4px rgba(12,22,38,0.07),
+    inset 0 1px 0 rgba(0,94,120,0.18);
+  --panel-top-accent:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(0,94,120,0.65) 35%,
+      rgba(98,0,168,0.50) 65%,
+      transparent 100%);
+  --background: var(--bg);
+  --foreground: var(--text);
 }
 
-/* ─── Base ────────────────────────────────────────────────────────────────── */
+/* ─── Base layout ─────────────────────────────────────────────────────────── */
 html {
-  /* Subtle cyberpunk grid — behind everything, no z-index needed */
+  min-height: 100%;
+  /* Solid base color — visible if body::before fails to render */
   background-color: var(--bg);
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 60px 60px;
-  background-attachment: fixed;
+  transition: background-color 0.18s ease;
 }
 
-html,
-body {
+html, body {
   padding: 0;
   margin: 0;
   min-height: 100vh;
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background-color: var(--bg);
+  /* Transparent — the fixed ::before provides the visual background.
+     html { background-color } serves as the opaque fallback. */
+  background: transparent;
   color: var(--text);
-  transition: background-color 0.18s ease, color 0.18s ease;
+  transition: color 0.18s ease;
 }
 
-a {
-  color: inherit;
+a { color: inherit; text-decoration: none; }
+
+/* ─── Cinematic background — fixed so it doesn't repaint on scroll ────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  /*
+    Dark mode: layered neon atmosphere. NO grid lines.
+
+    Layer strategy (front = first):
+      1. Small bright cyan hotspot  — nearer light source, upper-left
+      2. Large cyan bloom            — far atmospheric wash, same corner
+      3. Small bright magenta spot  — nearer light source, right side
+      4. Large magenta bloom         — far atmospheric wash, lower-right
+      5. Deep violet center bloom   — atmospheric depth, visible behind bright elements
+  */
+  background-image:
+    radial-gradient(ellipse 42vw 38vh at 6% 8%,
+      rgba(0,220,255,0.38) 0%,
+      rgba(0,180,255,0.12) 45%,
+      transparent 72%),
+    radial-gradient(ellipse 130vw 90vh at -22% -18%,
+      rgba(0,210,255,0.36) 0%,
+      rgba(0,155,220,0.13) 30%,
+      transparent 58%),
+    radial-gradient(ellipse 28vw 45vh at 98% 62%,
+      rgba(255,30,185,0.36) 0%,
+      rgba(240,0,160,0.12) 48%,
+      transparent 72%),
+    radial-gradient(ellipse 120vw 100vh at 122% 112%,
+      rgba(255,25,175,0.34) 0%,
+      rgba(200,0,140,0.12) 28%,
+      transparent 58%),
+    radial-gradient(ellipse 65vw 58vh at 52% 44%,
+      rgba(55,0,170,0.20) 0%,
+      transparent 56%);
+}
+
+/* ── Light mode background ── */
+:root[data-theme="light"] body::before {
+  background-image:
+    radial-gradient(ellipse 40vw 35vh at 4% 5%,
+      rgba(0,175,225,0.24) 0%,
+      rgba(0,140,210,0.08) 48%,
+      transparent 72%),
+    radial-gradient(ellipse 110vw 75vh at -15% -10%,
+      rgba(0,165,220,0.28) 0%,
+      rgba(0,120,195,0.09) 30%,
+      transparent 55%),
+    radial-gradient(ellipse 24vw 38vh at 98% 58%,
+      rgba(140,0,210,0.20) 0%,
+      rgba(110,0,180,0.07) 48%,
+      transparent 72%),
+    radial-gradient(ellipse 95vw 88vh at 115% 110%,
+      rgba(130,0,205,0.18) 0%,
+      rgba(90,0,165,0.07) 30%,
+      transparent 56%),
+    radial-gradient(ellipse 55vw 50vh at 50% 50%,
+      rgba(0,55,115,0.07) 0%,
+      transparent 55%);
+}
+
+/* ─── Focus styles ───────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+  border-radius: 4px;
+}
+
+/* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-from) 25%,
+    var(--skeleton-to)   50%,
+    var(--skeleton-from) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: 4px;
+}
+
+/* ─── Media card ─────────────────────────────────────────────────────────── */
+.media-card {
+  border: 1px solid rgba(0,212,255,0.18);
+  border-radius: 8px;
+  overflow: hidden;          /* clip poster to rounded corners */
   text-decoration: none;
+  color: inherit;
+  display: block;
+  background: var(--card-bg);
+  /*
+    Easing: cubic-bezier(0.16,1,0.3,1) — fast out, no overshoot.
+    Keeps scale within the carousel's padding headroom on every frame.
+  */
+  transition:
+    transform  0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+  will-change: transform;
+  position: relative;        /* required for z-index to work */
+}
+
+:root[data-theme="light"] .media-card {
+  border-color: #a8c4de;
+  border-width: 1.5px;
+  background: linear-gradient(160deg, #fafcff 0%, #f3f7fd 100%);
+  box-shadow: 0 2px 10px rgba(0,60,120,0.10), 0 1px 3px rgba(12,22,38,0.07);
+}
+
+/* ── Standard hover ── */
+.media-card:hover {
+  transform: scale(1.10);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--card-hover-border);
+  z-index: 5;
+}
+
+:root[data-theme="light"] .media-card:hover {
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--accent);
+}
+
+.media-card:focus-visible {
+  outline: none;
+  transform: scale(1.04);
+  box-shadow: 0 0 0 3px var(--accent-ring), var(--card-hover-shadow);
+  border-color: var(--accent);
+  z-index: 4;
+}
+
+/* ── Active (centered) card — visually dominant at rest ── */
+.media-card.carousel-card-active {
+  transform: translateY(-5px) scale(1.06);
+  box-shadow: var(--card-active-shadow);
+  border-color: var(--card-active-border);
+  z-index: 3;
+}
+
+/* ── Active + hovered — maximum state ── */
+.media-card.carousel-card-active:hover {
+  transform: scale(1.12);
+  box-shadow: var(--card-peak-shadow);
+  border-color: var(--card-hover-border);
+  z-index: 6;
+}
+
+:root[data-theme="light"] .media-card.carousel-card-active:hover {
+  box-shadow: var(--card-peak-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-card,
+  .media-card:hover,
+  .media-card.carousel-card-active,
+  .media-card.carousel-card-active:hover {
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ─── Theme toggle ────────────────────────────────────────────────────────── */
@@ -167,69 +373,6 @@ a {
   box-shadow: 0 0 0 3px var(--accent-ring);
 }
 
-/* ─── Focus visible (global) ─────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-button:focus-visible,
-a:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-ring);
-  border-radius: 4px;
-}
-
-/* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
-@keyframes skeleton-shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--skeleton-from) 25%,
-    var(--skeleton-to) 50%,
-    var(--skeleton-from) 75%
-  );
-  background-size: 800px 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-  border-radius: 4px;
-}
-
-/* ─── Media card ─────────────────────────────────────────────────────────── */
-.media-card {
-  border: 1px solid rgba(0, 255, 255, 0.12);
-  border-radius: 4px;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  background: var(--card-bg);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  will-change: transform;
-}
-
-:root[data-theme="light"] .media-card {
-  border-color: var(--border);
-  border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(15,23,42,0.07);
-}
-
-.media-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: var(--card-hover-shadow);
-  border-color: var(--card-hover-border);
-}
-
-.media-card:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--accent-ring), var(--card-hover-shadow);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
 /* ─── Section heading ────────────────────────────────────────────────────── */
 .section-heading {
   font-family: var(--font-orbitron, 'Orbitron', monospace);
@@ -238,18 +381,51 @@ a:focus-visible {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
-  text-shadow: 0 0 12px rgba(0, 255, 255, 0.7), 0 0 24px rgba(0, 255, 255, 0.35);
+  text-shadow:
+    0 0 10px rgba(0,212,255,0.85),
+    0 0 24px rgba(0,212,255,0.45);
   margin: 0 0 1rem;
 }
 
 :root[data-theme="light"] .section-heading {
   text-shadow: none;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
+  font-size: 0.92rem;
+  letter-spacing: 0.07em;
   font-weight: 800;
 }
 
-/* ─── Neon button ────────────────────────────────────────────────────────── */
+/* ─── Section panel ──────────────────────────────────────────────────────── */
+.section-panel {
+  padding: 1.375rem 1.5rem;
+  border-radius: 12px;
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  position: relative;
+  /*
+    overflow: visible is REQUIRED.
+    Cards scale outside the panel bounds on hover — they must not be clipped.
+  */
+  overflow: visible;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Cyan → magenta top highlight line */
+.section-panel::before {
+  content: '';
+  position: absolute;
+  /* Sit exactly on the 1.5px border */
+  top: -1.5px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: var(--panel-top-accent);
+  border-radius: 2px;
+  opacity: 0.95;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -265,20 +441,20 @@ a:focus-visible {
   transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  box-shadow: 0 0 14px rgba(0, 255, 255, 0.4), 0 0 28px rgba(0, 255, 255, 0.15);
+  box-shadow: var(--accent-glow);
 }
 
 :root[data-theme="light"] .btn-primary {
-  box-shadow: 0 1px 4px rgba(0, 95, 122, 0.22);
+  box-shadow: 0 2px 8px rgba(0,94,120,0.28), 0 1px 3px rgba(0,94,120,0.12);
 }
 
 .btn-primary:hover {
   background: var(--accent-dim);
-  box-shadow: 0 0 22px rgba(0, 255, 255, 0.65), 0 0 50px rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 24px rgba(0,212,255,0.78), 0 0 52px rgba(0,212,255,0.28);
 }
 
 :root[data-theme="light"] .btn-primary:hover {
-  box-shadow: 0 2px 10px rgba(0, 95, 122, 0.35);
+  box-shadow: 0 4px 16px rgba(0,94,120,0.38), 0 2px 6px rgba(0,94,120,0.15);
 }
 
 .btn-primary:focus-visible {
@@ -292,7 +468,6 @@ a:focus-visible {
   box-shadow: none;
 }
 
-/* ─── Ghost button ───────────────────────────────────────────────────────── */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -310,11 +485,11 @@ a:focus-visible {
 .btn-ghost:hover {
   border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(0,212,255,0.24);
 }
 
 :root[data-theme="light"] .btn-ghost:hover {
-  box-shadow: 0 0 6px rgba(0, 95, 122, 0.15);
+  box-shadow: 0 0 8px rgba(0,94,120,0.18);
 }
 
 .btn-ghost:focus-visible {
@@ -327,22 +502,29 @@ a:focus-visible {
   cursor: not-allowed;
 }
 
-/* ─── Carousel ───────────────────────────────────────────────────────────── */
+/* ─── Carousel scroll container ──────────────────────────────────────────── */
 .carousel-scroll {
   display: flex;
   overflow-x: auto;
   gap: 0.875rem;
-  padding-bottom: 0.75rem;
-  /* hide scrollbar — Firefox */
+  /*
+    Top/bottom padding provides vertical headroom for scaled cards.
+    Largest card ≈ 330px tall (185px wide, 2/3 ratio + text).
+    scale(1.12) needs  330 × 0.12/2 = 19.8px. 24px gives safe margin.
+    translateY(-5px) on active card adds 5px more → total 24.8px < 25px top.
+    Bottom needs 330 × 0.12/2 = 19.8px → 22px is safe.
+  */
+  padding: 25px 0.5rem 22px;
   scrollbar-width: none;
-  /* Safari touch */
   -webkit-overflow-scrolling: touch;
   outline: none;
-  /* smooth on JS scroll */
-  scroll-behavior: smooth;
+  cursor: grab;
 }
 
-/* hide scrollbar — Chromium + Safari */
+.carousel-scroll:active {
+  cursor: grabbing;
+}
+
 .carousel-scroll::-webkit-scrollbar {
   display: none;
 }
@@ -359,7 +541,6 @@ a:focus-visible {
   }
 
   .header-left {
-    /* logo + search in a column on very narrow */
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 0.4rem !important;
@@ -395,11 +576,10 @@ a:focus-visible {
     scroll-behavior: auto !important;
   }
 
-  .media-card:hover {
+  .media-card,
+  .media-card:hover,
+  .media-card.carousel-card-active,
+  .media-card.carousel-card-active:hover {
     transform: none;
-  }
-
-  .carousel-scroll {
-    scroll-behavior: auto;
   }
 }

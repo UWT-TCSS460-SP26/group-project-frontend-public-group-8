@@ -77,7 +77,7 @@ export default function CommunityFavorites() {
   const showSkeletons = loading && filtered.length === 0
 
   return (
-    <section style={{ marginBottom: '3rem' }}>
+    <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h2 className="section-heading" style={{ margin: 0, color: 'var(--violet)' }}>Community Favorites</h2>
         <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -108,8 +108,8 @@ export default function CommunityFavorites() {
                       </div>
                     )}
                     <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
-                      <p style={{ fontWeight: 600, fontSize: '0.82rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.title}</p>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0.15rem 0 0.3rem' }}>{meta.year}</p>
+                      <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.title}</p>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.15rem 0 0.3rem' }}>{meta.year}</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <span style={{ color: '#f59e0b', fontSize: '0.8rem' }}>★</span>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text)' }}>{item.avgRating.toFixed(1)}</span>

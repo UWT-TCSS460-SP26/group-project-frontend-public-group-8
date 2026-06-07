@@ -33,10 +33,10 @@ function MovieCard({ m }: { m: MovieSummary }) {
         </div>
       )}
       <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
-        <p style={{ fontWeight: 600, fontSize: '0.82rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {m.title}
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
           {m.releaseDate?.slice(0, 4)}
         </p>
       </div>
@@ -138,7 +138,7 @@ export default function PopularMediaSelector() {
   const showSkeletons = isLoading && items.length === 0
 
   return (
-    <section style={{ marginBottom: '3rem' }}>
+    <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h2 className="section-heading" style={{ margin: 0 }}>Featured</h2>
         <div style={{ display: 'flex', gap: '0.4rem' }}>

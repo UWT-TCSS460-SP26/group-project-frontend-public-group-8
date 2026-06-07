@@ -71,7 +71,7 @@ export default function GenreCarousel({ genre, title }: Props) {
   if (shows.length === 0 && !loading) return null
 
   return (
-    <section style={{ marginBottom: '2.5rem' }}>
+    <section className="section-panel" style={{ marginBottom: '2.5rem' }}>
       <h3 className="section-heading" style={{ margin: '0 0 0.75rem' }}>
         {title}
       </h3>
@@ -90,10 +90,10 @@ export default function GenreCarousel({ genre, title }: Props) {
                 </div>
               )}
               <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
-                <p style={{ fontWeight: 600, fontSize: '0.82rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {s.name}
                 </p>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                   {s.firstAirDate?.slice(0, 4)}
                 </p>
               </div>

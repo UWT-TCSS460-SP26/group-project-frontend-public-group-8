@@ -77,7 +77,7 @@ export default function RecentActivity() {
   if (!isMounted) return null
 
   return (
-    <section style={{ marginBottom: '3rem' }}>
+    <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <h2 className="section-heading" style={{ marginBottom: '1rem' }}>Your Recent Activity</h2>
 
       {!token ? (
