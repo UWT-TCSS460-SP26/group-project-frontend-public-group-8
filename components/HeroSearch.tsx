@@ -47,20 +47,21 @@ export default function HeroSearch() {
       style={{
         marginBottom: '3rem',
         borderRadius: '12px',
-        overflow: 'hidden',
         position: 'relative',
-        background: 'linear-gradient(135deg, #020810 0%, #080f1a 40%, #050c18 70%, #020810 100%)',
+        background: 'linear-gradient(135deg, var(--bg) 0%, var(--bg-muted) 40%, var(--bg-subtle) 70%, var(--bg) 100%)',
         border: '1px solid var(--border)',
       }}
     >
-      {/* Cyberpunk grid texture */}
+      {/* Cyberpunk grid texture — clipped to section bounds */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(rgba(0,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.07) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
           pointerEvents: 'none',
+          borderRadius: '12px',
+          overflow: 'hidden',
         }}
       />
       {/* Top neon accent line — cyan → magenta */}
@@ -108,7 +109,7 @@ export default function HeroSearch() {
               fontSize: '1rem',
               borderRadius: '8px',
               border: '1.5px solid var(--input-border)',
-              background: 'rgba(8, 13, 20, 0.8)',
+              background: 'var(--input-bg)',
               color: 'var(--text)',
               outline: 'none',
               boxShadow: '0 0 0 0 transparent',
@@ -132,11 +133,11 @@ export default function HeroSearch() {
               top: 'calc(100% + 6px)',
               left: 0,
               right: 0,
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border)',
+              background: 'var(--bg-muted)',
+              border: '1px solid var(--accent)',
               borderRadius: '8px',
-              boxShadow: '0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,255,0.08)',
-              zIndex: 20,
+              boxShadow: '0 16px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,229,255,0.12)',
+              zIndex: 200,
               textAlign: 'left',
               overflow: 'hidden',
             }}>
@@ -146,15 +147,15 @@ export default function HeroSearch() {
                 <>
                   {movies.length > 0 && (
                     <>
-                      <div style={{ padding: '0.4rem 1rem', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--bg-muted)' }}>
+                      <div style={{ padding: '0.4rem 1rem', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--bg-subtle)' }}>
                         Movies
                       </div>
                       {movies.map(m => (
                         <Link key={`m-${m.id}`} href={`/media/movie/${m.id}`}
                           onClick={() => setShowDropdown(false)}
                           style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.625rem 1rem', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--border)', transition: 'background 0.1s' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
                         >
                           {m.posterUrl
                             ? <img src={m.posterUrl} alt={m.title} style={{ width: '36px', height: '54px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
@@ -169,15 +170,15 @@ export default function HeroSearch() {
                   )}
                   {shows.length > 0 && (
                     <>
-                      <div style={{ padding: '0.4rem 1rem', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet)', background: 'var(--bg-muted)' }}>
+                      <div style={{ padding: '0.4rem 1rem', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--violet)', background: 'var(--bg-subtle)' }}>
                         TV Shows
                       </div>
                       {shows.map(s => (
                         <Link key={`tv-${s.id}`} href={`/media/tv/${s.id}`}
                           onClick={() => setShowDropdown(false)}
                           style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.625rem 1rem', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--border)', transition: 'background 0.1s' }}
-                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
-                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
                         >
                           {s.posterUrl
                             ? <img src={s.posterUrl} alt={s.name} style={{ width: '36px', height: '54px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />

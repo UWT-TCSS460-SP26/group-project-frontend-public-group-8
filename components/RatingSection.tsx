@@ -6,6 +6,7 @@ import StarRating from './StarRating'
 import ReviewForm from './ReviewForm'
 import ReviewVotes from './ReviewVotes'
 import SignInButton from './SignInButton'
+import ConfirmModal from './ConfirmModal'
 import {
   submitRating,
   deleteRating,
@@ -69,6 +70,7 @@ export default function RatingSection({
   const [editingReview, setEditingReview] = useState(false)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   
   const [callbackUrl, setCallbackUrl] = useState('/')
 
@@ -230,8 +232,8 @@ export default function RatingSection({
 
   async function handleReviewDelete() {
     if (!token || !myReview) return
-    if (!confirm('Delete your review?')) return
     setReviewSubmitting(true)
+    setShowDeleteConfirm(false)
     try {
       await deleteReview(myReview.id, token)
       setReviews(prev => prev.filter(r => r.id !== myReview.id))
@@ -246,6 +248,15 @@ export default function RatingSection({
 
   return (
     <div>
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Review"
+        message="Are you sure you want to delete your review? This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={handleReviewDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+        isLoading={reviewSubmitting}
+      />
       {/* ── Your Rating ── */}
       <section style={{
         marginBottom: '2.5rem',
@@ -332,7 +343,7 @@ export default function RatingSection({
                   Edit
                 </button>
                 <button type="button"
-                  onClick={handleReviewDelete}
+                  onClick={() => setShowDeleteConfirm(true)}
                   disabled={reviewSubmitting}
                   style={{ background: 'none', border: 'none', color: 'var(--error)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
                   Delete

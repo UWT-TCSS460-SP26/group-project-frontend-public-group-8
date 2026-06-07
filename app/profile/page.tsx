@@ -16,6 +16,7 @@ import {
   type MyReviewItem,
 } from '@/lib/api'
 import { signOutIfAuthError } from '@/lib/clientAuth'
+import ConfirmModal from '@/components/ConfirmModal'
 
 function RatingSkeleton() {
   return (
@@ -80,6 +81,7 @@ export default function ProfilePage() {
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null)
   const [reviewError, setReviewError] = useState<string | null>(null)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<{ type: 'rating' | 'review'; id: number } | null>(null)
 
   useEffect(() => {
     if (!token) return
@@ -132,6 +134,7 @@ export default function ProfilePage() {
 
   async function handleRatingDelete(titleId: number) {
     if (!token) return
+    setPendingDelete(null)
     try {
       await deleteRating(titleId, token)
       setRatings(prev => prev.filter(r => r.title_id !== titleId))
@@ -154,7 +157,8 @@ export default function ProfilePage() {
   }
 
   async function handleReviewDelete(reviewId: number) {
-    if (!token || !confirm('Delete this review?')) return
+    if (!token) return
+    setPendingDelete(null)
     try {
       await deleteReview(reviewId, token)
       setReviews(prev => prev.filter(r => r.id !== reviewId))
@@ -247,8 +251,8 @@ export default function ProfilePage() {
                     )}
                     <StarRating value={item.rating} onChange={star => handleRatingChange(item.title_id, star, item.media_type)} size={22} />
                   </div>
-                  <button type="button" onClick={() => handleRatingDelete(item.title_id)}
-                    style={{ background: 'none', border: 'none', color: 'var(--text-faint)', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', flexShrink: 0 }}>
+                  <button type="button" onClick={() => setPendingDelete({ type: 'rating', id: item.title_id })}
+                    style={{ background: 'none', border: 'none', color: 'var(--error)', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', flexShrink: 0 }}>
                     Remove
                   </button>
                 </div>
@@ -311,7 +315,7 @@ export default function ProfilePage() {
                         Edit
                       </button>
                       <button type="button"
-                        onClick={() => handleReviewDelete(item.id)}
+                        onClick={() => setPendingDelete({ type: 'review', id: item.id })}
                         style={{ background: 'none', border: 'none', color: 'var(--error)', fontSize: '0.78rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
                         Delete
                       </button>
@@ -357,6 +361,23 @@ export default function ProfilePage() {
           </>
         )}
       </section>
+
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        title={pendingDelete?.type === 'rating' ? 'Remove Rating' : 'Delete Review'}
+        message={
+          pendingDelete?.type === 'rating'
+            ? 'Are you sure you want to remove this rating?'
+            : 'Are you sure you want to delete this review? This cannot be undone.'
+        }
+        confirmLabel={pendingDelete?.type === 'rating' ? 'Remove' : 'Delete'}
+        onConfirm={() => {
+          if (!pendingDelete) return
+          if (pendingDelete.type === 'rating') handleRatingDelete(pendingDelete.id)
+          else handleReviewDelete(pendingDelete.id)
+        }}
+        onCancel={() => setPendingDelete(null)}
+      />
     </main>
   )
 }

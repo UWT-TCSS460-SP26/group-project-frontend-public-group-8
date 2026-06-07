@@ -1,137 +1,164 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 
 interface Props {
   children: React.ReactNode
   onScrollEnd?: () => void
 }
 
-const edgeThreshold = 100
-const scrollSpeed = 2
+const SCROLL_STEP = 320
+const HOVER_EDGE = 80
+const HOVER_SPEED = 2
 
 export default function HoverCarousel({ children, onScrollEnd }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const isAtEnd = useRef(false)
-  const [showArrows, setShowArrows] = useState(false)
+  const dirRef = useRef(0)
+  const rafRef = useRef(0)
+  const [showLeft, setShowLeft] = useState(false)
+  const [showRight, setShowRight] = useState(false)
 
+  const updateArrows = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    setShowLeft(el.scrollLeft > 4)
+    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4)
+  }, [])
+
+  // Sync arrows on scroll + resize
   useEffect(() => {
-    const element = ref.current
-    if (!element) return
+    const el = ref.current
+    if (!el) return
+    updateArrows()
+    const ro = new ResizeObserver(updateArrows)
+    ro.observe(el)
+    el.addEventListener('scroll', updateArrows, { passive: true })
+    return () => { ro.disconnect(); el.removeEventListener('scroll', updateArrows) }
+  }, [updateArrows])
 
-    const checkScrollable = () => {
-      setShowArrows(element.scrollWidth > element.clientWidth)
+  // Scroll-end callback
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !onScrollEnd) return
+    const check = () => {
+      const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1
+      if (atEnd && !isAtEnd.current) { isAtEnd.current = true; onScrollEnd() }
+      else if (!atEnd) isAtEnd.current = false
     }
-
-    checkScrollable()
-    const timeoutId = setTimeout(checkScrollable, 500)
-
-    let animationFrameId: number
-    let direction = 0
-
-    const scrollLoop = () => {
-      if (direction !== 0) {
-        element.scrollLeft += direction * scrollSpeed
-      }
-      const atEnd = element.scrollLeft >= element.scrollWidth - element.clientWidth - 1
-      if (atEnd && !isAtEnd.current) {
-        isAtEnd.current = true
-        onScrollEnd?.()
-      } else if (!atEnd) {
-        isAtEnd.current = false
-      }
-      animationFrameId = requestAnimationFrame(scrollLoop)
-    }
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const { clientX } = e
-      const { left, width } = element.getBoundingClientRect()
-      const x = clientX - left
-      if (x < edgeThreshold) direction = -1
-      else if (x > width - edgeThreshold) direction = 1
-      else direction = 0
-    }
-
-    const handleMouseLeave = () => { direction = 0 }
-
-    element.addEventListener('mousemove', handleMouseMove)
-    element.addEventListener('mouseleave', handleMouseLeave)
-    animationFrameId = requestAnimationFrame(scrollLoop)
-
-    return () => {
-      clearTimeout(timeoutId)
-      element.removeEventListener('mousemove', handleMouseMove)
-      element.removeEventListener('mouseleave', handleMouseLeave)
-      cancelAnimationFrame(animationFrameId)
-    }
+    el.addEventListener('scroll', check, { passive: true })
+    return () => el.removeEventListener('scroll', check)
   }, [onScrollEnd])
+
+  // Mouse-proximity auto-scroll (desktop hover UX)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const loop = () => {
+      if (dirRef.current !== 0) el.scrollLeft += dirRef.current * HOVER_SPEED
+      rafRef.current = requestAnimationFrame(loop)
+    }
+    const onMove = (e: MouseEvent) => {
+      const { left, width } = el.getBoundingClientRect()
+      const x = e.clientX - left
+      dirRef.current = x < HOVER_EDGE ? -1 : x > width - HOVER_EDGE ? 1 : 0
+    }
+    const onLeave = () => { dirRef.current = 0 }
+    el.addEventListener('mousemove', onMove)
+    el.addEventListener('mouseleave', onLeave)
+    rafRef.current = requestAnimationFrame(loop)
+    return () => {
+      el.removeEventListener('mousemove', onMove)
+      el.removeEventListener('mouseleave', onLeave)
+      cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  function scrollDir(dir: number) {
+    ref.current?.scrollBy({ left: dir * SCROLL_STEP, behavior: 'smooth' })
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.tagName === 'SELECT' ||
+      target.isContentEditable
+    ) return
+    if (e.key === 'ArrowLeft') { e.preventDefault(); scrollDir(-1) }
+    if (e.key === 'ArrowRight') { e.preventDefault(); scrollDir(1) }
+  }
+
+  const arrowBtn: React.CSSProperties = {
+    position: 'absolute',
+    top: 0,
+    bottom: '1rem',
+    width: '44px',
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer',
+    zIndex: 10,
+    background: 'none',
+    border: 'none',
+    padding: 0,
+  }
 
   return (
     <div style={{ position: 'relative' }}>
-      {/* Left neon arrow — thin transparent fade, no card-obscuring shader */}
-      {showArrows && (
-        <div
-          aria-hidden="true"
+      {showLeft && (
+        <button
+          type="button"
+          aria-label="Scroll left"
+          tabIndex={-1}
+          onClick={() => scrollDir(-1)}
           style={{
-            position: 'absolute',
+            ...arrowBtn,
             left: 0,
-            top: 0,
-            bottom: '1rem',
-            width: '40px',
-            background: 'linear-gradient(to right, rgba(2,8,16,0.75) 0%, transparent 100%)',
-            display: 'flex',
-            alignItems: 'center',
             justifyContent: 'flex-start',
-            paddingLeft: '2px',
-            pointerEvents: 'none',
-            zIndex: 10,
+            paddingLeft: '4px',
+            background: 'linear-gradient(to right, var(--carousel-fade) 0%, transparent 100%)',
           }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            aria-hidden="true"
             style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
           >
             <polyline points="15 18 9 12 15 6" />
           </svg>
-        </div>
+        </button>
       )}
 
-      {/* Right neon arrow — thin transparent fade, no card-obscuring shader */}
-      {showArrows && (
-        <div
-          aria-hidden="true"
+      {showRight && (
+        <button
+          type="button"
+          aria-label="Scroll right"
+          tabIndex={-1}
+          onClick={() => scrollDir(1)}
           style={{
-            position: 'absolute',
+            ...arrowBtn,
             right: 0,
-            top: 0,
-            bottom: '1rem',
-            width: '40px',
-            background: 'linear-gradient(to left, rgba(2,8,16,0.75) 0%, transparent 100%)',
-            display: 'flex',
-            alignItems: 'center',
             justifyContent: 'flex-end',
-            paddingRight: '2px',
-            pointerEvents: 'none',
-            zIndex: 10,
+            paddingRight: '4px',
+            background: 'linear-gradient(to left, var(--carousel-fade) 0%, transparent 100%)',
           }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
             stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            aria-hidden="true"
             style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8)) drop-shadow(0 0 16px rgba(0,255,255,0.4))', opacity: 0.95 }}
           >
             <polyline points="9 6 15 12 9 18" />
           </svg>
-        </div>
+        </button>
       )}
 
       <div
         ref={ref}
-        style={{
-          display: 'flex',
-          overflowX: 'hidden',
-          gap: '0.875rem',
-          paddingBottom: '0.75rem',
-        }}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className="carousel-scroll"
       >
         {children}
       </div>

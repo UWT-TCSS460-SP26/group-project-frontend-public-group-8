@@ -6,7 +6,7 @@ import { getPopularMovies, getPopularTV } from '@/lib/api'
 import type { MovieSummary, TVSummary } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
 
-const CARD_WIDTH = 150
+const CARD_WIDTH = 185
 
 function CardSkeleton() {
   return (
@@ -140,7 +140,7 @@ export default function PopularMediaSelector() {
   return (
     <section style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <h2 className="section-heading" style={{ margin: 0 }}>Popular</h2>
+        <h2 className="section-heading" style={{ margin: 0 }}>Featured</h2>
         <div style={{ display: 'flex', gap: '0.4rem' }}>
           <button
             onClick={() => setSelected('movies')}

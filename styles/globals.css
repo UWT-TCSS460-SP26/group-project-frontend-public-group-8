@@ -47,6 +47,12 @@
   --skeleton-from: #0d1a2a;
   --skeleton-to:   #162438;
 
+  /* Carousel edge fade color */
+  --carousel-fade: rgba(2, 8, 16, 0.85);
+
+  /* Cyberpunk grid line color */
+  --grid-line: rgba(0, 255, 255, 0.028);
+
   /* ── Aliases for merged components that use different var names ── */
   --background:   var(--bg);
   --foreground:   var(--text);
@@ -54,45 +60,57 @@
 
 /* ─── Light theme ─────────────────────────────────────────────────────────── */
 :root[data-theme="light"] {
-  --bg:           #f0f4f8;
+  --bg:           #eef2f8;
   --bg-subtle:    #e2eaf4;
   --bg-muted:     #d4dff0;
-  --surface:      #ffffff;
-  --card-bg:      #ffffff;
-  --border:       #c8d6e8;
+  --surface:      #f8fafc;
+  --card-bg:      #f8fafc;
+  --border:       #b8ccdf;
   --text:         #0f172a;
-  --text-secondary: #334155;
-  --text-muted:   #475569;
-  --text-faint:   #7a90a8;
-  --input-bg:     #ffffff;
-  --input-border: #99b0cc;
+  --text-secondary: #1e3a5f;
+  --text-muted:   #3d5a7a;
+  --text-faint:   #6a85a0;
+  --input-bg:     #f8fafc;
+  --input-border: #8aaac8;
   --input-text:   #0f172a;
-  --accent:       #0099bb;
-  --accent-dim:   #007a99;
+  /* Darker teal for 5.5:1+ contrast on light bg */
+  --accent:       #005f7a;
+  --accent-dim:   #004d63;
   --accent-text:  #ffffff;
-  --accent-ring:  rgba(0, 153, 187, 0.2);
-  --accent-glow:  0 0 12px rgba(0, 153, 187, 0.14);
-  --violet:       #8800cc;
-  --violet-glow:  0 0 10px rgba(136, 0, 204, 0.15);
+  --accent-ring:  rgba(0, 95, 122, 0.22);
+  --accent-glow:  0 0 10px rgba(0, 95, 122, 0.18);
+  /* Deeper violet for contrast */
+  --violet:       #6600aa;
+  --violet-glow:  0 0 10px rgba(102, 0, 170, 0.18);
   --placeholder-bg: #d4dff0;
-  --danger:       #dc2626;
-  --error:        #dc2626;
-  --shadow:       0 2px 8px rgba(15, 23, 42, 0.1);
-  --card-hover-shadow: 0 8px 24px rgba(0, 153, 187, 0.12), 0 2px 6px rgba(15,23,42,0.08);
-  --card-hover-border: #0099bb;
+  --danger:       #b91c1c;
+  --error:        #b91c1c;
+  --shadow:       0 2px 8px rgba(15, 23, 42, 0.12);
+  --card-hover-shadow: 0 8px 24px rgba(0, 95, 122, 0.14), 0 2px 6px rgba(15,23,42,0.08);
+  --card-hover-border: #005f7a;
   --skeleton-from: #d4dff0;
   --skeleton-to:   #c0d0e6;
+  --carousel-fade: rgba(238, 242, 248, 0.92);
+  --grid-line: rgba(0, 95, 122, 0.055);
   --background:   var(--bg);
   --foreground:   var(--text);
 }
 
 /* ─── Base ────────────────────────────────────────────────────────────────── */
+html {
+  /* Subtle cyberpunk grid — behind everything, no z-index needed */
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-attachment: fixed;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  background-color: var(--bg);
-  color: var(--text);
   min-height: 100vh;
   font-family:
     -apple-system,
@@ -106,24 +124,13 @@ body {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
-  transition: background-color 0.18s ease, color 0.18s ease;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Scanline overlay — dark mode only */
-:root:not([data-theme="light"]) body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0, 0, 0, 0.07) 3px,
-    rgba(0, 0, 0, 0.07) 4px
-  );
-  pointer-events: none;
-  z-index: 9999;
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.18s ease, color 0.18s ease;
 }
 
 a {
@@ -152,7 +159,7 @@ a {
 
 .theme-toggle:hover {
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  box-shadow: var(--accent-glow);
 }
 
 .theme-toggle:focus-visible {
@@ -207,6 +214,7 @@ a:focus-visible {
 :root[data-theme="light"] .media-card {
   border-color: var(--border);
   border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(15,23,42,0.07);
 }
 
 .media-card:hover {
@@ -236,10 +244,9 @@ a:focus-visible {
 
 :root[data-theme="light"] .section-heading {
   text-shadow: none;
-  font-size: 1.05rem;
-  letter-spacing: 0.04em;
-  font-weight: 700;
-  font-family: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  font-weight: 800;
 }
 
 /* ─── Neon button ────────────────────────────────────────────────────────── */
@@ -261,9 +268,17 @@ a:focus-visible {
   box-shadow: 0 0 14px rgba(0, 255, 255, 0.4), 0 0 28px rgba(0, 255, 255, 0.15);
 }
 
+:root[data-theme="light"] .btn-primary {
+  box-shadow: 0 1px 4px rgba(0, 95, 122, 0.22);
+}
+
 .btn-primary:hover {
   background: var(--accent-dim);
   box-shadow: 0 0 22px rgba(0, 255, 255, 0.65), 0 0 50px rgba(0, 255, 255, 0.25);
+}
+
+:root[data-theme="light"] .btn-primary:hover {
+  box-shadow: 0 2px 10px rgba(0, 95, 122, 0.35);
 }
 
 .btn-primary:focus-visible {
@@ -298,9 +313,75 @@ a:focus-visible {
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
 }
 
+:root[data-theme="light"] .btn-ghost:hover {
+  box-shadow: 0 0 6px rgba(0, 95, 122, 0.15);
+}
+
 .btn-ghost:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Carousel ───────────────────────────────────────────────────────────── */
+.carousel-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.875rem;
+  padding-bottom: 0.75rem;
+  /* hide scrollbar — Firefox */
+  scrollbar-width: none;
+  /* Safari touch */
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+  /* smooth on JS scroll */
+  scroll-behavior: smooth;
+}
+
+/* hide scrollbar — Chromium + Safari */
+.carousel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Responsive header ──────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .header-root {
+    height: auto !important;
+    min-height: 56px;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.5rem 1rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .header-left {
+    /* logo + search in a column on very narrow */
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.4rem !important;
+  }
+
+  .header-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: flex-start;
+  }
+
+  .nav-search-form {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
 }
 
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */
@@ -316,5 +397,9 @@ a:focus-visible {
 
   .media-card:hover {
     transform: none;
+  }
+
+  .carousel-scroll {
+    scroll-behavior: auto;
   }
 }

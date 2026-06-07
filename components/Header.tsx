@@ -12,6 +12,7 @@ export default async function Header() {
 
   return (
     <header
+      className="header-root"
       style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -31,35 +32,54 @@ export default async function Header() {
       }}
     >
       {/* Left: logo + search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: 0 }}>
-        <Link
-          href="/"
-          aria-label="Screen8 home"
-          style={{
-            fontFamily: playfair.style.fontFamily,
-            fontWeight: 700,
-            fontSize: '1.15rem',
-            textDecoration: 'none',
-            color: 'var(--accent)',
-            flexShrink: 0,
-            textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1px',
-          }}
-        >
-          Screen
-          <img
-            src="/icon.svg"
-            alt="8"
-            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
-          />
-        </Link>
+      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: 0 }}>
+        <div className="header-logo-row" style={{ display: 'contents' }}>
+          <Link
+            href="/"
+            aria-label="Screen8 home"
+            style={{
+              fontFamily: playfair.style.fontFamily,
+              fontWeight: 700,
+              fontSize: '1.15rem',
+              textDecoration: 'none',
+              color: 'var(--accent)',
+              flexShrink: 0,
+              textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1px',
+            }}
+          >
+            Screen
+            <img
+              src="/icon.svg"
+              alt="8"
+              style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
+            />
+          </Link>
+        </div>
         <NavSearch />
       </div>
 
-      {/* Right: user area */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+      {/* Right: user area + API link */}
+      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+        <Link
+          href="/api-test"
+          style={{
+            fontSize: '0.78rem',
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            padding: '0.3rem 0.5rem',
+            borderRadius: '4px',
+            border: '1px solid var(--border)',
+            transition: 'color 0.15s, border-color 0.15s',
+          }}
+          onMouseEnter={undefined}
+        >
+          Test the API
+        </Link>
+
         {session?.user ? (
           <>
             <Link
