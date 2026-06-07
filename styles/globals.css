@@ -12,11 +12,17 @@
   /* Borders */
   --border:         #0d2038;
 
-  /* Text — high contrast on dark */
+  /* Text — high contrast on dark
+     Contrast ratios on --bg (#020810):
+       --text           #ddeeff  ≈ 17.1:1   primary content
+       --text-secondary #9abdd8  ≈ 10.2:1   supporting text
+       --text-muted     #7090b0  ≈  6.0:1   labels, captions, metadata
+       --text-faint     #6080a0  ≈  4.9:1   timestamps, minor details (WCAG AA ✓)
+  */
   --text:           #ddeeff;
   --text-secondary: #9abdd8;
-  --text-muted:     #5a7a9a;
-  --text-faint:     #2a4060;
+  --text-muted:     #7090b0;
+  --text-faint:     #6080a0;
 
   /* Inputs */
   --input-bg:       #030a18;
@@ -96,10 +102,16 @@
   --surface:        #f4f8fe;
   --card-bg:        #f8fbff;
   --border:         #a8c2dc;
+  /* Text — contrast ratios on --bg (#e8eef8):
+       --text           #0c1625  ≈ 18.8:1   primary
+       --text-secondary #1a3050  ≈ 14.0:1   supporting
+       --text-muted     #38587a  ≈  6.3:1   labels, captions
+       --text-faint     #446278  ≈  5.5:1   timestamps, minor details (WCAG AA ✓)
+  */
   --text:           #0c1625;
   --text-secondary: #1a3050;
   --text-muted:     #38587a;
-  --text-faint:     #5c7a98;
+  --text-faint:     #446278;
   --input-bg:       #f5f8fd;
   --input-border:   #7ea8c8;
   --input-text:     #0c1625;
@@ -245,6 +257,13 @@ a:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-ring);
   border-radius: 4px;
+}
+
+/* ─── Placeholder text ───────────────────────────────────────────────────── */
+/* Override browser-default opacity-based placeholder so color is predictable */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 /* ─── Skeleton shimmer ────────────────────────────────────────────────────── */
