@@ -3,6 +3,7 @@ import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
 import NavSearch from '@/components/NavSearch'
+import EightBallLauncher from '@/components/EightBallLauncher'
 import { Playfair_Display } from 'next/font/google'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: '700' })
@@ -64,6 +65,7 @@ export default async function Header() {
 
       {/* Right: user area + API link */}
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+        <EightBallLauncher />
         <Link
           href="/api-test"
           style={{

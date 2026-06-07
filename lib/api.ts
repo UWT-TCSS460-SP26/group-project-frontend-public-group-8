@@ -289,6 +289,10 @@ export function searchTVByGenre(genre: string, page = 1) {
   return apiFetch<TVSearchResponse>(`/v1/tv/search/genre?q=${encodeURIComponent(genre)}&page=${page}`)
 }
 
+export function searchMovieByGenre(genre: string, page = 1) {
+  return apiFetch<MovieSearchResponse>(`/v1/movie/search/genre?q=${encodeURIComponent(genre)}&page=${page}`)
+}
+
 export function submitRating(titleId: number, rating: number, mediaType: 'movie' | 'tv', token: string) {
   return apiMutate<RatingResponse>('POST', `/v1/ratings/${titleId}`, token, { rating, media_type: mediaType })
 }

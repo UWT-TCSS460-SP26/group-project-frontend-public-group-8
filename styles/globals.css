@@ -676,3 +676,19 @@ html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active:ho
     transform: none;
   }
 }
+
+/* ─── Magic 8-ball shake ──────────────────────────────────────────────────── */
+@keyframes eightball-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  15% { transform: translate(-6px, 4px) rotate(-7deg); }
+  30% { transform: translate(6px, -4px) rotate(7deg); }
+  45% { transform: translate(-5px, -3px) rotate(-5deg); }
+  60% { transform: translate(5px, 3px) rotate(5deg); }
+  75% { transform: translate(-3px, 2px) rotate(-3deg); }
+}
+
+.eightball-shake { animation: eightball-shake 0.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .eightball-shake { animation: none; }
+}
