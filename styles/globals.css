@@ -620,6 +620,44 @@ a:focus-visible {
   }
 }
 
+/* ─── Compact carousel mode ─────────────────────────────────────────────── */
+/*
+  Compact mode is activated by setting data-carousel-compact="true" on <html>.
+  CSS !important overrides the inline minWidth/maxWidth set by each carousel
+  component; the gap and card-transform rules need no !important since they
+  are not set inline.
+*/
+html[data-carousel-compact] .carousel-scroll {
+  gap: 0.5rem;
+}
+
+html[data-carousel-compact] .carousel-scroll .media-card {
+  min-width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* Keep the active-card lift smaller so tighter-packed cards don't overlap */
+html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active {
+  transform: translateY(-3px) scale(1.04);
+}
+
+html[data-carousel-compact] .carousel-scroll .media-card:hover {
+  transform: scale(1.07);
+}
+
+html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active:hover {
+  transform: scale(1.09);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-carousel-compact] .carousel-scroll .media-card,
+  html[data-carousel-compact] .carousel-scroll .media-card:hover,
+  html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active,
+  html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active:hover {
+    transform: none;
+  }
+}
+
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -6,7 +6,6 @@ import { getMyRatings } from '@/lib/api'
 import type { MyRatingItem } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
 import { getSession } from 'next-auth/react'
-import SignInButton from './SignInButton'
 
 const CARD_WIDTH = 150
 
@@ -23,17 +22,18 @@ function CardSkeleton() {
 }
 
 export default function RecentActivity() {
-  const [ratings, setRatings] = useState<MyRatingItem[]>([])
-  const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [hasMore, setHasMore] = useState(true)
-  const [token, setToken] = useState<string | undefined>()
-  const [isMounted, setIsMounted] = useState(false)
-  const [callbackUrl, setCallbackUrl] = useState('/')
+  const [ratings, setRatings]       = useState<MyRatingItem[]>([])
+  const [page, setPage]             = useState(1)
+  const [loading, setLoading]       = useState(true)
+  const [hasMore, setHasMore]       = useState(true)
+  const [token, setToken]           = useState<string | undefined>()
+  const [isMounted, setIsMounted]   = useState(false)
+  // Separate flag for the auth check itself so we never flash a sign-in
+  // prompt or skeleton to a logged-out user
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(() => {
     setIsMounted(true)
-    setCallbackUrl(window.location.href)
   }, [])
 
   useEffect(() => {
@@ -43,6 +43,8 @@ export default function RecentActivity() {
       setLoading(true)
       const session = await getSession()
       if (cancelled) return
+      // Auth check is now complete — we know whether the user is signed in
+      setAuthLoading(false)
       if (session?.accessToken) {
         setToken(session.accessToken)
         try {
@@ -74,28 +76,15 @@ export default function RecentActivity() {
     } catch { /* silent */ } finally { setLoading(false) }
   }
 
-  if (!isMounted) return null
+  // Not yet mounted (SSR) or still checking auth or definitely logged out
+  // — render nothing so there is zero visible placeholder for guests
+  if (!isMounted || authLoading || !token) return null
 
   return (
     <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <h2 className="section-heading" style={{ marginBottom: '1rem' }}>Your Recent Activity</h2>
 
-      {!token ? (
-        <div style={{
-          padding: '1.75rem 2rem',
-          border: '1px dashed var(--border)',
-          borderRadius: '8px',
-          textAlign: 'center',
-          background: 'var(--bg-subtle)',
-        }}>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.9rem' }}>
-            Sign in to track your ratings and see your recent activity here.
-          </p>
-          <SignInButton callbackUrl={callbackUrl} className="btn-primary">
-            Sign In
-          </SignInButton>
-        </div>
-      ) : loading && ratings.length === 0 ? (
+      {loading && ratings.length === 0 ? (
         <HoverCarousel>
           {Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
         </HoverCarousel>

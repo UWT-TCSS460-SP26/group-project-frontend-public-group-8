@@ -7,15 +7,27 @@ interface Props {
   onScrollEnd?: () => void
 }
 
-// Cards scroll by one "page" worth of visible cards
-const SCROLL_STEP = 320
+const SCROLL_STEP    = 320
+const SNAP_SETTLE_MS = 120   // ms of scroll silence before snap fires
+const DRAG_THRESHOLD = 5     // px horizontal movement before treating as drag vs click
 
 export default function HoverCarousel({ children, onScrollEnd }: Props) {
-  const ref        = useRef<HTMLDivElement>(null)
-  const isAtEnd    = useRef(false)
-  const rafRef     = useRef(0)
+  const ref         = useRef<HTMLDivElement>(null)
+  const isAtEnd     = useRef(false)
+  const rafRef      = useRef(0)
   const leftBtnRef  = useRef<HTMLButtonElement>(null)
   const rightBtnRef = useRef<HTMLButtonElement>(null)
+
+  // Mouse-drag state
+  const isDragging     = useRef(false)
+  const dragStartX     = useRef(0)
+  const dragScrollLeft = useRef(0)
+  const hasDragged     = useRef(false)
+
+  // Snap state
+  const snapTimer      = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isSnapping     = useRef(false)
+  const snapTarget     = useRef(0)
 
   // Single rAF pass: update arrow opacity + active-card class
   const sync = useCallback(() => {
@@ -28,15 +40,14 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     const lb = leftBtnRef.current
     const rb = rightBtnRef.current
     if (lb) {
-      lb.style.opacity      = atLeft  ? '0' : '1'
+      lb.style.opacity       = atLeft  ? '0' : '1'
       lb.style.pointerEvents = atLeft  ? 'none' : 'auto'
     }
     if (rb) {
-      rb.style.opacity      = atRight ? '0' : '1'
+      rb.style.opacity       = atRight ? '0' : '1'
       rb.style.pointerEvents = atRight ? 'none' : 'auto'
     }
 
-    // Identify the .media-card child closest to the carousel center
     const cards = Array.from(el.children).filter(
       c => (c as HTMLElement).classList.contains('media-card')
     ) as HTMLElement[]
@@ -63,6 +74,51 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     rafRef.current = requestAnimationFrame(sync)
   }, [sync])
 
+  // Snap to the card whose center is closest to the carousel center
+  const snapToNearestCard = useCallback(() => {
+    const el = ref.current
+    if (!el || isSnapping.current) return
+
+    const cards = Array.from(el.children).filter(
+      c => (c as HTMLElement).classList.contains('media-card')
+    ) as HTMLElement[]
+    if (cards.length === 0) return
+
+    const center = el.scrollLeft + el.clientWidth / 2
+    let closest: HTMLElement | null = null
+    let minDist = Infinity
+    cards.forEach(card => {
+      const dist = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center)
+      if (dist < minDist) { minDist = dist; closest = card }
+    })
+    if (!closest) return
+
+    const targetLeft = (closest as HTMLElement).offsetLeft
+      + (closest as HTMLElement).offsetWidth / 2
+      - el.clientWidth / 2
+
+    if (Math.abs(el.scrollLeft - targetLeft) < 2) return
+
+    snapTarget.current  = targetLeft
+    isSnapping.current  = true
+    el.scrollTo({ left: targetLeft, behavior: 'smooth' })
+    // Release snap lock after generous smooth-scroll window
+    setTimeout(() => { isSnapping.current = false }, 800)
+  }, [])
+
+  // Debounce: schedule snap after scroll has been quiet for SNAP_SETTLE_MS
+  const scheduleSnap = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    // If a snap is running and we've reached the target, release the lock early
+    if (isSnapping.current && Math.abs(el.scrollLeft - snapTarget.current) < 2) {
+      isSnapping.current = false
+    }
+    if (isSnapping.current) return
+    if (snapTimer.current) clearTimeout(snapTimer.current)
+    snapTimer.current = setTimeout(snapToNearestCard, SNAP_SETTLE_MS)
+  }, [snapToNearestCard])
+
   // Attach scroll + resize listeners
   useEffect(() => {
     const el = ref.current
@@ -71,12 +127,15 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     const ro = new ResizeObserver(scheduleSync)
     ro.observe(el)
     el.addEventListener('scroll', scheduleSync, { passive: true })
+    el.addEventListener('scroll', scheduleSnap, { passive: true })
     return () => {
       ro.disconnect()
       el.removeEventListener('scroll', scheduleSync)
+      el.removeEventListener('scroll', scheduleSnap)
       cancelAnimationFrame(rafRef.current)
+      if (snapTimer.current) clearTimeout(snapTimer.current)
     }
-  }, [scheduleSync])
+  }, [scheduleSync, scheduleSnap])
 
   // Infinite-load callback — fires when user scrolls to the end
   useEffect(() => {
@@ -91,6 +150,53 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     return () => el.removeEventListener('scroll', check)
   }, [onScrollEnd])
 
+  // Mouse drag — attached to the DOM element so we can listen on window for
+  // mousemove/mouseup (finger can leave the carousel bounds during a fast drag)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const onMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return
+      // Don't hijack clicks on interactive children (buttons, inputs, etc.)
+      const target = e.target as HTMLElement
+      if (target.closest('button, input, select, textarea, [contenteditable]')) return
+
+      isDragging.current     = true
+      hasDragged.current     = false
+      dragStartX.current     = e.clientX
+      dragScrollLeft.current = el.scrollLeft
+      el.style.cursor                = 'grabbing'
+      document.body.style.userSelect = 'none'
+    }
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) return
+      const delta = dragStartX.current - e.clientX
+      if (Math.abs(delta) > DRAG_THRESHOLD) hasDragged.current = true
+      el.scrollLeft = dragScrollLeft.current + delta
+    }
+
+    const onMouseUp = () => {
+      if (!isDragging.current) return
+      isDragging.current             = false
+      el.style.cursor                = ''
+      document.body.style.userSelect = ''
+      // Snap is triggered by the debounced scroll listener
+    }
+
+    el.addEventListener('mousedown', onMouseDown)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup',   onMouseUp)
+
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup',   onMouseUp)
+      document.body.style.userSelect = ''
+    }
+  }, [])
+
   function scrollDir(dir: number) {
     ref.current?.scrollBy({ left: dir * SCROLL_STEP, behavior: 'smooth' })
   }
@@ -100,6 +206,35 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) return
     if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollDir(-1) }
     if (e.key === 'ArrowRight') { e.preventDefault(); scrollDir(1) }
+  }
+
+  // Click handler: suppress navigation after a drag; center a partially-visible card
+  function handleClick(e: React.MouseEvent) {
+    // Drag just ended — suppress the resulting synthetic click
+    if (hasDragged.current) {
+      e.preventDefault()
+      e.stopPropagation()
+      hasDragged.current = false
+      return
+    }
+
+    // Don't intercept clicks on interactive elements inside cards
+    const target = e.target as HTMLElement
+    if (target.closest('button, input, select, textarea, [contenteditable]')) return
+
+    const card = target.closest('.media-card') as HTMLElement | null
+    if (!card) return
+    // Already the active/centered card — let the link navigate normally
+    if (card.classList.contains('carousel-card-active')) return
+
+    // Partially visible card clicked — center it instead of navigating
+    e.preventDefault()
+    e.stopPropagation()
+
+    const el = ref.current
+    if (!el) return
+    const targetLeft = card.offsetLeft + card.offsetWidth / 2 - el.clientWidth / 2
+    el.scrollTo({ left: targetLeft, behavior: 'smooth' })
   }
 
   /*
@@ -122,15 +257,12 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     border:     'none',
     padding:    0,
     transition: 'opacity 0.2s ease',
-    /* No touchAction override — browser default lets the engine decide. */
   }
 
   return (
     /*
       overflow: visible on the wrapper is critical.
-      Scaled cards must be able to visually escape the wrapper boundary
-      (they are clipped only by overflow:auto on .carousel-scroll in the Y axis —
-      which is why .carousel-scroll has generous top/bottom padding).
+      Scaled cards must be able to visually escape the wrapper boundary.
     */
     <div style={{ position: 'relative', overflow: 'visible' }}>
 
@@ -143,7 +275,7 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
         onClick={() => scrollDir(-1)}
         style={{
           ...arrowBase,
-          left:            0,
+          left:           0,
           justifyContent: 'flex-start',
           paddingLeft:    '10px',
           background:     'linear-gradient(to right, var(--carousel-fade) 0%, var(--carousel-mid) 45%, transparent 100%)',
@@ -180,7 +312,7 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
         onClick={() => scrollDir(1)}
         style={{
           ...arrowBase,
-          right:           0,
+          right:          0,
           justifyContent: 'flex-end',
           paddingRight:   '10px',
           background:     'linear-gradient(to left, var(--carousel-fade) 0%, var(--carousel-mid) 45%, transparent 100%)',
@@ -213,6 +345,7 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
         ref={ref}
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onClickCapture={handleClick}
         className="carousel-scroll"
       >
         {children}

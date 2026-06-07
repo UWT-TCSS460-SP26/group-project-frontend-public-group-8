@@ -3,11 +3,17 @@ import PopularMediaSelector from '@/components/PopularMediaSelector'
 import CommunityFavorites from '@/components/CommunityFavorites'
 import RecentActivity from '@/components/RecentActivity'
 import GenreCarousel from '@/components/GenreCarousel'
+import CompactToggle from '@/components/CompactToggle'
 
 export default function Home() {
   return (
     <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
       <HeroSearch />
+
+      {/* Card display-mode toggle — affects all carousels on the page */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '0.75rem 0 0.25rem' }}>
+        <CompactToggle />
+      </div>
 
       <RecentActivity />
 
