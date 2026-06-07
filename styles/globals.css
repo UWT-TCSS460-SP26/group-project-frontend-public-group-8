@@ -506,6 +506,15 @@ a:focus-visible {
 .carousel-scroll {
   display: flex;
   overflow-x: auto;
+  /*
+    overflow-y: hidden must be explicit.
+    CSS computes overflow-y as "auto" whenever overflow-x is not "visible",
+    which makes the browser think the element can scroll in both axes and
+    causes it to pick vertical page-scroll over horizontal carousel-scroll
+    when the gesture direction is ambiguous.
+    Declaring hidden removes that ambiguity.
+  */
+  overflow-y: hidden;
   gap: 0.875rem;
   /*
     Top/bottom padding provides vertical headroom for scaled cards.
@@ -516,7 +525,25 @@ a:focus-visible {
   */
   padding: 25px 0.5rem 22px;
   scrollbar-width: none;
+  /* Safari momentum scrolling */
   -webkit-overflow-scrolling: touch;
+  /*
+    touch-action: pan-x
+    Tells the browser: this element handles horizontal finger panning.
+    Effect:
+      • Horizontal swipe  → carousel scrolls ✓
+      • Vertical swipe    → gesture is passed UP to the page, which scrolls ✓
+    Without this, the browser guesses from early finger movement and often
+    picks vertical page-scroll for ambiguous diagonals, breaking carousel UX.
+    pan-x does NOT block vertical page scrolling — it only claims horizontal.
+  */
+  touch-action: pan-x;
+  /*
+    Prevent scroll-chaining: when the carousel reaches its boundary and the
+    user keeps swiping, the overscroll stays within the carousel rather than
+    triggering a horizontal page bounce.
+  */
+  overscroll-behavior-x: contain;
   outline: none;
   cursor: grab;
 }
