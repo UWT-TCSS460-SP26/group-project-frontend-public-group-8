@@ -507,43 +507,49 @@ a:focus-visible {
   display: flex;
   overflow-x: auto;
   /*
-    overflow-y: hidden must be explicit.
-    CSS computes overflow-y as "auto" whenever overflow-x is not "visible",
-    which makes the browser think the element can scroll in both axes and
-    causes it to pick vertical page-scroll over horizontal carousel-scroll
-    when the gesture direction is ambiguous.
-    Declaring hidden removes that ambiguity.
+    overflow-y: hidden — explicit, intentional, and load-bearing.
+
+    When overflow-x is not "visible", the CSS spec computes overflow-y as
+    "auto" unless you override it. "auto" makes the browser believe this
+    element is a candidate for BOTH horizontal AND vertical scrolling, so
+    when a finger gesture starts here the browser hesitates and often picks
+    vertical page-scroll even for clear left-right swipes.
+
+    Declaring overflow-y: hidden removes that ambiguity: the browser sees
+    this container can only scroll horizontally. Horizontal touches →
+    carousel; vertical touches → passed up to the page naturally.
+
+    This structural declaration is the correct alternative to touch-action:
+    pan-x. Unlike pan-x, it does not assert an axis lock at the gesture
+    level, so iOS Safari continues to delegate vertical touches to the page
+    rather than swallowing them.
   */
   overflow-y: hidden;
   gap: 0.875rem;
   /*
     Top/bottom padding provides vertical headroom for scaled cards.
     Largest card ≈ 330px tall (185px wide, 2/3 ratio + text).
-    scale(1.12) needs  330 × 0.12/2 = 19.8px. 24px gives safe margin.
-    translateY(-5px) on active card adds 5px more → total 24.8px < 25px top.
-    Bottom needs 330 × 0.12/2 = 19.8px → 22px is safe.
+    scale(1.12) needs 330 × 0.12/2 = 19.8px. 25px gives a safe margin.
+    translateY(-5px) on active card adds 5px → total 24.8px < 25px top. ✓
+    Bottom needs same 19.8px → 22px is safe.
   */
   padding: 25px 0.5rem 22px;
   scrollbar-width: none;
-  /* Safari momentum scrolling */
+  /* Safari momentum / kinetic scrolling */
   -webkit-overflow-scrolling: touch;
   /*
-    touch-action: pan-x
-    Tells the browser: this element handles horizontal finger panning.
-    Effect:
-      • Horizontal swipe  → carousel scrolls ✓
-      • Vertical swipe    → gesture is passed UP to the page, which scrolls ✓
-    Without this, the browser guesses from early finger movement and often
-    picks vertical page-scroll for ambiguous diagonals, breaking carousel UX.
-    pan-x does NOT block vertical page scrolling — it only claims horizontal.
-  */
-  touch-action: pan-x;
-  /*
-    Prevent scroll-chaining: when the carousel reaches its boundary and the
-    user keeps swiping, the overscroll stays within the carousel rather than
-    triggering a horizontal page bounce.
+    Prevent scroll-chaining at boundaries: when the carousel reaches the
+    left or right end and the user keeps swiping, the overscroll is
+    absorbed here rather than causing a horizontal bounce on the page.
   */
   overscroll-behavior-x: contain;
+  /*
+    No explicit touch-action.
+    The browser default ("auto") lets the engine choose scroll direction
+    from the finger's dominant movement axis. Combined with overflow-y:
+    hidden above, it correctly routes horizontal swipes to this container
+    and vertical swipes to the page — without ever blocking either.
+  */
   outline: none;
   cursor: grab;
 }
@@ -556,6 +562,21 @@ a:focus-visible {
   display: none;
 }
 
+/*
+  Prevent native image-drag behavior from competing with swipe gestures.
+  On iOS Safari a finger held briefly on a poster before swiping can
+  trigger an image-save / drag-start animation that interrupts the scroll.
+  -webkit-user-drag: none stops the drag; -webkit-touch-callout: none
+  suppresses the long-press context menu. Neither removes pointer events
+  (the card link still receives taps normally).
+*/
+.media-card img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* ─── Responsive header ──────────────────────────────────────────────────── */
 @media (max-width: 560px) {
   .header-root {
@@ -565,18 +586,6 @@ a:focus-visible {
     align-items: stretch !important;
     padding: 0.5rem 1rem !important;
     gap: 0.4rem !important;
-  }
-
-  .header-left {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 0.4rem !important;
-  }
-
-  .header-logo-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
 
   .header-right {

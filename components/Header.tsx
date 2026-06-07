@@ -15,13 +15,11 @@ export default async function Header() {
       className="header-root"
       style={{
         display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0 1.5rem',
         height: '56px',
         borderBottom: '1px solid rgba(0,255,255,0.4)',
         gap: '1rem',
-        flexWrap: 'wrap',
         background: 'rgba(2, 8, 16, 0.95)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
@@ -31,33 +29,36 @@ export default async function Header() {
         boxShadow: '0 1px 0 rgba(0,255,255,0.15), 0 0 30px rgba(0,255,255,0.06), 0 4px 24px rgba(0,0,0,0.8)',
       }}
     >
-      {/* Left: logo + search */}
-      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1, minWidth: 0 }}>
-        <div className="header-logo-row" style={{ display: 'contents' }}>
-          <Link
-            href="/"
-            aria-label="Screen8 home"
-            style={{
-              fontFamily: playfair.style.fontFamily,
-              fontWeight: 700,
-              fontSize: '1.15rem',
-              textDecoration: 'none',
-              color: 'var(--accent)',
-              flexShrink: 0,
-              textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1px',
-            }}
-          >
-            Screen
-            <img
-              src="/icon.svg"
-              alt="8"
-              style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
-            />
-          </Link>
-        </div>
+      {/* Left: logo */}
+      <div className="header-left" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <Link
+          href="/"
+          aria-label="Screen8 home"
+          style={{
+            fontFamily: playfair.style.fontFamily,
+            fontWeight: 700,
+            fontSize: '1.15rem',
+            textDecoration: 'none',
+            color: 'var(--accent)',
+            flexShrink: 0,
+            textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1px',
+          }}
+        >
+          Screen
+          <img
+            src="/icon.svg"
+            alt="8"
+            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
+          />
+        </Link>
+      </div>
+
+      {/* Center: search — flex:1 fills available space; justify-content centers the
+          form within that space once the form hits its own maxWidth cap (560px). */}
+      <div className="header-center" style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
         <NavSearch />
       </div>
 

@@ -110,28 +110,19 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     on top; arrows remain clickable even when a card is scaled near the edge.
   */
   const arrowBase: React.CSSProperties = {
-    position:      'absolute',
-    top:           0,
-    bottom:        0,
-    width:         '80px',
-    display:       'flex',
-    alignItems:    'center',
-    cursor:        'pointer',
-    zIndex:        10,
-    background:    'none',
-    border:        'none',
-    padding:       0,
-    transition:    'opacity 0.2s ease',
-    /*
-      touchAction: 'pan-x' on the arrow buttons is critical for mobile.
-      The buttons are 80px wide and sit on top of the carousel scroll container
-      with pointer-events: auto, so touches starting in those zones land on
-      the button element, not on the carousel-scroll div. Without pan-x on the
-      button itself, the browser cannot tell that a horizontal swipe starting
-      here should scroll the carousel — it falls back to scrolling the page.
-      With pan-x, taps still fire onClick; swipes pass through as scroll gestures.
-    */
-    touchAction:   'pan-x',
+    position:   'absolute',
+    top:        0,
+    bottom:     0,
+    width:      '80px',
+    display:    'flex',
+    alignItems: 'center',
+    cursor:     'pointer',
+    zIndex:     10,
+    background: 'none',
+    border:     'none',
+    padding:    0,
+    transition: 'opacity 0.2s ease',
+    /* No touchAction override — browser default lets the engine decide. */
   }
 
   return (
