@@ -21,7 +21,8 @@ const team = [
       'Back-end: validation & null-safety bug fixes (controllers, validateNumericId)',
       'Back-end: Sprint-4 admin bug-report stories (list / update / delete) + tests',
       'API documentation (ratings, reviews, media, auth) & OpenAPI spec',
-      'Test infrastructure (Prisma mock, JWT setup), sprint planning & PR integration',
+      'Test infrastructure (Prisma mock, JWT setup)',
+      'Front-end: initial pages, components, sign-in, ratings, reviews, upvote/downvote, favicon, About page'
     ],
   },
   {
@@ -97,14 +98,24 @@ export default function AboutPage() {
       >
         About Screen8
       </h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '1rem' }}>
+      <p
+        style={{
+          color: 'var(--text-muted)',
+          marginBottom: '2.5rem',
+          fontSize: '1rem',
+        }}
+      >
         A movie & TV community built for TCSS 460 · Spring 2026
       </p>
 
       {/* The team */}
       <section
         className="section-panel"
-        style={{ padding: '1.75rem 2rem', marginBottom: '2rem', borderRadius: '12px' }}
+        style={{
+          padding: '1.75rem 2rem',
+          marginBottom: '2rem',
+          borderRadius: '12px',
+        }}
       >
         <h2
           className={orbitron.className}
@@ -181,7 +192,11 @@ export default function AboutPage() {
       {/* Powered by */}
       <section
         className="section-panel"
-        style={{ padding: '1.75rem 2rem', marginBottom: '2rem', borderRadius: '12px' }}
+        style={{
+          padding: '1.75rem 2rem',
+          marginBottom: '2rem',
+          borderRadius: '12px',
+        }}
       >
         <h2
           className={orbitron.className}
@@ -209,7 +224,13 @@ export default function AboutPage() {
                 borderBottom: '1px solid rgba(0,212,255,0.08)',
               }}
             >
-              <p style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text)' }}>
+              <p
+                style={{
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  color: 'var(--text)',
+                }}
+              >
                 {svc.href ? (
                   <Link
                     href={svc.href}
@@ -223,7 +244,13 @@ export default function AboutPage() {
                   svc.name
                 )}
               </p>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
+              <p
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--text-muted)',
+                  margin: 0,
+                }}
+              >
                 {svc.description}
               </p>
             </div>
@@ -249,13 +276,28 @@ export default function AboutPage() {
         >
           The Build
         </h2>
-        <p style={{ fontSize: '0.925rem', color: 'var(--text-muted)', lineHeight: 1.75, margin: 0 }}>
-          Screen8 started as a Next.js shell and grew quarter-long into a full media community
-          — browse, search, rate, and review movies and TV shows backed by a live REST API.
-          The biggest surprises were how much coordination a front-end/back-end split actually
-          takes, and how rewarding it feels when the pieces finally snap together. If we were
-          starting over we'd write integration tests earlier and agree on API contracts before
-          a single component got built. We're proud of what we shipped.
+        <p
+          style={{
+            fontSize: '0.925rem',
+            color: 'var(--text-muted)',
+            lineHeight: 1.75,
+            margin: 0,
+          }}
+        >
+          Screen8 started as a basic project and grew into a fully functional
+          platform through collaboration between frontend and backend teams. One
+          of the biggest surprises was how much we learned by working with
+          another team's frontend, which gave us a better understanding of what
+          frontend developers need from a backend API. We also discovered the
+          importance of handling integration details early, such as configuring
+          CORS permissions. Using AI coding agents was another eye-opening
+          experience; code-focused AI tools improved our productivity and showed
+          us the tradeoff between greater access and greater risk. If we were
+          starting over, we'd spend more time defining API expectations upfront,
+          explore AI-assisted development workflows earlier, and incorporate
+          useful features like genre search and upvote/downvote functionality
+          from the beginning. We're proud of what we built and what we learned
+          along the way.
         </p>
       </section>
     </main>
