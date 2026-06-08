@@ -51,7 +51,7 @@ const services = [
     name: 'Group 7 API',
     description:
       'Our upstream partner group whose REST API powers every browse, search, detail, rating, and review interaction in Screen8.',
-    href: 'https://tcss-460-group-7.onrender.com',
+    href: '/api-test',
   },
   {
     name: 'TMDB',
@@ -68,6 +68,7 @@ const services = [
     name: 'TCSS 460 Token Playground',
     description:
       'The course-provided token playground used to inspect and test JWT access tokens during development.',
+    href: 'https://tcss460-token-playground.onrender.com/',
   },
 ]
 
