@@ -31,7 +31,7 @@ export default async function Header() {
       }}
     >
       {/* Left: logo */}
-      <div className="header-left" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
         <Link
           href="/"
           aria-label="Screen 8 home"
@@ -55,15 +55,6 @@ export default async function Header() {
             style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
           />
         </Link>
-      </div>
-
-      {/* Center: About link + search — flex:1 fills available space; justify-content
-          centers the group within that space once the search form hits its own
-          maxWidth cap (560px). About sits immediately to the left of the search bar. */}
-      <div
-        className="header-center"
-        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.625rem', minWidth: 0 }}
-      >
         <Link
           href="/about"
           style={{
@@ -80,6 +71,11 @@ export default async function Header() {
         >
           About
         </Link>
+      </div>
+
+      {/* Center: search — flex:1 fills available space; justify-content centers the
+          form within that space once the form hits its own maxWidth cap (560px). */}
+      <div className="header-center" style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
         <NavSearch />
       </div>
 
