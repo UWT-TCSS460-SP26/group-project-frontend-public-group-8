@@ -272,9 +272,9 @@ function SearchPageInner() {
 
   const filterBtnActive: React.CSSProperties = {
     ...filterBtnBase,
-    background:  'var(--accent)',
-    color:       '#000',
-    borderColor: 'var(--accent)',
+    background:  'var(--accent-dim)',
+    color:       '#fff',
+    borderColor: 'var(--accent-dim)',
   }
 
   return (
@@ -410,7 +410,7 @@ function SearchPageInner() {
                         padding:     '0.1rem 0.45rem',
                         borderRadius:'999px',
                         background:  urlType === type ? 'rgba(0,0,0,0.2)' : 'var(--bg-muted)',
-                        color:       urlType === type ? '#000' : 'var(--text-faint)',
+                        color:       urlType === type ? '#cfcfcf' : 'var(--text-faint)',
                         flexShrink:  0,
                       }}>
                         {count.toLocaleString()}

@@ -102,8 +102,8 @@ export default function CommunityFavorites() {
                     className="media-card"
                     style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
                     {meta.poster_url ? (
-                      <img src={meta.poster_url} alt={meta.title}
-                        style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+                      <img src={meta.poster_url} alt=""
+                        style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
                         No poster

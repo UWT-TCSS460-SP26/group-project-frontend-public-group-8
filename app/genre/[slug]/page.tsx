@@ -266,7 +266,7 @@ function GenrePageInner() {
             ? tvItems.map(s => (
               <Link key={s.id} href={`/media/tv/${s.id}`} className="media-card" style={{ display: 'block' }}>
                 {s.posterUrl
-                  ? <img src={s.posterUrl} alt={s.name} loading="lazy" style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+                  ? <img src={s.posterUrl} alt="" width={150} height={225} style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
                   : <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>{s.name}</div>
                 }
                 <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
@@ -278,7 +278,7 @@ function GenrePageInner() {
             : movieItems.map(m => (
               <Link key={m.id} href={`/media/movie/${m.id}`} className="media-card" style={{ display: 'block' }}>
                 {m.posterUrl
-                  ? <img src={m.posterUrl} alt={m.title} loading="lazy" style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+                  ? <img src={m.posterUrl} alt="" width={150} height={225} style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
                   : <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>{m.title}</div>
                 }
                 <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>

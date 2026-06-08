@@ -25,8 +25,8 @@ function MovieCard({ m }: { m: MovieSummary }) {
     <Link href={`/media/movie/${m.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {m.posterUrl ? (
-        <img src={m.posterUrl} alt={m.title}
-          style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+        <img src={m.posterUrl} alt="" width={185} height={278}
+          style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
           No poster
@@ -49,8 +49,8 @@ function TVCard({ s }: { s: TVSummary }) {
     <Link href={`/media/tv/${s.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {s.posterUrl ? (
-        <img src={s.posterUrl} alt={s.name}
-          style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+        <img src={s.posterUrl} alt="" width={185} height={278}
+          style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
           No poster
