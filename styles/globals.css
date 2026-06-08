@@ -658,7 +658,118 @@ html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active:ho
   }
 }
 
+/* ─── Genre heading link ─────────────────────────────────────────────────── */
+.genre-heading-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-orbitron, 'Orbitron', monospace);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  text-shadow:
+    0 0 10px rgba(0,212,255,0.85),
+    0 0 24px rgba(0,212,255,0.45);
+  transition: text-shadow 0.2s ease;
+  border-radius: 3px;
+}
+
+.genre-heading-link:hover,
+.genre-heading-link:focus-visible {
+  text-shadow:
+    0 0 14px rgba(0,212,255,1.0),
+    0 0 36px rgba(0,212,255,0.70),
+    0 0 60px rgba(0,212,255,0.30);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(0,212,255,0.55);
+}
+
+.genre-heading-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.genre-heading-link svg {
+  opacity: 0.65;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  flex-shrink: 0;
+}
+
+.genre-heading-link:hover svg,
+.genre-heading-link:focus-visible svg {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+:root[data-theme="light"] .genre-heading-link {
+  text-shadow: none;
+  color: var(--accent);
+}
+
+:root[data-theme="light"] .genre-heading-link:hover,
+:root[data-theme="light"] .genre-heading-link:focus-visible {
+  text-shadow: none;
+  text-decoration-color: var(--accent);
+}
+
+/* ─── Genre carousel description preview ────────────────────────────────── */
+.genre-preview {
+  padding: 0.8rem 0.25rem 0.25rem;
+  min-height: 7.5rem;   /* reserves stable space — prevents section reflow */
+}
+
+@keyframes genre-preview-fade {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.genre-preview-content {
+  animation: genre-preview-fade 0.18s ease;
+}
+
+.genre-preview-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.15rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.genre-preview-year {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin: 0 0 0.35rem;
+}
+
+.genre-preview-desc {
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html[data-carousel-compact] .genre-preview-desc {
+  -webkit-line-clamp: 3;
+}
+
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .genre-preview-content {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

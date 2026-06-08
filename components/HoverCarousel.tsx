@@ -5,18 +5,24 @@ import { useRef, useEffect, useCallback } from 'react'
 interface Props {
   children: React.ReactNode
   onScrollEnd?: () => void
+  onActiveIndexChange?: (index: number) => void
 }
 
 const SCROLL_STEP    = 320
 const SNAP_SETTLE_MS = 120   // ms of scroll silence before snap fires
 const DRAG_THRESHOLD = 5     // px horizontal movement before treating as drag vs click
 
-export default function HoverCarousel({ children, onScrollEnd }: Props) {
+export default function HoverCarousel({ children, onScrollEnd, onActiveIndexChange }: Props) {
   const ref         = useRef<HTMLDivElement>(null)
   const isAtEnd     = useRef(false)
   const rafRef      = useRef(0)
   const leftBtnRef  = useRef<HTMLButtonElement>(null)
   const rightBtnRef = useRef<HTMLButtonElement>(null)
+
+  // Keep a stable ref so sync() never captures a stale callback
+  const onActiveIndexChangeRef = useRef(onActiveIndexChange)
+  useEffect(() => { onActiveIndexChangeRef.current = onActiveIndexChange }, [onActiveIndexChange])
+  const lastActiveIdx = useRef(-1)
 
   // Mouse-drag state
   const isDragging     = useRef(false)
@@ -67,6 +73,11 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
         card.classList.toggle('carousel-card-active', should)
       }
     })
+
+    if (closestIdx !== lastActiveIdx.current) {
+      lastActiveIdx.current = closestIdx
+      onActiveIndexChangeRef.current?.(closestIdx)
+    }
   }, [])
 
   const scheduleSync = useCallback(() => {
