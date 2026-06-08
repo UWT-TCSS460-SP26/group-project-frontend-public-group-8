@@ -11,7 +11,7 @@ const team = [
       'Back-end: GET /v1/media/:id route (TMDB details + community reviews)',
       'Back-end: integration tests & stubAuth test middleware',
       'Front-end: cyberpunk design system — glass navbar, cinematic hero, detail pages',
-      'Front-end: light mode, mobile fixes, auth error page, TMDB image config',
+      'Front-end: light mode, mobile fixes, auth error page, TMDB image config, test API page',
     ],
   },
   {
