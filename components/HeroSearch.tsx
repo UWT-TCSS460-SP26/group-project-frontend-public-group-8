@@ -93,17 +93,19 @@ export default function HeroSearch() {
             onChange={e => setQuery(e.target.value)}
             aria-label="Search movies and TV shows"
             style={{
-              width: '100%',
-              padding: '0.875rem 1.5rem',
-              fontSize: '1rem',
+              width:        '100%',
+              padding:      '0.875rem 1.5rem',
+              fontSize:     '1rem',
               borderRadius: '8px',
-              border: '1.5px solid var(--input-border)',
-              background: 'var(--input-bg)',
-              color: 'var(--text)',
-              outline: 'none',
-              boxShadow: '0 0 0 0 transparent',
-              transition: 'border-color 0.15s, box-shadow 0.15s',
-              boxSizing: 'border-box',
+              borderWidth:  '1.5px',
+              borderStyle:  'solid',
+              borderColor:  'var(--input-border)',
+              background:   'var(--input-bg)',
+              color:        'var(--text)',
+              outline:      'none',
+              boxShadow:    '0 0 0 0 transparent',
+              transition:   'border-color 0.15s, box-shadow 0.15s',
+              boxSizing:    'border-box',
             }}
             onFocus={(e) => {
               if (query.trim().length >= 2) setShowDropdown(true)

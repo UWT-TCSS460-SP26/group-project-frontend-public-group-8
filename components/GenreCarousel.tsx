@@ -113,6 +113,7 @@ export default function GenreCarousel({ genre, title }: Props) {
       <HoverCarousel
         onScrollEnd={handleScrollEnd}
         onActiveIndexChange={setActiveIndex}
+        hoverIndex={hoverIndex}
       >
         {loading && shows.length === 0
           ? Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)

@@ -6,23 +6,25 @@ interface Props {
   children: React.ReactNode
   onScrollEnd?: () => void
   onActiveIndexChange?: (index: number) => void
+  hoverIndex?: number | null
 }
 
 const SCROLL_STEP    = 320
 const SNAP_SETTLE_MS = 120   // ms of scroll silence before snap fires
 const DRAG_THRESHOLD = 5     // px horizontal movement before treating as drag vs click
 
-export default function HoverCarousel({ children, onScrollEnd, onActiveIndexChange }: Props) {
+export default function HoverCarousel({ children, onScrollEnd, onActiveIndexChange, hoverIndex }: Props) {
   const ref         = useRef<HTMLDivElement>(null)
   const isAtEnd     = useRef(false)
   const rafRef      = useRef(0)
   const leftBtnRef  = useRef<HTMLButtonElement>(null)
   const rightBtnRef = useRef<HTMLButtonElement>(null)
 
-  // Keep a stable ref so sync() never captures a stale callback
+  // Keep stable refs so sync() never captures stale callbacks or values
   const onActiveIndexChangeRef = useRef(onActiveIndexChange)
   useEffect(() => { onActiveIndexChangeRef.current = onActiveIndexChange }, [onActiveIndexChange])
-  const lastActiveIdx = useRef(-1)
+  const lastActiveIdx  = useRef(-1)
+  const hoverIndexRef  = useRef<number | null>(null)
 
   // Mouse-drag state
   const isDragging     = useRef(false)
@@ -67,8 +69,13 @@ export default function HoverCarousel({ children, onScrollEnd, onActiveIndexChan
       const dist = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center)
       if (dist < minDist) { minDist = dist; closestIdx = i }
     })
+    // When a card is hovered, visually emphasise it instead of the scroll-centered card.
+    // onActiveIndexChange still reflects scroll position (not hover) for the preview fallback.
+    const hi = hoverIndexRef.current
+    const effectiveIdx = (hi !== null && hi >= 0 && hi < cards.length) ? hi : closestIdx
+
     cards.forEach((card, i) => {
-      const should = i === closestIdx
+      const should = i === effectiveIdx
       if (card.classList.contains('carousel-card-active') !== should) {
         card.classList.toggle('carousel-card-active', should)
       }
@@ -129,6 +136,13 @@ export default function HoverCarousel({ children, onScrollEnd, onActiveIndexChan
     if (snapTimer.current) clearTimeout(snapTimer.current)
     snapTimer.current = setTimeout(snapToNearestCard, SNAP_SETTLE_MS)
   }, [snapToNearestCard])
+
+  // When the parent changes which card is hovered, update the ref and re-sync
+  // the carousel-card-active class immediately without waiting for a scroll event.
+  useEffect(() => {
+    hoverIndexRef.current = hoverIndex ?? null
+    scheduleSync()
+  }, [hoverIndex, scheduleSync])
 
   // Attach scroll + resize listeners
   useEffect(() => {

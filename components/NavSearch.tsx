@@ -1,24 +1,26 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 
 function NavSearchInner() {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const [q, setQ] = useState(searchParams?.get('q') ?? '')
-  const [type, setType] = useState(searchParams?.get('type') ?? 'all')
+  const router       = useRouter()
 
-  useEffect(() => {
-    setQ(searchParams?.get('q') ?? '')
-    setType(searchParams?.get('type') ?? 'all')
-  }, [searchParams])
+  // Initialize from URL; do not sync on every searchParams change —
+  // the search page manages its own input state, and syncing here was
+  // the source of repeated re-renders in NavSearch.
+  const [q,    setQ]    = useState(searchParams?.get('q')    ?? '')
+  const [type, setType] = useState(searchParams?.get('type') ?? 'all')
 
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     const trimmed = q.trim()
     if (!trimmed) return
-    router.push(`/search?q=${encodeURIComponent(trimmed)}&type=${type}`)
+    const p = new URLSearchParams()
+    p.set('q', trimmed)
+    if (type !== 'all') p.set('type', type)
+    router.push(`/search?${p.toString()}`)
   }
 
   return (
@@ -29,47 +31,51 @@ function NavSearchInner() {
       <input
         type="search"
         value={q}
-        onChange={(e) => setQ(e.target.value)}
+        onChange={e => setQ(e.target.value)}
         placeholder="Search movies & shows…"
         aria-label="Search movies and TV shows"
         style={{
-          flex: 1,
-          padding: '0.35rem 0.625rem',
-          border: '1px solid var(--input-border)',
+          flex:         1,
+          padding:      '0.35rem 0.625rem',
+          borderWidth:  '1px',
+          borderStyle:  'solid',
+          borderColor:  'var(--input-border)',
           borderRadius: '6px',
-          fontSize: '0.85rem',
-          background: 'var(--bg-subtle)',
-          color: 'var(--text)',
-          minWidth: 0,
-          height: '32px',
-          boxSizing: 'border-box',
-          transition: 'border-color 0.15s, box-shadow 0.15s',
-          outline: 'none',
+          fontSize:     '0.85rem',
+          background:   'var(--bg-subtle)',
+          color:        'var(--text)',
+          minWidth:     0,
+          height:       '32px',
+          boxSizing:    'border-box',
+          transition:   'border-color 0.15s, box-shadow 0.15s',
+          outline:      'none',
         }}
-        onFocus={(e) => {
+        onFocus={e => {
           e.currentTarget.style.borderColor = 'var(--accent)'
-          e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-ring)'
+          e.currentTarget.style.boxShadow   = '0 0 0 2px var(--accent-ring)'
         }}
-        onBlur={(e) => {
+        onBlur={e => {
           e.currentTarget.style.borderColor = 'var(--input-border)'
-          e.currentTarget.style.boxShadow = 'none'
+          e.currentTarget.style.boxShadow   = 'none'
         }}
       />
       <select
         value={type}
-        onChange={(e) => setType(e.target.value)}
+        onChange={e => setType(e.target.value)}
         aria-label="Media type filter"
         style={{
-          padding: '0.35rem 0.5rem',
-          border: '1px solid var(--input-border)',
+          padding:      '0.35rem 0.5rem',
+          borderWidth:  '1px',
+          borderStyle:  'solid',
+          borderColor:  'var(--input-border)',
           borderRadius: '6px',
-          fontSize: '0.8rem',
-          background: 'var(--bg-subtle)',
-          color: 'var(--text)',
-          flexShrink: 0,
-          height: '32px',
-          boxSizing: 'border-box',
-          cursor: 'pointer',
+          fontSize:     '0.8rem',
+          background:   'var(--bg-subtle)',
+          color:        'var(--text)',
+          flexShrink:   0,
+          height:       '32px',
+          boxSizing:    'border-box',
+          cursor:       'pointer',
         }}
       >
         <option value="all">All</option>

@@ -788,6 +788,34 @@ html[data-carousel-compact] .genre-preview-desc {
   }
 }
 
+/* ─── Search page layout ─────────────────────────────────────────────────── */
+.search-results-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* On narrow screens: single column, filter panel stacks above results */
+@media (max-width: 640px) {
+  .search-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Horizontal scrollable filter strip on mobile */
+  .search-filter-buttons {
+    flex-direction: row !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+
+  .search-filter-buttons button {
+    flex-shrink: 0;
+    width: auto !important;
+  }
+}
+
 /* ─── Magic 8-ball shake ──────────────────────────────────────────────────── */
 @keyframes eightball-shake {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }

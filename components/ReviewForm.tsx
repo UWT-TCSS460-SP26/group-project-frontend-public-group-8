@@ -34,17 +34,19 @@ export default function ReviewForm({
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '0.5rem 0.75rem',
-    border: '1px solid var(--input-border)',
+    width:        '100%',
+    padding:      '0.5rem 0.75rem',
+    borderWidth:  '1px',
+    borderStyle:  'solid',
+    borderColor:  'var(--input-border)',
     borderRadius: '6px',
-    background: 'var(--bg)',
-    color: 'var(--text)',
-    fontSize: '0.9rem',
-    fontFamily: 'inherit',
-    transition: 'border-color 0.15s, box-shadow 0.15s',
-    outline: 'none',
-    boxSizing: 'border-box',
+    background:   'var(--bg)',
+    color:        'var(--text)',
+    fontSize:     '0.9rem',
+    fontFamily:   'inherit',
+    transition:   'border-color 0.15s, box-shadow 0.15s',
+    outline:      'none',
+    boxSizing:    'border-box',
   }
 
   return (
@@ -85,8 +87,8 @@ export default function ReviewForm({
           aria-invalid={!!contentError}
           style={{
             ...inputStyle,
-            border: `1px solid ${contentError ? 'var(--error)' : 'var(--input-border)'}`,
-            resize: 'vertical',
+            borderColor: contentError ? 'var(--error)' : 'var(--input-border)',
+            resize:      'vertical',
           }}
           onFocus={e => { e.currentTarget.style.borderColor = contentError ? 'var(--error)' : 'var(--accent)'; e.currentTarget.style.boxShadow = '0 0 0 2px var(--accent-ring)' }}
           onBlur={e => { e.currentTarget.style.borderColor = contentError ? 'var(--error)' : 'var(--input-border)'; e.currentTarget.style.boxShadow = 'none' }}

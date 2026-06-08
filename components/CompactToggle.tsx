@@ -37,7 +37,9 @@ export default function CompactToggle() {
     alignItems:     'center',
     justifyContent: 'center',
     padding:        '4px 14px',
-    border:         '1px solid var(--border)',
+    borderWidth:    '1px',
+    borderStyle:    'solid',
+    borderColor:    'var(--border)',
     borderRadius:   '4px',
     fontSize:       '0.70rem',
     fontWeight:     700,
@@ -71,17 +73,6 @@ export default function CompactToggle() {
       role="group"
       aria-label="Card display mode"
     >
-      <span style={{
-        fontSize:      '0.65rem',
-        color:         'var(--text-faint)',
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontFamily:    'var(--font-orbitron, "Orbitron", monospace)',
-        marginRight:   '0.25rem',
-        userSelect:    'none',
-      }}>
-        Cards
-      </span>
       <button
         type="button"
         aria-pressed={mode === 'standard'}

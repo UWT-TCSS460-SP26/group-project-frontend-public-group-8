@@ -69,22 +69,24 @@ function TVCard({ s }: { s: TVSummary }) {
 }
 
 const tabBase: React.CSSProperties = {
-  padding: '0.3rem 0.875rem',
-  borderRadius: '6px',
-  border: '1px solid var(--border)',
-  background: 'transparent',
-  color: 'var(--text-muted)',
-  fontSize: '0.82rem',
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+  padding:       '0.3rem 0.875rem',
+  borderRadius:  '6px',
+  borderWidth:   '1px',
+  borderStyle:   'solid',
+  borderColor:   'var(--border)',
+  background:    'transparent',
+  color:         'var(--text-muted)',
+  fontSize:      '0.82rem',
+  fontWeight:    600,
+  cursor:        'pointer',
+  transition:    'background 0.15s, color 0.15s, border-color 0.15s',
   letterSpacing: '0.03em',
 }
 
 const tabActive: React.CSSProperties = {
   ...tabBase,
-  background: 'var(--accent)',
-  color: 'var(--accent-text)',
+  background:  'var(--accent)',
+  color:       'var(--accent-text)',
   borderColor: 'var(--accent)',
 }
 
