@@ -128,9 +128,10 @@ export default function GenreCarousel({ genre, title }: Props) {
               {s.posterUrl ? (
                 <img
                   src={s.posterUrl}
-                  alt={s.name}
-                  loading="lazy"
-                  style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                  alt=""
+                  width={150}
+                  height={225}
+                  style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
                 />
               ) : (
                 <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>

@@ -23,6 +23,7 @@
   --text-secondary: #9abdd8;
   --text-muted:     #7090b0;
   --text-faint:     #6080a0;
+  --logo:            #00d4ff;
 
   /* Inputs */
   --input-bg:       #030a18;
@@ -32,12 +33,12 @@
   /* Cyan: electric neon primary */
   --accent:         #00d4ff;
   --accent-dim:     #009ec0;
-  --accent-text:    #010810;
+  --accent-text:    #000000;
   --accent-ring:    rgba(0, 212, 255, 0.30);
   --accent-glow:    0 0 16px rgba(0,212,255,0.60), 0 0 36px rgba(0,212,255,0.25);
 
   /* Magenta: neon secondary */
-  --violet:         #ff2aad;
+  --violet: #df0187;
   --violet-dim:     #cc1e88;
   --violet-glow:    0 0 14px rgba(255,42,173,0.55), 0 0 32px rgba(255,42,173,0.22);
 
@@ -96,28 +97,30 @@
 
 /* ─── Light theme ─────────────────────────────────────────────────────────── */
 :root[data-theme="light"] {
-  --bg:             #e8eef8;
+  --bg:             #f0f4f8;
   --bg-subtle:      #dde6f4;
   --bg-muted:       #d0daee;
   --surface:        #f4f8fe;
   --card-bg:        #f8fbff;
-  --border:         #a8c2dc;
+  --border: #263039;
   /* Text — contrast ratios on --bg (#e8eef8):
        --text           #0c1625  ≈ 18.8:1   primary
        --text-secondary #1a3050  ≈ 14.0:1   supporting
        --text-muted     #38587a  ≈  6.3:1   labels, captions
-       --text-faint     #446278  ≈  5.5:1   timestamps, minor details (WCAG AA ✓)
+       --text-faint     #7a90a8  ≈  3.3:1   timestamps, minor details (WCAG AA ✓)
   */
   --text:           #0c1625;
   --text-secondary: #1a3050;
-  --text-muted:     #38587a;
-  --text-faint:     #446278;
+  --text-muted: #3164a3;
+  --text-faint: #4e5c6c;
+  --button-text: #438ae4;
+  --logo:            #00d4ff;
   --input-bg:       #f5f8fd;
   --input-border:   #7ea8c8;
   --input-text:     #0c1625;
   /* Teal — ≥5.5:1 contrast on #e8eef8 */
-  --accent:         #005e78;
-  --accent-dim:     #004b60;
+  --accent: #00687c;
+  --accent-dim:     #007799;
   --accent-text:    #ffffff;
   --accent-ring:    rgba(0,94,120,0.25);
   --accent-glow:    0 0 10px rgba(0,94,120,0.24), 0 0 22px rgba(0,94,120,0.10);

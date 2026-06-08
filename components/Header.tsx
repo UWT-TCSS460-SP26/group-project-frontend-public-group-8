@@ -34,13 +34,13 @@ export default async function Header() {
       <div className="header-left" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
         <Link
           href="/"
-          aria-label="Screen8 home"
+          aria-label="Screen 8 home"
           style={{
             fontFamily: playfair.style.fontFamily,
             fontWeight: 700,
             fontSize: '1.15rem',
             textDecoration: 'none',
-            color: 'var(--accent)',
+            color: 'var(--logo)',
             flexShrink: 0,
             textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
             display: 'flex',
@@ -51,7 +51,7 @@ export default async function Header() {
           Screen
           <img
             src="/icon.svg"
-            alt="8"
+            alt=""
             style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
           />
         </Link>
@@ -70,7 +70,7 @@ export default async function Header() {
           href="/api-test"
           style={{
             fontSize: '0.78rem',
-            color: 'var(--text-muted)',
+            color: 'var(--button-text)',
             textDecoration: 'none',
             whiteSpace: 'nowrap',
             padding: '0.3rem 0.5rem',
