@@ -265,9 +265,9 @@ export default function RatingSection({
         border: '1px solid var(--border)',
         borderRadius: '10px',
       }}>
-        <h3 style={{ margin: '0 0 0.875rem', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+        <h2 style={{ margin: '0 0 0.875rem', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
           Your Rating
-        </h3>
+        </h2>
 
         {status === 'unauthenticated' ? (
           <SignInButton callbackUrl={callbackUrl} className="btn-ghost" aria-label="Sign in to rate this title">
