@@ -182,7 +182,10 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
       isDragging.current             = false
       el.style.cursor                = ''
       document.body.style.userSelect = ''
-      // Snap is triggered by the debounced scroll listener
+      // If mouseup lands off the carousel, no click event fires and hasDragged
+      // would stay set, silently swallowing the next clean click. Reset it after
+      // any pending synthetic click (which fires synchronously before this task).
+      setTimeout(() => { hasDragged.current = false }, 0)
     }
 
     el.addEventListener('mousedown', onMouseDown)
@@ -208,33 +211,14 @@ export default function HoverCarousel({ children, onScrollEnd }: Props) {
     if (e.key === 'ArrowRight') { e.preventDefault(); scrollDir(1) }
   }
 
-  // Click handler: suppress navigation after a drag; center a partially-visible card
+  // Click handler: suppress navigation only when the pointer was released after a drag.
+  // All clean clicks fall through to the card's own <Link> regardless of active state.
   function handleClick(e: React.MouseEvent) {
-    // Drag just ended — suppress the resulting synthetic click
     if (hasDragged.current) {
       e.preventDefault()
       e.stopPropagation()
       hasDragged.current = false
-      return
     }
-
-    // Don't intercept clicks on interactive elements inside cards
-    const target = e.target as HTMLElement
-    if (target.closest('button, input, select, textarea, [contenteditable]')) return
-
-    const card = target.closest('.media-card') as HTMLElement | null
-    if (!card) return
-    // Already the active/centered card — let the link navigate normally
-    if (card.classList.contains('carousel-card-active')) return
-
-    // Partially visible card clicked — center it instead of navigating
-    e.preventDefault()
-    e.stopPropagation()
-
-    const el = ref.current
-    if (!el) return
-    const targetLeft = card.offsetLeft + card.offsetWidth / 2 - el.clientWidth / 2
-    el.scrollTo({ left: targetLeft, behavior: 'smooth' })
   }
 
   /*
