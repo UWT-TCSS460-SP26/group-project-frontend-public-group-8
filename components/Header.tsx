@@ -65,6 +65,22 @@ export default async function Header() {
       {/* Right: user area + API link */}
       <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
         <Link
+          href="/about"
+          style={{
+            fontSize: '0.78rem',
+            color: 'var(--text-muted)',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            padding: '0.3rem 0.5rem',
+            borderRadius: '4px',
+            border: '1px solid var(--border)',
+            transition: 'color 0.15s, border-color 0.15s',
+          }}
+        >
+          About
+        </Link>
+
+        <Link
           href="/api-test"
           style={{
             fontSize: '0.78rem',
