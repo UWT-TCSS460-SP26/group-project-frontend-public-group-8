@@ -58,7 +58,16 @@ export default async function Header() {
             gap: '1px',
           }}
         >
-          Screen8
+          Screen
+          <img
+            src="/icon.svg"
+            alt="8"
+            style={{
+              height: '1em',
+              verticalAlign: 'middle',
+              marginTop: '-0.1em',
+            }}
+          />
         </Link>
         <Link
           href="/about"
