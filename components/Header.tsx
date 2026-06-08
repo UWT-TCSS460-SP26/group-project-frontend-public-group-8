@@ -27,11 +27,20 @@ export default async function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        boxShadow: '0 1px 0 rgba(0,255,255,0.15), 0 0 30px rgba(0,255,255,0.06), 0 4px 24px rgba(0,0,0,0.8)',
+        boxShadow:
+          '0 1px 0 rgba(0,255,255,0.15), 0 0 30px rgba(0,255,255,0.06), 0 4px 24px rgba(0,0,0,0.8)',
       }}
     >
       {/* Left: logo */}
-      <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+      <div
+        className="header-left"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.625rem',
+          flexShrink: 0,
+        }}
+      >
         <Link
           href="/"
           aria-label="Screen 8 home"
@@ -42,24 +51,20 @@ export default async function Header() {
             textDecoration: 'none',
             color: 'var(--logo)',
             flexShrink: 0,
-            textShadow: '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
+            textShadow:
+              '0 0 12px rgba(0, 255, 255, 0.7), 0 0 28px rgba(0, 255, 255, 0.35)',
             display: 'flex',
             alignItems: 'center',
             gap: '1px',
           }}
         >
-          Screen
-          <img
-            src="/icon.svg"
-            alt=""
-            style={{ height: '1em', verticalAlign: 'middle', marginTop: '-0.1em' }}
-          />
+          Screen8
         </Link>
         <Link
           href="/about"
           style={{
             fontSize: '0.78rem',
-            color: '#fff',
+            color: 'var(--text-muted)',
             textDecoration: 'none',
             whiteSpace: 'nowrap',
             padding: '0.3rem 0.5rem',
@@ -75,12 +80,28 @@ export default async function Header() {
 
       {/* Center: search — flex:1 fills available space; justify-content centers the
           form within that space once the form hits its own maxWidth cap (560px). */}
-      <div className="header-center" style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
+      <div
+        className="header-center"
+        style={{
+          flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          minWidth: 0,
+        }}
+      >
         <NavSearch />
       </div>
 
       {/* Right: user area */}
-      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+      <div
+        className="header-right"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.625rem',
+          flexShrink: 0,
+        }}
+      >
         <EightBallLauncher />
         {session?.user ? (
           <>
