@@ -24,6 +24,17 @@ interface Props {
   onResult?: () => void
 }
 
+// Shrink the fortune so short ones fill the ball and long ones stay readable.
+// Anything still too tall falls back to scrolling inside the window.
+function fitFont(text: string): string {
+  const n = text.length
+  if (n <= 22) return '1.35rem'
+  if (n <= 34) return '1.15rem'
+  if (n <= 48) return '1rem'
+  if (n <= 70) return '0.88rem'
+  return '0.8rem'
+}
+
 export default function EightBall({ onResult }: Props) {
   const [mediaType, setMediaType] = useState<MediaFilter>('both')
   const [genre, setGenre] = useState<string | null>(null)
@@ -88,9 +99,13 @@ export default function EightBall({ onResult }: Props) {
             {shaking ? (
               <span style={{ fontSize: '1.8rem', letterSpacing: '0.1em', opacity: 0.9 }}>•••</span>
             ) : item ? (
-              <span style={ballVerdict}>{item.verdict}</span>
+              <div className="eightball-scroll">
+                <span style={{ ...ballVerdict, fontSize: fitFont(item.verdict) }}>
+                  {item.verdict}
+                </span>
+              </div>
             ) : (
-              <span style={{ fontSize: '3.2rem', fontWeight: 900 }}>8</span>
+              <span style={{ fontSize: '6.5rem', fontWeight: 900, lineHeight: 1 }}>8</span>
             )}
           </span>
         </span>
@@ -200,6 +215,7 @@ const ballWindow: React.CSSProperties = {
   width: '190px',
   height: '190px',
   borderRadius: '50%',
+  overflow: 'hidden',
   background: 'radial-gradient(circle at 50% 38%, #00465c 0%, #021018 82%)',
   color: '#7ff0ff',
   padding: '0 1.1rem',
