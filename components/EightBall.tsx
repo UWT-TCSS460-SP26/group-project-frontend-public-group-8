@@ -86,11 +86,11 @@ export default function EightBall({ onResult }: Props) {
         <span className={shaking ? 'eightball-shake' : undefined} style={ballOuter}>
           <span style={ballWindow}>
             {shaking ? (
-              <span style={{ fontSize: '1.6rem', letterSpacing: '0.1em', opacity: 0.9 }}>•••</span>
+              <span style={{ fontSize: '1.8rem', letterSpacing: '0.1em', opacity: 0.9 }}>•••</span>
             ) : item ? (
               <span style={ballVerdict}>{item.verdict}</span>
             ) : (
-              <span style={{ fontSize: '2.6rem', fontWeight: 900 }}>8</span>
+              <span style={{ fontSize: '3.2rem', fontWeight: 900 }}>8</span>
             )}
           </span>
         </span>
@@ -150,7 +150,6 @@ export default function EightBall({ onResult }: Props) {
             <div style={{ ...resultPoster, ...posterPlaceholder }}>No poster</div>
           )}
           <div style={{ textAlign: 'left', flex: 1, minWidth: 0 }}>
-            <p style={resultVerdict}>{item.verdict}</p>
             <p style={resultTitle}>{item.title}</p>
             <p style={resultMeta}>
               {[
@@ -184,13 +183,13 @@ const ballOuter: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '150px',
-  height: '150px',
+  width: '260px',
+  height: '260px',
   borderRadius: '50%',
   background: 'radial-gradient(circle at 35% 28%, #243240 0%, #0a0e14 55%, #000 100%)',
   border: '1.5px solid rgba(0,212,255,0.40)',
   boxShadow:
-    '0 0 28px rgba(0,212,255,0.30), 0 10px 30px rgba(0,0,0,0.8), inset -8px -10px 24px rgba(0,0,0,0.7)',
+    '0 0 36px rgba(0,212,255,0.30), 0 12px 36px rgba(0,0,0,0.8), inset -10px -12px 30px rgba(0,0,0,0.7)',
 }
 
 const ballWindow: React.CSSProperties = {
@@ -198,20 +197,21 @@ const ballWindow: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   textAlign: 'center',
-  width: '88px',
-  height: '88px',
+  width: '190px',
+  height: '190px',
   borderRadius: '50%',
   background: 'radial-gradient(circle at 50% 38%, #00465c 0%, #021018 82%)',
   color: '#7ff0ff',
-  padding: '0 0.4rem',
+  padding: '0 1.1rem',
   textShadow: '0 0 12px rgba(0,212,255,0.95)',
   boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.8), 0 0 14px rgba(0,212,255,0.25)',
 }
 
 const ballVerdict: React.CSSProperties = {
-  fontSize: '0.72rem',
+  fontSize: '1.05rem',
   fontWeight: 700,
-  lineHeight: 1.25,
+  lineHeight: 1.3,
+  overflowWrap: 'anywhere',
 }
 
 const controls: React.CSSProperties = {
@@ -278,15 +278,6 @@ const posterPlaceholder: React.CSSProperties = {
   background: 'var(--placeholder-bg)',
   color: 'var(--text-faint)',
   fontSize: '0.75rem',
-}
-
-const resultVerdict: React.CSSProperties = {
-  margin: '0 0 0.35rem',
-  fontSize: '0.75rem',
-  fontWeight: 800,
-  color: 'var(--accent)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
 }
 
 const resultTitle: React.CSSProperties = {
