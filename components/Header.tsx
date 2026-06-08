@@ -57,48 +57,35 @@ export default async function Header() {
         </Link>
       </div>
 
-      {/* Center: search — flex:1 fills available space; justify-content centers the
-          form within that space once the form hits its own maxWidth cap (560px). */}
-      <div className="header-center" style={{ flex: 1, display: 'flex', justifyContent: 'center', minWidth: 0 }}>
-        <NavSearch />
-      </div>
-
-      {/* Right: user area + API link */}
-      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
-        <EightBallLauncher />
+      {/* Center: About link + search — flex:1 fills available space; justify-content
+          centers the group within that space once the search form hits its own
+          maxWidth cap (560px). About sits immediately to the left of the search bar. */}
+      <div
+        className="header-center"
+        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.625rem', minWidth: 0 }}
+      >
         <Link
           href="/about"
           style={{
             fontSize: '0.78rem',
-            color: 'var(--text-muted)',
+            color: '#fff',
             textDecoration: 'none',
             whiteSpace: 'nowrap',
             padding: '0.3rem 0.5rem',
             borderRadius: '4px',
             border: '1px solid var(--border)',
             transition: 'color 0.15s, border-color 0.15s',
+            flexShrink: 0,
           }}
         >
           About
         </Link>
+        <NavSearch />
+      </div>
 
-        <Link
-          href="/api-test"
-          style={{
-            fontSize: '0.78rem',
-            color: 'var(--button-text)',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            padding: '0.3rem 0.5rem',
-            borderRadius: '4px',
-            border: '1px solid var(--border)',
-            transition: 'color 0.15s, border-color 0.15s',
-          }}
-          onMouseEnter={undefined}
-        >
-          Test the API
-        </Link>
-
+      {/* Right: user area */}
+      <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexShrink: 0 }}>
+        <EightBallLauncher />
         {session?.user ? (
           <>
             <Link
