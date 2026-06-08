@@ -63,22 +63,146 @@ export const GENRES: GenreOption[] = [
   { name: 'Reality', label: 'Reality', movie: false, tv: true },
 ]
 
-/** Always-affirmative verdicts — the ball has decided, so we lean positive. */
+// 100 affirmative Magic 8-Ball fortunes, each weaving in the picked title
+// ({title} is substituted at draw time). We only use the positive register —
+// the ball is always handing back a real recommendation, so a "no" would
+// contradict it. The big pool + shuffle-bag picker (below) keeps every reveal
+// feeling personal and fresh.
 export const VERDICTS: string[] = [
-  'It is decided.',
-  'Signs point to yes.',
-  'Without a doubt.',
-  'The stars align.',
-  'You may rely on it.',
-  'Most likely…',
-  'As I see it, yes.',
-  'Outlook excellent.',
-  'It is certain.',
-  'Tonight is the night.',
+  'Fate has chosen {title}.',
+  'The stars insist on {title}.',
+  'Destiny whispers {title}.',
+  'The universe nudges you toward {title}.',
+  'The cards say {title}.',
+  'The omens favor {title}.',
+  'The cosmos points to {title}.',
+  'The spirits suggest {title}.',
+  'The crystal shows {title}.',
+  'The fates align on {title}.',
+  'The night favors {title}.',
+  'The ball has spoken for {title}.',
+  'The mists clear to reveal {title}.',
+  'The signs all point to {title}.',
+  'The vision reveals {title}.',
+  'The 8-ball is sure about {title}.',
+  'The answer glows clear for {title}.',
+  'The future belongs to {title}.',
+  'The ball never lies about {title}.',
+  'The ball glows for {title}.',
+  '{title} is the one.',
+  '{title} is your destiny tonight.',
+  '{title} is written in the stars.',
+  '{title} is exactly right.',
+  '{title} is what the night needs.',
+  '{title} is the perfect pick.',
+  '{title} is your lucky choice.',
+  '{title} is meant to be.',
+  '{title} is your sign.',
+  '{title} is the move.',
+  '{title} is in your cards.',
+  '{title} is your fortune.',
+  '{title} is your perfect match.',
+  '{title} is the right call.',
+  '{title} is waiting just for you.',
+  '{title} was meant for you.',
+  '{title} is calling your name.',
+  '{title} will not let you down.',
+  '{title} feels like home tonight.',
+  '{title} hums with promise.',
+  '{title} is your tonight.',
+  '{title} is the chosen one tonight.',
+  '{title} was always the answer.',
+  '{title} is calling the shots tonight.',
+  '{title} is your happy ending.',
+  '{title} is the lucky one tonight.',
+  '{title} is your kind of magic.',
+  '{title} is your fate tonight.',
+  '{title} is the obvious choice.',
+  '{title} is calling you in.',
+  'Press play on {title}.',
+  'Surrender to {title}.',
+  'Go with {title} tonight.',
+  'Reach for {title}.',
+  'Embrace {title}.',
+  'Say yes to {title}.',
+  'Settle in with {title}.',
+  'Lean into {title}.',
+  'Give in to {title}.',
+  'Make tonight {title}.',
+  'Dim the lights for {title}.',
+  'Believe in {title}.',
+  'Trust {title} tonight.',
+  'Choose {title} and never look back.',
+  'Look no further than {title}.',
+  'Pour a drink and queue {title}.',
+  'Cozy up with {title}.',
+  'Surrender the remote to {title}.',
+  'Cancel your plans for {title}.',
+  'Lose yourself in {title}.',
+  'Clear your evening for {title}.',
+  'Let {title} take the night.',
+  'Trust the ball and watch {title}.',
+  'Hold out for {title}.',
+  'Bet the night on {title}.',
+  'Without a doubt, it is {title}.',
+  'Yes, definitely {title}.',
+  'You may rely on {title}.',
+  'As I see it, {title}.',
+  'Most likely, {title}.',
+  'Outlook is good for {title}.',
+  'Signs point to {title}.',
+  'You can count on {title}.',
+  'It is decidedly {title}.',
+  'Beyond a doubt, {title}.',
+  'Count on {title} tonight.',
+  'Certain as ever, {title}.',
+  'Tonight it must be {title}.',
+  'All roads lead to {title}.',
+  'Your answer is {title}.',
+  'Yes, a thousand times {title}.',
+  'Tonight belongs to {title}.',
+  'Your evening wants {title}.',
+  'Your future holds {title}.',
+  'Your gut already knows {title}.',
+  'Lucky you, it is {title}.',
+  'Tonight rewards you with {title}.',
+  'Trust me, it is {title}.',
+  'Destiny approves of {title}.',
+  'Tonight your fortune is {title}.',
 ]
 
 export function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
+}
+
+// Shuffle-bag picker: hand out every verdict once (in random order) before any
+// repeats, and never start a fresh bag with the phrase the previous bag ended
+// on. This makes any given phrase recur only rarely.
+let verdictBag: string[] = []
+let lastVerdict: string | null = null
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+export function nextVerdict(title: string): string {
+  if (verdictBag.length === 0) {
+    verdictBag = shuffle(VERDICTS)
+    // Avoid an immediate repeat across bag boundaries.
+    if (verdictBag[verdictBag.length - 1] === lastVerdict && verdictBag.length > 1) {
+      ;[verdictBag[0], verdictBag[verdictBag.length - 1]] = [
+        verdictBag[verdictBag.length - 1],
+        verdictBag[0],
+      ]
+    }
+  }
+  lastVerdict = verdictBag.pop()!
+  return lastVerdict.replace('{title}', title)
 }
 
 /** Which media types a draw should query, honoring genre support for "both". */
@@ -183,7 +307,7 @@ export async function drawRecommendation(filters: RecFilters): Promise<DrawResul
       return { ok: false, error: 'Nothing surfaced for that combo. Try another vibe.' }
     }
     const chosen = pick(candidates)
-    return { ok: true, item: { ...chosen, verdict: pick(VERDICTS) } }
+    return { ok: true, item: { ...chosen, verdict: nextVerdict(chosen.title) } }
   } catch {
     return { ok: false, error: 'The 8-ball is cloudy right now — try again.' }
   }

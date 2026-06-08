@@ -692,3 +692,22 @@ html[data-carousel-compact] .carousel-scroll .media-card.carousel-card-active:ho
 @media (prefers-reduced-motion: reduce) {
   .eightball-shake { animation: none; }
 }
+
+/* ─── Magic 8-ball in-window scroll (Apple Watch–style edge fade) ──────────── */
+.eightball-scroll {
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: center;
+  padding: 0.4rem 0;
+  scroll-behavior: smooth;
+  /* Fade text into the curve of the ball at the top and bottom edges. */
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  -webkit-overflow-scrolling: touch;
+}
+
+.eightball-scroll::-webkit-scrollbar {
+  display: none;
+}
