@@ -22,7 +22,7 @@ const team = [
       'Back-end: Sprint-4 admin bug-report stories (list / update / delete) + tests',
       'API documentation (ratings, reviews, media, auth) & OpenAPI spec',
       'Test infrastructure (Prisma mock, JWT setup)',
-      'Front-end: initial pages, components, sign-in, ratings, reviews, upvote/downvote, favicon, About page'
+      'Front-end: initial pages, components, ratings, reviews, upvote/downvote, favicon, About page'
     ],
   },
   {
