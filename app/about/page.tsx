@@ -287,16 +287,16 @@ export default function AboutPage() {
           Screen8 started as a basic project and grew into a fully functional
           platform through collaboration between frontend and backend teams. One
           of the biggest surprises was how much we learned by working with
-          another team's frontend, which gave us a better understanding of what
+          another team&apos;s frontend, which gave us a better understanding of what
           frontend developers need from a backend API. We also discovered the
           importance of handling integration details early, such as configuring
           CORS permissions. Using AI coding agents was another eye-opening
           experience; code-focused AI tools improved our productivity and showed
           us the tradeoff between greater access and greater risk. If we were
-          starting over, we'd spend more time defining API expectations upfront,
+          starting over, we&apos;d spend more time defining API expectations upfront,
           explore AI-assisted development workflows earlier, and incorporate
           useful features like genre search and upvote/downvote functionality
-          from the beginning. We're proud of what we built and what we learned
+          from the beginning. We&apos;re proud of what we built and what we learned
           along the way.
         </p>
       </section>

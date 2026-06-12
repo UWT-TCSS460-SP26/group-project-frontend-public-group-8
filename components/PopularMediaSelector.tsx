@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getPopularMovies, getPopularTV } from '@/lib/api'
 import type { MovieSummary, TVSummary } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
+import { useMedia } from '@/lib/MediaContext'
 
 const CARD_WIDTH = 185
 
@@ -91,7 +92,7 @@ const tabActive: React.CSSProperties = {
 }
 
 export default function PopularMediaSelector() {
-  const [selected, setSelected] = useState<'movies' | 'tv'>('movies')
+  const { mediaType } = useMedia()
   const [movies, setMovies] = useState<MovieSummary[]>([])
   const [moviePage, setMoviePage] = useState(1)
   const [loadingMovies, setLoadingMovies] = useState(true)
@@ -114,7 +115,7 @@ export default function PopularMediaSelector() {
   }, [])
 
   const handleScrollEnd = async () => {
-    if (selected === 'movies' && hasMoreMovies && !loadingMovies) {
+    if (mediaType === 'movie' && hasMoreMovies && !loadingMovies) {
       setLoadingMovies(true)
       try {
         const next = moviePage + 1
@@ -123,7 +124,7 @@ export default function PopularMediaSelector() {
         setMoviePage(next)
         setHasMoreMovies(res.page < res.totalPages)
       } catch { /* silent */ } finally { setLoadingMovies(false) }
-    } else if (selected === 'tv' && hasMoreTv && !loadingTv) {
+    } else if (mediaType === 'tv' && hasMoreTv && !loadingTv) {
       setLoadingTv(true)
       try {
         const next = tvPage + 1
@@ -135,36 +136,20 @@ export default function PopularMediaSelector() {
     }
   }
 
-  const isLoading = selected === 'movies' ? loadingMovies : loadingTv
-  const items = selected === 'movies' ? movies : shows
+  const isLoading = mediaType === 'movie' ? loadingMovies : loadingTv
+  const items = mediaType === 'movie' ? movies : shows
   const showSkeletons = isLoading && items.length === 0
 
   return (
     <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h2 className="section-heading" style={{ margin: 0 }}>Featured</h2>
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <button
-            onClick={() => setSelected('movies')}
-            style={selected === 'movies' ? tabActive : tabBase}
-            aria-pressed={selected === 'movies'}
-          >
-            Movies
-          </button>
-          <button
-            onClick={() => setSelected('tv')}
-            style={selected === 'tv' ? tabActive : tabBase}
-            aria-pressed={selected === 'tv'}
-          >
-            TV Shows
-          </button>
-        </div>
       </div>
 
       <HoverCarousel onScrollEnd={handleScrollEnd}>
         {showSkeletons
           ? Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)
-          : selected === 'movies'
+          : mediaType === 'movie'
             ? movies.map(m => <MovieCard key={m.id} m={m} />)
             : shows.map(s => <TVCard key={s.id} s={s} />)}
         {isLoading && items.length > 0 && (

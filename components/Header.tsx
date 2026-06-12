@@ -4,6 +4,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
 import NavSearch from '@/components/NavSearch'
 import EightBallLauncher from '@/components/EightBallLauncher'
+import MasterMediaToggle from '@/components/MasterMediaToggle'
 import { Playfair_Display } from 'next/font/google'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: '700' })
@@ -111,6 +112,7 @@ export default async function Header() {
           flexShrink: 0,
         }}
       >
+        <MasterMediaToggle />
         <EightBallLauncher />
         {session?.user ? (
           <>

@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react"
 import Header from "@/components/Header"
 import TokenExpiryWatcher from "@/components/TokenExpiryWatcher"
 import { Orbitron } from "next/font/google"
+import { MediaProvider } from "@/lib/MediaContext"
 import "@/styles/globals.css"
 
 const orbitron = Orbitron({
@@ -32,11 +33,13 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <SessionProvider>
-          <TokenExpiryWatcher />
-          <Header />
-          {children}
-        </SessionProvider>
+        <MediaProvider>
+          <SessionProvider>
+            <TokenExpiryWatcher />
+            <Header />
+            {children}
+          </SessionProvider>
+        </MediaProvider>
       </body>
     </html>
   )

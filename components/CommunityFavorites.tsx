@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getTopRated } from '@/lib/api'
 import type { TopRatedItem } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
+import { useMedia } from '@/lib/MediaContext'
 
 const CARD_WIDTH = 150
 
@@ -43,7 +44,7 @@ const tabActive: React.CSSProperties = {
 }
 
 export default function CommunityFavorites() {
-  const [mediaType, setMediaType] = useState<'movie' | 'tv'>('movie')
+  const { mediaType } = useMedia()
   const [items, setItems] = useState<TopRatedItem[]>([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -82,10 +83,6 @@ export default function CommunityFavorites() {
     <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h2 className="section-heading" style={{ margin: 0, color: 'var(--violet)' }}>Community Favorites</h2>
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <button onClick={() => setMediaType('movie')} style={mediaType === 'movie' ? tabActive : tabBase} aria-pressed={mediaType === 'movie'}>Movies</button>
-          <button onClick={() => setMediaType('tv')} style={mediaType === 'tv' ? tabActive : tabBase} aria-pressed={mediaType === 'tv'}>TV Shows</button>
-        </div>
       </div>
 
       <HoverCarousel onScrollEnd={handleScrollEnd}>
