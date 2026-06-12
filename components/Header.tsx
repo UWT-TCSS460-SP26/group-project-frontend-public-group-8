@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
@@ -60,11 +61,14 @@ export default async function Header() {
           }}
         >
           Screen
-          <img
+          <Image
             src="/icon.svg"
             alt="8"
+            width={20}
+            height={20}
             style={{
               height: '1em',
+              width: 'auto',
               verticalAlign: 'middle',
               marginTop: '-0.1em',
             }}

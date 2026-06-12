@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getTopRated } from '@/lib/api'
 import type { TopRatedItem } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
@@ -20,29 +21,6 @@ function CardSkeleton() {
     </div>
   )
 }
-
-const tabBase: React.CSSProperties = {
-  padding:      '0.3rem 0.875rem',
-  borderRadius: '6px',
-  borderWidth:  '1px',
-  borderStyle:  'solid',
-  borderColor:  'var(--border)',
-  background:   'transparent',
-  color:        'var(--text-muted)',
-  fontSize:     '0.82rem',
-  fontWeight:   600,
-  cursor:       'pointer',
-  transition:   'background 0.15s, color 0.15s, border-color 0.15s',
-  letterSpacing:'0.03em',
-}
-
-const tabActive: React.CSSProperties = {
-  ...tabBase,
-  background:  'var(--violet)',
-  color:       '#fff',
-  borderColor: 'var(--violet)',
-}
-
 export default function CommunityFavorites() {
   const { mediaType } = useMedia()
   const [items, setItems] = useState<TopRatedItem[]>([])
@@ -99,8 +77,13 @@ export default function CommunityFavorites() {
                     className="media-card"
                     style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
                     {meta.poster_url ? (
-                      <img src={meta.poster_url} alt=""
-                        style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+                      <Image
+                        src={meta.poster_url}
+                        alt={meta.title}
+                        width={150}
+                        height={225}
+                        style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                      />
                     ) : (
                       <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
                         No poster

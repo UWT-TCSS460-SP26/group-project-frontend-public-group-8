@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getPopularMovies, getPopularTV } from '@/lib/api'
 import type { MovieSummary, TVSummary } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
@@ -26,7 +27,7 @@ function MovieCard({ m }: { m: MovieSummary }) {
     <Link href={`/media/movie/${m.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {m.posterUrl ? (
-        <img src={m.posterUrl} alt="" width={185} height={278}
+        <Image src={m.posterUrl} alt={m.title} width={185} height={278}
           style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
@@ -50,7 +51,7 @@ function TVCard({ s }: { s: TVSummary }) {
     <Link href={`/media/tv/${s.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {s.posterUrl ? (
-        <img src={s.posterUrl} alt="" width={185} height={278}
+        <Image src={s.posterUrl} alt={s.name} width={185} height={278}
           style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
@@ -68,29 +69,6 @@ function TVCard({ s }: { s: TVSummary }) {
     </Link>
   )
 }
-
-const tabBase: React.CSSProperties = {
-  padding:       '0.3rem 0.875rem',
-  borderRadius:  '6px',
-  borderWidth:   '1px',
-  borderStyle:   'solid',
-  borderColor:   'var(--border)',
-  background:    'transparent',
-  color:         'var(--text-muted)',
-  fontSize:      '0.82rem',
-  fontWeight:    600,
-  cursor:        'pointer',
-  transition:    'background 0.15s, color 0.15s, border-color 0.15s',
-  letterSpacing: '0.03em',
-}
-
-const tabActive: React.CSSProperties = {
-  ...tabBase,
-  background:  'var(--accent)',
-  color:       'var(--accent-text)',
-  borderColor: 'var(--accent)',
-}
-
 export default function PopularMediaSelector() {
   const { mediaType } = useMedia()
   const [movies, setMovies] = useState<MovieSummary[]>([])

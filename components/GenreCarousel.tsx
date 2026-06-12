@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { searchTVByGenre, searchMovieByGenre } from '@/lib/api'
 import type { TVSearchResult, MovieSearchResult } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
@@ -143,9 +144,9 @@ export default function GenreCarousel({ genre, title, mediaType = 'tv' }: Props)
                   onMouseEnter={() => setHoverIndex(i)}
                 >
                   {item.posterUrl ? (
-                    <img
+                    <Image
                       src={item.posterUrl}
-                      alt=""
+                      alt={titleText}
                       width={150}
                       height={225}
                       style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}

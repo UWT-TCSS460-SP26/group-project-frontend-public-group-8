@@ -45,7 +45,7 @@ const GENRE_TITLES: Record<string, string> = {
   Reality:          'Reality',
 }
 
-function formatSlug(slug: string, mediaType?: 'tv' | 'movie'): string {
+function formatSlug(slug: string): string {
   if (GENRE_TITLES[slug]) return GENRE_TITLES[slug]
   
   // Fallback: split by comma (combined) and join with pretty titles
@@ -119,7 +119,7 @@ function GenrePageInner() {
     }
   }, [mediaType, router, searchParams, slug])
 
-  const pageTitle = formatSlug(slug, mediaType)
+  const pageTitle = formatSlug(slug)
 
   const [items, setItems]               = useState<(TVSearchResult | MovieSearchResult)[]>([])
   const [totalPages, setTotalPages]     = useState(1)
@@ -133,17 +133,22 @@ function GenrePageInner() {
   useEffect(() => {
     const genres  = slug.split(',').filter(Boolean)
     const fetchId = ++fetchIdRef.current
-    const searchFn = mediaType === 'movie' ? searchMovieByGenre : searchTVByGenre
 
     setLoading(true)
     setError(null)
     setItems([])
 
-    Promise.all(genres.map(g => searchFn(g, currentPage)))
-      .then(responses => {
+    const fetchPromises = mediaType === 'movie'
+      ? genres.map(g => searchMovieByGenre(g, currentPage))
+      : genres.map(g => searchTVByGenre(g, currentPage))
+
+    Promise.all(fetchPromises)
+      .then((responses: (any)[]) => {
         if (fetchId !== fetchIdRef.current) return
         const combined = responses.flatMap(r => r.results)
-        const unique   = Array.from(new Map(combined.map(s => [s.id, s])).values())
+        const unique = Array.from(new Map<number, TVSearchResult | MovieSearchResult>(
+          combined.map((s: TVSearchResult | MovieSearchResult) => [s.id, s])
+        ).values())
         setItems(unique)
         // TMDB limits results to 500 pages
         const maxPages = Math.min(500, Math.max(1, ...responses.map(r => r.totalPages)))

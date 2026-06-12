@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { apiFetch } from '@/lib/api'
 import type { EnrichedMediaResponse } from '@/lib/api'
 import RatingSection from '@/components/RatingSection'
@@ -43,11 +44,15 @@ export default async function MediaDetailPage({ params }: Props) {
         {/* Poster */}
         <div style={{ flexShrink: 0, position: 'relative' }}>
           {m.poster_url ? (
-            <img
+            <Image
               src={m.poster_url}
               alt={m.title}
+              width={200}
+              height={300}
+              priority
               style={{
                 width: '200px',
+                height: 'auto',
                 borderRadius: '10px',
                 display: 'block',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--border)',

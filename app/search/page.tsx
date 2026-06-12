@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { searchMovies, searchTV } from '@/lib/api'
 import type { MovieSearchResult, TVSearchResult } from '@/lib/api'
 
@@ -69,10 +70,11 @@ function ResultRow({
         background: 'var(--placeholder-bg)',
       }}>
         {posterUrl ? (
-          <img
+          <Image
             src={posterUrl}
             alt={title}
-            loading="lazy"
+            width={POSTER_W}
+            height={POSTER_H}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
