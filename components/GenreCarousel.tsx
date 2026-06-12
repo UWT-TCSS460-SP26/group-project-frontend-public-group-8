@@ -58,10 +58,12 @@ export default function GenreCarousel({ genre, title, mediaType = 'tv' }: Props)
       ...genres.map(g => searchFn(g, 1)),
       ...genres.map(g => searchFn(g, 2)),
     ])
-      .then(responses => {
+      .then((responses: any[]) => {
         if (fetchId !== fetchIdRef.current) return
         const combined = responses.flatMap(r => r.results)
-        const unique = Array.from(new Map(combined.map(s => [s.id, s])).values())
+        const unique = Array.from(new Map<number, TVSearchResult | MovieSearchResult>(
+          combined.map((s: TVSearchResult | MovieSearchResult) => [s.id, s])
+        ).values())
         setItems(unique)
         // hasMore is determined by the page-2 responses (second half of the array)
         // TMDB limit is 500 pages
@@ -81,10 +83,11 @@ export default function GenreCarousel({ genre, title, mediaType = 'tv' }: Props)
     setLoading(true)
     try {
       const next = page + 1
-      const responses = await Promise.all(genres.map(g => searchFn(g, next)))
+      const responses: any[] = await Promise.all(genres.map(g => searchFn(g, next)))
       setItems(prev => {
         const existingIds = new Set(prev.map(s => s.id))
-        return [...prev, ...responses.flatMap(r => r.results).filter(s => !existingIds.has(s.id))]
+        const newItems = responses.flatMap(r => r.results).filter((s: TVSearchResult | MovieSearchResult) => !existingIds.has(s.id))
+        return [...prev, ...newItems]
       })
       setPage(next)
       // TMDB limit is 500 pages
