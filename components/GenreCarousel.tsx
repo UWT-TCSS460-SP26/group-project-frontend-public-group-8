@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { searchTVByGenre } from '@/lib/api'
-import type { TVSearchResult } from '@/lib/api'
+import Image from 'next/image'
+import { searchTVByGenre, searchMovieByGenre } from '@/lib/api'
+import type { TVSearchResult, MovieSearchResult } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
 
 interface Props {
   genre: string | string[]
   title: string
+  mediaType?: 'movie' | 'tv'
 }
 
 const CARD_WIDTH = 150
@@ -25,45 +27,55 @@ function CardSkeleton() {
   )
 }
 
-export default function GenreCarousel({ genre, title }: Props) {
-  const [shows, setShows] = useState<TVSearchResult[]>([])
+export default function GenreCarousel({ genre, title, mediaType = 'tv' }: Props) {
+  const [items, setItems] = useState<(TVSearchResult | MovieSearchResult)[]>([])
   const [page, setPage] = useState(2)      // pages 1+2 loaded on mount
   const [loading, setLoading] = useState(true)
   const [hasMore, setHasMore] = useState(true)
   const genreKey = Array.isArray(genre) ? genre.join(',') : genre
-  const mounted = useRef(false)
+  const fetchIdRef = useRef(0)
 
   // Preview area state
   const [activeIndex, setActiveIndex] = useState(0)
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
   const displayIndex = hoverIndex ?? activeIndex
-  const displayItem: TVSearchResult | null = shows[displayIndex] ?? shows[0] ?? null
+  const displayItem = items[displayIndex] ?? items[0] ?? null
+
+  const searchFn = mediaType === 'movie' ? searchMovieByGenre : searchTVByGenre
 
   useEffect(() => {
-    if (mounted.current) return
-    mounted.current = true
+    // Reset state and increment fetch ID to discard previous in-flight requests
+    setItems([])
+    setPage(2)
+    setHasMore(true)
+    setLoading(true)
+    const fetchId = ++fetchIdRef.current
 
     const genres = Array.isArray(genre) ? genre : [genre]
-    setLoading(true)
 
     // Load pages 1 and 2 concurrently so each carousel starts with ~40 items
     Promise.all([
-      ...genres.map(g => searchTVByGenre(g, 1)),
-      ...genres.map(g => searchTVByGenre(g, 2)),
+      ...genres.map(g => searchFn(g, 1)),
+      ...genres.map(g => searchFn(g, 2)),
     ])
-      .then(responses => {
+      .then((responses: any[]) => {
+        if (fetchId !== fetchIdRef.current) return
         const combined = responses.flatMap(r => r.results)
-        const unique = Array.from(new Map(combined.map(s => [s.id, s])).values())
-        setShows(unique)
+        const unique = Array.from(new Map<number, TVSearchResult | MovieSearchResult>(
+          combined.map((s: TVSearchResult | MovieSearchResult) => [s.id, s])
+        ).values())
+        setItems(unique)
         // hasMore is determined by the page-2 responses (second half of the array)
+        // TMDB limit is 500 pages
         const page2 = responses.slice(genres.length)
-        setHasMore(page2.some(r => r.page < r.totalPages))
+        const maxPages = Math.min(500, Math.max(...page2.map(r => r.totalPages)))
+        setHasMore(page2.some(r => r.page < maxPages))
       })
       .catch(() => { /* hide empty carousels via null render below */ })
-      .finally(() => setLoading(false))
-  // genreKey is a stable string derived from the prop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [genreKey])
+      .finally(() => {
+        if (fetchId === fetchIdRef.current) setLoading(false)
+      })
+  }, [genreKey, mediaType, searchFn, genre])
 
   const handleScrollEnd = async () => {
     if (!hasMore || loading) return
@@ -71,19 +83,23 @@ export default function GenreCarousel({ genre, title }: Props) {
     setLoading(true)
     try {
       const next = page + 1
-      const responses = await Promise.all(genres.map(g => searchTVByGenre(g, next)))
-      setShows(prev => {
+      const responses: any[] = await Promise.all(genres.map(g => searchFn(g, next)))
+      setItems(prev => {
         const existingIds = new Set(prev.map(s => s.id))
-        return [...prev, ...responses.flatMap(r => r.results).filter(s => !existingIds.has(s.id))]
+        const newItems = responses.flatMap(r => r.results).filter((s: TVSearchResult | MovieSearchResult) => !existingIds.has(s.id))
+        return [...prev, ...newItems]
       })
       setPage(next)
-      setHasMore(responses.some(r => r.page < r.totalPages))
+      // TMDB limit is 500 pages
+      const maxPages = Math.min(500, Math.max(...responses.map(r => r.totalPages)))
+      setHasMore(responses.some(r => r.page < maxPages))
     } catch { /* silent */ } finally { setLoading(false) }
   }
 
-  if (shows.length === 0 && !loading) return null
+  if (items.length === 0 && !loading) return null
 
   const genreSlug = Array.isArray(genre) ? genre.join(',') : genre
+  const browseHref = `/genre/${genreSlug}?type=${mediaType}`
 
   return (
     <section
@@ -94,7 +110,7 @@ export default function GenreCarousel({ genre, title }: Props) {
       {/* Clickable genre heading */}
       <div style={{ margin: '0 0 0.75rem' }}>
         <Link
-          href={`/genre/${genreSlug}`}
+          href={browseHref}
           className="genre-heading-link"
           aria-label={`Browse all ${title}`}
         >
@@ -115,40 +131,46 @@ export default function GenreCarousel({ genre, title }: Props) {
         onActiveIndexChange={setActiveIndex}
         hoverIndex={hoverIndex}
       >
-        {loading && shows.length === 0
+        {loading && items.length === 0
           ? Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)
-          : shows.map((s, i) => (
-            <Link
-              key={s.id}
-              href={`/media/tv/${s.id}`}
-              className="media-card"
-              style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}
-              onMouseEnter={() => setHoverIndex(i)}
-            >
-              {s.posterUrl ? (
-                <img
-                  src={s.posterUrl}
-                  alt=""
-                  width={150}
-                  height={225}
-                  style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>
-                  {s.name}
-                </div>
-              )}
-              <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
-                <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {s.name}
-                </p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
-                  {s.firstAirDate?.slice(0, 4)}
-                </p>
-              </div>
-            </Link>
-          ))}
-        {loading && shows.length > 0 && (
+          : items.map((item, i) => {
+              const id = item.id
+              const titleText = 'title' in item ? item.title : item.name
+              const dateText = ('releaseDate' in item ? item.releaseDate : item.firstAirDate)?.slice(0, 4)
+
+              return (
+                <Link
+                  key={id}
+                  href={`/media/${mediaType}/${id}`}
+                  className="media-card"
+                  style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}
+                  onMouseEnter={() => setHoverIndex(i)}
+                >
+                  {item.posterUrl ? (
+                    <Image
+                      src={item.posterUrl}
+                      alt={titleText}
+                      width={150}
+                      height={225}
+                      style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>
+                      {titleText}
+                    </div>
+                  )}
+                  <div style={{ padding: '0.5rem 0.6rem 0.6rem' }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.95rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {titleText}
+                    </p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                      {dateText}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+        {loading && items.length > 0 && (
           <div style={{ minWidth: CARD_WIDTH, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-faint)', fontSize: '0.8rem' }}>
             Loading…
           </div>
@@ -159,8 +181,10 @@ export default function GenreCarousel({ genre, title }: Props) {
       {displayItem && (
         <div className="genre-preview">
           <div className="genre-preview-content" key={displayItem.id}>
-            <p className="genre-preview-title">{displayItem.name}</p>
-            <span className="genre-preview-year">{displayItem.firstAirDate?.slice(0, 4)}</span>
+            <p className="genre-preview-title">{'title' in displayItem ? displayItem.title : displayItem.name}</p>
+            <span className="genre-preview-year">
+              {('releaseDate' in displayItem ? displayItem.releaseDate : displayItem.firstAirDate)?.slice(0, 4)}
+            </span>
             {displayItem.overview && (
               <p className="genre-preview-desc">{displayItem.overview}</p>
             )}

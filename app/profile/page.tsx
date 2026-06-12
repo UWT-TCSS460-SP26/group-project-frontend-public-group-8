@@ -3,6 +3,7 @@
 import { useSession, signIn } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import StarRating from '@/components/StarRating'
 import ReviewForm from '@/components/ReviewForm'
 import {
@@ -231,8 +232,13 @@ export default function ProfilePage() {
               {ratings.map(item => (
                 <div key={item.id} style={cardStyle}>
                   {item.metadata?.poster_url && (
-                    <img src={item.metadata.poster_url} alt={item.metadata.title}
-                      style={{ width: '48px', borderRadius: '4px', flexShrink: 0 }} />
+                    <Image
+                      src={item.metadata.poster_url}
+                      alt={item.metadata.title}
+                      width={48}
+                      height={72}
+                      style={{ borderRadius: '4px', flexShrink: 0, objectFit: 'cover' }}
+                    />
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {item.metadata ? (

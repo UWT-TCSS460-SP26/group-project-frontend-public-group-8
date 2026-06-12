@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { searchMovies, searchTV } from '@/lib/api'
 import type { MovieSearchResult, TVSearchResult } from '@/lib/api'
 
@@ -149,7 +150,7 @@ export default function HeroSearch() {
                           onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
                         >
                           {m.posterUrl
-                            ? <img src={m.posterUrl} alt={m.title} style={{ width: '36px', height: '54px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
+                            ? <Image src={m.posterUrl} alt={m.title} width={36} height={54} style={{ objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
                             : <div style={{ width: '36px', height: '54px', background: 'var(--placeholder-bg)', borderRadius: '4px', flexShrink: 0 }} />}
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{m.title}</div>
@@ -172,7 +173,7 @@ export default function HeroSearch() {
                           onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-muted)')}
                         >
                           {s.posterUrl
-                            ? <img src={s.posterUrl} alt={s.name} style={{ width: '36px', height: '54px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
+                            ? <Image src={s.posterUrl} alt={s.name} width={36} height={54} style={{ objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
                             : <div style={{ width: '36px', height: '54px', background: 'var(--placeholder-bg)', borderRadius: '4px', flexShrink: 0 }} />}
                           <div>
                             <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{s.name}</div>

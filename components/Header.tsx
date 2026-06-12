@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { auth, signIn } from '@/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import SignOutButton from '@/components/SignOutButton'
 import NavSearch from '@/components/NavSearch'
 import EightBallLauncher from '@/components/EightBallLauncher'
+import MasterMediaToggle from '@/components/MasterMediaToggle'
 import { Playfair_Display } from 'next/font/google'
 
 const playfair = Playfair_Display({ subsets: ['latin'], weight: '700' })
@@ -59,11 +61,14 @@ export default async function Header() {
           }}
         >
           Screen
-          <img
+          <Image
             src="/icon.svg"
             alt="8"
+            width={20}
+            height={20}
             style={{
               height: '1em',
+              width: 'auto',
               verticalAlign: 'middle',
               marginTop: '-0.1em',
             }}
@@ -111,6 +116,7 @@ export default async function Header() {
           flexShrink: 0,
         }}
       >
+        <MasterMediaToggle />
         <EightBallLauncher />
         {session?.user ? (
           <>

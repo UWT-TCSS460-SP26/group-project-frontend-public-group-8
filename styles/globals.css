@@ -819,6 +819,25 @@ html[data-carousel-compact] .genre-preview-desc {
   }
 }
 
+/* ─── Genre results grid ───────────────────────────────────────────────── */
+.genre-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 480px) {
+  .genre-results-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .genre-results-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 /* ─── Magic 8-ball shake ──────────────────────────────────────────────────── */
 @keyframes eightball-shake {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }

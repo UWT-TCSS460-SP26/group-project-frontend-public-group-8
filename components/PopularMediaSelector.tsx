@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getPopularMovies, getPopularTV } from '@/lib/api'
 import type { MovieSummary, TVSummary } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
+import { useMedia } from '@/lib/MediaContext'
 
 const CARD_WIDTH = 185
 
@@ -25,7 +27,7 @@ function MovieCard({ m }: { m: MovieSummary }) {
     <Link href={`/media/movie/${m.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {m.posterUrl ? (
-        <img src={m.posterUrl} alt="" width={185} height={278}
+        <Image src={m.posterUrl} alt={m.title} width={185} height={278}
           style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
@@ -49,7 +51,7 @@ function TVCard({ s }: { s: TVSummary }) {
     <Link href={`/media/tv/${s.id}`} className="media-card"
       style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
       {s.posterUrl ? (
-        <img src={s.posterUrl} alt="" width={185} height={278}
+        <Image src={s.posterUrl} alt={s.name} width={185} height={278}
           style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
       ) : (
         <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)' }}>
@@ -67,31 +69,8 @@ function TVCard({ s }: { s: TVSummary }) {
     </Link>
   )
 }
-
-const tabBase: React.CSSProperties = {
-  padding:       '0.3rem 0.875rem',
-  borderRadius:  '6px',
-  borderWidth:   '1px',
-  borderStyle:   'solid',
-  borderColor:   'var(--border)',
-  background:    'transparent',
-  color:         'var(--text-muted)',
-  fontSize:      '0.82rem',
-  fontWeight:    600,
-  cursor:        'pointer',
-  transition:    'background 0.15s, color 0.15s, border-color 0.15s',
-  letterSpacing: '0.03em',
-}
-
-const tabActive: React.CSSProperties = {
-  ...tabBase,
-  background:  'var(--accent)',
-  color:       'var(--accent-text)',
-  borderColor: 'var(--accent)',
-}
-
 export default function PopularMediaSelector() {
-  const [selected, setSelected] = useState<'movies' | 'tv'>('movies')
+  const { mediaType } = useMedia()
   const [movies, setMovies] = useState<MovieSummary[]>([])
   const [moviePage, setMoviePage] = useState(1)
   const [loadingMovies, setLoadingMovies] = useState(true)
@@ -114,7 +93,7 @@ export default function PopularMediaSelector() {
   }, [])
 
   const handleScrollEnd = async () => {
-    if (selected === 'movies' && hasMoreMovies && !loadingMovies) {
+    if (mediaType === 'movie' && hasMoreMovies && !loadingMovies) {
       setLoadingMovies(true)
       try {
         const next = moviePage + 1
@@ -123,7 +102,7 @@ export default function PopularMediaSelector() {
         setMoviePage(next)
         setHasMoreMovies(res.page < res.totalPages)
       } catch { /* silent */ } finally { setLoadingMovies(false) }
-    } else if (selected === 'tv' && hasMoreTv && !loadingTv) {
+    } else if (mediaType === 'tv' && hasMoreTv && !loadingTv) {
       setLoadingTv(true)
       try {
         const next = tvPage + 1
@@ -135,36 +114,20 @@ export default function PopularMediaSelector() {
     }
   }
 
-  const isLoading = selected === 'movies' ? loadingMovies : loadingTv
-  const items = selected === 'movies' ? movies : shows
+  const isLoading = mediaType === 'movie' ? loadingMovies : loadingTv
+  const items = mediaType === 'movie' ? movies : shows
   const showSkeletons = isLoading && items.length === 0
 
   return (
     <section className="section-panel" style={{ marginBottom: '3rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <h2 className="section-heading" style={{ margin: 0 }}>Featured</h2>
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <button
-            onClick={() => setSelected('movies')}
-            style={selected === 'movies' ? tabActive : tabBase}
-            aria-pressed={selected === 'movies'}
-          >
-            Movies
-          </button>
-          <button
-            onClick={() => setSelected('tv')}
-            style={selected === 'tv' ? tabActive : tabBase}
-            aria-pressed={selected === 'tv'}
-          >
-            TV Shows
-          </button>
-        </div>
       </div>
 
       <HoverCarousel onScrollEnd={handleScrollEnd}>
         {showSkeletons
           ? Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)
-          : selected === 'movies'
+          : mediaType === 'movie'
             ? movies.map(m => <MovieCard key={m.id} m={m} />)
             : shows.map(s => <TVCard key={s.id} s={s} />)}
         {isLoading && items.length > 0 && (

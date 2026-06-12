@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { searchMovies, searchTV } from '@/lib/api'
 import type { MovieSearchResult, TVSearchResult } from '@/lib/api'
 
@@ -69,10 +70,11 @@ function ResultRow({
         background: 'var(--placeholder-bg)',
       }}>
         {posterUrl ? (
-          <img
+          <Image
             src={posterUrl}
             alt={title}
-            loading="lazy"
+            width={POSTER_W}
+            height={POSTER_H}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
@@ -163,8 +165,6 @@ function SearchPageInner() {
   // API result state
   const [movies,     setMovies]     = useState<MovieSearchResult[]>([])
   const [tvShows,    setTvShows]    = useState<TVSearchResult[]>([])
-  const [movieTotal, setMovieTotal] = useState(0)
-  const [tvTotal,    setTvTotal]    = useState(0)
   const [loading,    setLoading]    = useState(false)
   const [error,      setError]      = useState<string | null>(null)
 
@@ -172,18 +172,15 @@ function SearchPageInner() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   // Sync input ← URL when user navigates back/forward.
-  // Cancel any pending debounce so a stale timeout does not overwrite the restored URL.
   useEffect(() => {
     clearTimeout(debounceRef.current)
     setInputValue(urlQ)
   }, [urlQ])
 
   // Fetch results whenever the committed URL query changes.
-  // Always fetch both types so filter counts are always accurate.
   useEffect(() => {
     if (!urlQ.trim()) {
       setMovies([]); setTvShows([])
-      setMovieTotal(0); setTvTotal(0)
       setLoading(false); setError(null)
       return
     }
@@ -193,13 +190,11 @@ function SearchPageInner() {
     setError(null)
     setMovies([]); setTvShows([])
 
-    Promise.all([searchMovies(urlQ), searchTV(urlQ)])
+    Promise.all([searchMovies(urlQ, 1), searchTV(urlQ, 1)])
       .then(([moviesRes, tvRes]) => {
         if (fetchId !== fetchIdRef.current) return
         setMovies(moviesRes.results)
-        setMovieTotal(moviesRes.totalResults)
         setTvShows(tvRes.results)
-        setTvTotal(tvRes.totalResults)
       })
       .catch(() => {
         if (fetchId !== fetchIdRef.current) return
@@ -219,7 +214,7 @@ function SearchPageInner() {
     return `/search${p.toString() ? `?${p.toString()}` : ''}`
   }, [])
 
-  // Typing: debounce the URL update so we don't pollute history
+  // Typing: debounce the URL update so we don't pollute history.
   const handleInputChange = (val: string) => {
     setInputValue(val)
     clearTimeout(debounceRef.current)
@@ -232,22 +227,32 @@ function SearchPageInner() {
     }, 350)
   }
 
-  // Submit (Enter or button): immediate URL push (creates a history entry)
+  // Submit (Enter or button): immediate URL push (creates a history entry).
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     clearTimeout(debounceRef.current)
     router.push(buildURL(inputValue.trim(), urlType))
   }
 
-  // Filter button: update URL immediately, keep current query
+  // Filter button: update URL immediately, keep current query.
   const handleFilterChange = (newType: Filter) => {
     clearTimeout(debounceRef.current)
     router.replace(buildURL(inputValue.trim() || urlQ, newType))
   }
 
-  const hasResults    = movies.length > 0 || tvShows.length > 0
-  const showMovieRows = urlType === 'all' || urlType === 'movie'
-  const showTVRows    = urlType === 'all' || urlType === 'tv'
+  // Combined and sorted results for the integrated view
+  const unifiedResults = useMemo(() => {
+    const combined: (MovieSearchResult | TVSearchResult)[] = []
+    if (urlType === 'all' || urlType === 'movie') combined.push(...movies)
+    if (urlType === 'all' || urlType === 'tv') combined.push(...tvShows)
+    
+    // Sort by popularity descending to keep the merged list relevant
+    return combined.sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+  }, [movies, tvShows, urlType])
+
+  const hasResults = unifiedResults.length > 0
+  const movieCount = movies.length
+  const tvCount    = tvShows.length
 
   const filterBtnBase: React.CSSProperties = {
     display:        'flex',
@@ -391,9 +396,9 @@ function SearchPageInner() {
 
               <div className="search-filter-buttons" style={{ padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                 {([
-                  ['all',   'All Results', movieTotal + tvTotal],
-                  ['movie', 'Movies',      movieTotal],
-                  ['tv',    'TV Shows',    tvTotal],
+                  ['all',   'All Results', movieCount + tvCount],
+                  ['movie', 'Movies',      movieCount],
+                  ['tv',    'TV Shows',    tvCount],
                 ] as [Filter, string, number][]).map(([type, label, count]) => (
                   <button
                     key={type}
@@ -443,63 +448,26 @@ function SearchPageInner() {
             {/* Results */}
             {!loading && !error && (
               <>
-                {showMovieRows && movies.length > 0 && (
-                  <div style={{ marginBottom: urlType === 'all' && tvShows.length > 0 ? '1.5rem' : 0 }}>
-                    {urlType === 'all' && (
-                      <p style={{
-                        margin: '0 0 0.625rem',
-                        fontSize: '0.72rem', fontWeight: 700,
-                        letterSpacing: '0.08em', textTransform: 'uppercase',
-                        color: 'var(--accent)',
-                      }}>
-                        Movies
-                        {movieTotal > movies.length
-                          ? ` — showing ${movies.length.toLocaleString()} of ${movieTotal.toLocaleString()}`
-                          : ` (${movieTotal.toLocaleString()})`}
-                      </p>
-                    )}
-                    {movies.map(m => (
-                      <ResultRow
-                        key={`movie-${m.id}`}
-                        href={`/media/movie/${m.id}`}
-                        posterUrl={m.posterUrl}
-                        title={m.title}
-                        year={m.releaseDate?.slice(0, 4)}
-                        typeLabel="Movie"
-                        overview={m.overview}
-                      />
-                    ))}
-                  </div>
-                )}
+                {unifiedResults.map(item => {
+                  const isMovie = 'title' in item
+                  const id = item.id
+                  const title = isMovie ? item.title : item.name
+                  const date = (isMovie ? item.releaseDate : item.firstAirDate)?.slice(0, 4)
+                  const typeLabel = isMovie ? 'Movie' : 'TV Show'
+                  const href = `/media/${isMovie ? 'movie' : 'tv'}/${id}`
 
-                {showTVRows && tvShows.length > 0 && (
-                  <div>
-                    {urlType === 'all' && (
-                      <p style={{
-                        margin: '0 0 0.625rem',
-                        fontSize: '0.72rem', fontWeight: 700,
-                        letterSpacing: '0.08em', textTransform: 'uppercase',
-                        color: 'var(--violet)',
-                      }}>
-                        TV Shows
-                        {tvTotal > tvShows.length
-                          ? ` — showing ${tvShows.length.toLocaleString()} of ${tvTotal.toLocaleString()}`
-                          : ` (${tvTotal.toLocaleString()})`}
-                      </p>
-                    )}
-                    {tvShows.map(s => (
-                      <ResultRow
-                        key={`tv-${s.id}`}
-                        href={`/media/tv/${s.id}`}
-                        posterUrl={s.posterUrl}
-                        title={s.name}
-                        year={s.firstAirDate?.slice(0, 4)}
-                        typeLabel="TV Show"
-                        overview={s.overview}
-                      />
-                    ))}
-                  </div>
-                )}
+                  return (
+                    <ResultRow
+                      key={`${isMovie ? 'movie' : 'tv'}-${id}`}
+                      href={href}
+                      posterUrl={item.posterUrl}
+                      title={title}
+                      year={date}
+                      typeLabel={typeLabel as 'Movie' | 'TV Show'}
+                      overview={item.overview}
+                    />
+                  )
+                })}
 
                 {/* Empty state — no results at all */}
                 {!hasResults && urlQ.trim() && (
@@ -518,10 +486,7 @@ function SearchPageInner() {
                 )}
 
                 {/* Empty state — selected filter has no results but other type does */}
-                {urlType !== 'all' && (
-                  (urlType === 'movie' && movies.length === 0 && tvShows.length > 0) ||
-                  (urlType === 'tv'    && tvShows.length === 0 && movies.length > 0)
-                ) && (
+                {urlType !== 'all' && unifiedResults.length === 0 && (movieCount > 0 || tvCount > 0) && (
                   <div style={{
                     textAlign: 'center', padding: '2.5rem 1rem',
                     borderWidth: '1px', borderStyle: 'solid', borderColor: 'var(--border)',

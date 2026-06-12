@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getMyRatings } from '@/lib/api'
 import type { MyRatingItem } from '@/lib/api'
 import HoverCarousel from './HoverCarousel'
@@ -109,8 +110,13 @@ export default function RecentActivity() {
                 className="media-card"
                 style={{ minWidth: CARD_WIDTH, maxWidth: CARD_WIDTH, flexShrink: 0 }}>
                 {meta.poster_url ? (
-                  <img src={meta.poster_url} alt={meta.title}
-                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }} />
+                  <Image
+                    src={meta.poster_url}
+                    alt={meta.title}
+                    width={150}
+                    height={225}
+                    style={{ width: '100%', display: 'block', aspectRatio: '2/3', objectFit: 'cover' }}
+                  />
                 ) : (
                   <div style={{ width: '100%', aspectRatio: '2/3', background: 'var(--placeholder-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--text-faint)', padding: '0.5rem', textAlign: 'center' }}>
                     {meta.title}
